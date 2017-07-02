@@ -124,8 +124,9 @@ func (res *Resource) ToParam() string {
 		} else {
 			if res.Config.Singleton == true {
 				res.params = utils.ToParamString(res.Name)
+			} else {
+				res.params = utils.ToParamString(inflection.Plural(res.Name))
 			}
-			res.params = utils.ToParamString(inflection.Plural(res.Name))
 		}
 	}
 	return res.params
