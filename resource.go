@@ -54,20 +54,14 @@ func (res *Resource) Meta(meta *Meta) *Meta {
 
 		if meta.Setter != nil {
 			oldMeta.Setter = meta.Setter
-		} else {
-			oldMeta.Setter = oldMeta.Meta.Setter
 		}
 
 		if meta.Valuer != nil {
 			oldMeta.Valuer = meta.Valuer
-		} else {
-			oldMeta.Valuer = oldMeta.Meta.Valuer
 		}
 
 		if meta.FormattedValuer != nil {
 			oldMeta.FormattedValuer = meta.FormattedValuer
-		} else {
-			oldMeta.FormattedValuer = oldMeta.Meta.FormattedValuer
 		}
 
 		if meta.Resource != nil {
