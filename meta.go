@@ -176,16 +176,28 @@ func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) 
 }
 
 func (meta *Meta) updateMeta() {
-	meta.Meta = &resource.Meta{
-		Name:            meta.Name,
-		FieldName:       meta.FieldName,
-		Setter:          meta.Setter,
-		Valuer:          meta.Valuer,
-		FormattedValuer: meta.FormattedValuer,
-		BaseResource:    meta.baseResource,
-		Resource:        meta.Resource,
-		Permission:      meta.Permission,
-		Config:          meta.Config,
+	if meta.Meta == nil {
+		meta.Meta = &resource.Meta{
+			Name:            meta.Name,
+			FieldName:       meta.FieldName,
+			Setter:          meta.Setter,
+			Valuer:          meta.Valuer,
+			FormattedValuer: meta.FormattedValuer,
+			BaseResource:    meta.baseResource,
+			Resource:        meta.Resource,
+			Permission:      meta.Permission,
+			Config:          meta.Config,
+		}
+	} else {
+		meta.Meta.Name = meta.Name
+		meta.Meta.FieldName = meta.FieldName
+		meta.Meta.Setter = meta.Setter
+		meta.Meta.Valuer = meta.Valuer
+		meta.Meta.FormattedValuer = meta.FormattedValuer
+		meta.Meta.BaseResource = meta.baseResource
+		meta.Meta.Resource = meta.Resource
+		meta.Meta.Permission = meta.Permission
+		meta.Meta.Config = meta.Config
 	}
 
 	meta.PreInitialize()
