@@ -130,6 +130,12 @@ func (res *Resource) UseTheme(theme interface{}) []ThemeInterface {
 	if ti, ok := theme.(ThemeInterface); ok {
 		themeInterface = ti
 	} else if str, ok := theme.(string); ok {
+		for _, theme := range res.Config.Themes {
+			if theme.GetName() == str {
+				return res.Config.Themes
+			}
+		}
+
 		themeInterface = Theme{Name: str}
 	}
 
