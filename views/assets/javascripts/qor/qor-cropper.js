@@ -134,14 +134,13 @@
                 outputValue = $.trim(this.$output.val());
                 if (outputValue) {
                     data = JSON.parse(outputValue);
+                    if (isSVG(data.URL || data.Url)) {
+                        this.resetImage();
+                        return;
+                    }
                 }
 
                 this.data = data || {};
-
-                if (isSVG(data.URL || data.Url)) {
-                    this.resetImage();
-                    return;
-                }
 
                 this.build();
                 this.bind();
@@ -402,12 +401,18 @@
                 data[options.key] = {};
             }
 
-            $modal.trigger('enable.qor.material').find(CLASS_WRAPPER).html($clone);
+            $modal
+                .trigger('enable.qor.material')
+                .find(CLASS_WRAPPER)
+                .html($clone);
 
             list = this.getList(sizeAspectRatio);
 
             if (list) {
-                $modal.find(CLASS_OPTIONS).show().append(list);
+                $modal
+                    .find(CLASS_OPTIONS)
+                    .show()
+                    .append(list);
             }
 
             $clone.cropper({
@@ -475,38 +480,41 @@
         getList: function(aspectRatio) {
             let list = [];
 
-            this.$list.find('img').not(this.$target).each(function() {
-                let data = $(this).data(),
-                    resolution = data.sizeResolution,
-                    name = data.sizeName,
-                    width = data.sizeResolutionWidth,
-                    height = data.sizeResolutionHeight;
+            this.$list
+                .find('img')
+                .not(this.$target)
+                .each(function() {
+                    let data = $(this).data(),
+                        resolution = data.sizeResolution,
+                        name = data.sizeName,
+                        width = data.sizeResolutionWidth,
+                        height = data.sizeResolutionHeight;
 
-                if (resolution) {
-                    if (!width && !height) {
-                        width = getValueByNoCaseKey(resolution, 'width');
-                        height = getValueByNoCaseKey(resolution, 'height');
-                    }
+                    if (resolution) {
+                        if (!width && !height) {
+                            width = getValueByNoCaseKey(resolution, 'width');
+                            height = getValueByNoCaseKey(resolution, 'height');
+                        }
 
-                    if (width / height === aspectRatio) {
-                        list.push(
-                            '<label>' +
-                                '<input class="qor-cropper__options-input" type="checkbox" name="' +
-                                name +
-                                '" checked> ' +
-                                '<span>' +
-                                name +
-                                '<small>(' +
-                                width +
-                                '&times;' +
-                                height +
-                                ' px)</small>' +
-                                '</span>' +
-                                '</label>'
-                        );
+                        if (width / height === aspectRatio) {
+                            list.push(
+                                '<label>' +
+                                    '<input class="qor-cropper__options-input" type="checkbox" name="' +
+                                    name +
+                                    '" checked> ' +
+                                    '<span>' +
+                                    name +
+                                    '<small>(' +
+                                    width +
+                                    '&times;' +
+                                    height +
+                                    ' px)</small>' +
+                                    '</span>' +
+                                    '</label>'
+                            );
+                        }
                     }
-                }
-            });
+                });
 
             return list.length ? '<ul><li>' + list.join('</li><li>') + '</li></ul>' : '';
         },
@@ -591,20 +599,23 @@
                 cropOptions = this.data[this.options.key],
                 _this = this;
 
-            this.$list.find('img').not(this.$target).each(function() {
-                let $this = $(this),
-                    sizeName = $this.data('sizeName');
+            this.$list
+                .find('img')
+                .not(this.$target)
+                .each(function() {
+                    let $this = $(this),
+                        sizeName = $this.data('sizeName');
 
-                if ($.inArray(sizeName, data) > -1) {
-                    cropOptions[sizeName] = $.extend({}, cropData);
+                    if ($.inArray(sizeName, data) > -1) {
+                        cropOptions[sizeName] = $.extend({}, cropData);
 
-                    if (url) {
-                        _this.center($this.attr('src', url), true);
-                    } else {
-                        _this.preview($this);
+                        if (url) {
+                            _this.center($this.attr('src', url), true);
+                        } else {
+                            _this.preview($this);
+                        }
                     }
-                }
-            });
+                });
         },
 
         destroy: function() {
