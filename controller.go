@@ -72,6 +72,7 @@ func (ac *Controller) New(context *Context) {
 // Create create data
 func (ac *Controller) Create(context *Context) {
 	res := context.Resource
+	status := http.StatusCreated
 	result := res.NewStruct()
 	if context.AddError(res.Decode(context.Context, result)); !context.HasError() {
 		context.AddError(res.CallSave(result, context.Context))
@@ -90,6 +91,7 @@ func (ac *Controller) Create(context *Context) {
 			context.Flash(string(context.t("qor_admin.form.successfully_created", "{{.Name}} was successfully created", res)), "success")
 			http.Redirect(context.Writer, context.Request, context.URLFor(result, res), http.StatusFound)
 		}).With([]string{"json", "xml"}, func() {
+			context.Writer.WriteHeader(status)
 			context.Encode("show", result)
 		}).Respond(context.Request)
 	}
@@ -182,7 +184,7 @@ func (ac *Controller) Update(context *Context) {
 // Delete delete data
 func (ac *Controller) Delete(context *Context) {
 	res := context.Resource
-	status := http.StatusOK
+	status := http.StatusNoContent
 
 	if context.AddError(res.CallDelete(res.NewStruct(), context.Context)); context.HasError() {
 		context.Flash(string(context.t("qor_admin.form.failed_to_delete", "Failed to delete {{.Name}}", res)), "error")
