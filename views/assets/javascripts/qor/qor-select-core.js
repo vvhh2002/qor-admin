@@ -35,9 +35,7 @@
         },
 
         bind: function() {
-            this.$element
-                .on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this))
-                .on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+            this.$element.on(EVENT_CLICK, CLASS_CLICK_TABLE, this.processingData.bind(this)).on(EVENT_SUBMIT, 'form', this.submit.bind(this));
         },
 
         unbind: function() {
@@ -94,7 +92,10 @@
                     processData: false,
                     contentType: false,
                     beforeSend: function() {
-                        $form.parent().find('.qor-error').remove();
+                        $form
+                            .parent()
+                            .find('.qor-error')
+                            .remove();
                         $submit.prop('disabled', true);
                     },
                     success: function(json) {
@@ -121,7 +122,9 @@
                                         </label></li>
                                     </ul>`;
                         } else {
-                            error = `<ul class="qor-error">${$(xhr.responseText).find('#errors').html()}</ul>`;
+                            error = `<ul class="qor-error">${$(xhr.responseText)
+                                .find('#errors')
+                                .html()}</ul>`;
                         }
 
                         $('.qor-bottomsheets .qor-page__body').scrollTop(0);

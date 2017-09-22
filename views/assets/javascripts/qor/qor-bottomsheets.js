@@ -268,7 +268,10 @@
                     $bottomsheets.find(CLASS_BODY_CONTENT).html($responseBody.html());
 
                     if ($responseHeader.length) {
-                        _this.$body.find(CLASS_BODY_HEAD).html($responseHeader.html()).trigger('enable');
+                        _this.$body
+                            .find(CLASS_BODY_HEAD)
+                            .html($responseHeader.html())
+                            .trigger('enable');
                         _this.addHeaderClass();
                     }
                     // will trigger this event(relaod.qor.bottomsheets) when bottomsheets reload complete: like pagination, filter, action etc.
@@ -305,7 +308,10 @@
         addHeaderClass: function() {
             this.$body.find(CLASS_BODY_HEAD).hide();
             if (this.$bottomsheets.find(CLASS_BODY_HEAD).children(CLASS_BOTTOMSHEETS_FILTER).length) {
-                this.$body.addClass('has-header').find(CLASS_BODY_HEAD).show();
+                this.$body
+                    .addClass('has-header')
+                    .find(CLASS_BODY_HEAD)
+                    .show();
             }
         },
 
@@ -346,12 +352,8 @@
         },
 
         submit: function(e) {
-            let resourseData = this.resourseData;
-
-            $(document).trigger(EVENT_BOTTOMSHEET_BEFORESEND);
-
             // will ingore submit event if need handle with other submit event: like select one, many...
-            if (resourseData.ingoreSubmit) {
+            if ($('body').data('qor.bottomsheets').resourseData.ingoreSubmit) {
                 return;
             }
 
@@ -359,10 +361,11 @@
                 form = e.target,
                 $form = $(form),
                 _this = this,
-                ajaxType = resourseData.ajaxType,
                 url = $form.prop('action'),
                 formData = new FormData(form),
-                $bottomsheets = this.$bottomsheets,
+                $bottomsheets = $form.closest('.qor-bottomsheets'),
+                resourseData = $bottomsheets.data(),
+                ajaxType = resourseData.ajaxType,
                 $submit = $form.find(':submit');
 
             // will submit form as normal,
@@ -375,6 +378,7 @@
                 return;
             }
 
+            $(document).trigger(EVENT_BOTTOMSHEET_BEFORESEND);
             e.preventDefault();
 
             $.ajax(url, {
@@ -388,7 +392,7 @@
                 },
                 success: function(data, textStatus, jqXHR) {
                     if (resourseData.ajaxMute) {
-                        $form.closest('.qor-bottomsheets').remove();
+                        $bottomsheets.remove();
                         return;
                     }
 
