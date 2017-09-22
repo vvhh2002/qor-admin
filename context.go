@@ -25,7 +25,8 @@ type Context struct {
 	Result       interface{}
 	RouteHandler *routeHandler
 
-	funcMaps template.FuncMap
+	usedThemes []string
+	funcMaps   template.FuncMap
 }
 
 // NewContext new admin context

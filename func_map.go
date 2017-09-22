@@ -82,6 +82,11 @@ func (res *Resource) RoutePrefix() string {
 	return params
 }
 
+// UseTheme append used themes into current context, will load those theme's stylesheet, javascripts in admin pages
+func (context *Context) UseTheme(name string) {
+	context.usedThemes = append(context.usedThemes, name)
+}
+
 // URLFor generate url for resource value
 //     context.URLFor(&Product{})
 //     context.URLFor(&Product{ID: 111})
@@ -728,21 +733,32 @@ func (context *Context) styleSheetTag(names ...string) template.HTML {
 	return template.HTML(strings.Join(results, ""))
 }
 
-func (context *Context) getThemes() (themes []ThemeInterface) {
+func (context *Context) getThemeNames() (themes []string) {
+	themesMap := map[string]bool{}
+
 	if context.Resource != nil {
 		for _, theme := range context.Resource.Config.Themes {
-			themes = append(themes, theme)
+			if _, ok := themesMap[theme.GetName()]; !ok {
+				themes = append(themes, theme.GetName())
+			}
 		}
 	}
+
+	for _, usedTheme := range context.usedThemes {
+		if _, ok := themesMap[usedTheme]; !ok {
+			themes = append(themes, usedTheme)
+		}
+	}
+
 	return
 }
 
 func (context *Context) loadThemeStyleSheets() template.HTML {
 	var results []string
-	for _, theme := range context.getThemes() {
-		var file = path.Join("themes", theme.GetName(), "assets", "stylesheets", theme.GetName()+".css")
+	for _, themeName := range context.getThemeNames() {
+		var file = path.Join("themes", themeName, "assets", "stylesheets", themeName+".css")
 		if _, err := context.Asset(file); err == nil {
-			results = append(results, fmt.Sprintf(`<link type="text/css" rel="stylesheet" href="%s?theme=%s">`, path.Join(context.Admin.GetRouter().Prefix, "assets", "stylesheets", theme.GetName()+".css"), theme.GetName()))
+			results = append(results, fmt.Sprintf(`<link type="text/css" rel="stylesheet" href="%s?theme=%s">`, path.Join(context.Admin.GetRouter().Prefix, "assets", "stylesheets", themeName+".css"), themeName))
 		}
 	}
 
@@ -751,10 +767,10 @@ func (context *Context) loadThemeStyleSheets() template.HTML {
 
 func (context *Context) loadThemeJavaScripts() template.HTML {
 	var results []string
-	for _, theme := range context.getThemes() {
-		var file = path.Join("themes", theme.GetName(), "assets", "javascripts", theme.GetName()+".js")
+	for _, themeName := range context.getThemeNames() {
+		var file = path.Join("themes", themeName, "assets", "javascripts", themeName+".js")
 		if _, err := context.Asset(file); err == nil {
-			results = append(results, fmt.Sprintf(`<script src="%s?theme=%s"></script>`, path.Join(context.Admin.GetRouter().Prefix, "assets", "javascripts", theme.GetName()+".js"), theme.GetName()))
+			results = append(results, fmt.Sprintf(`<script src="%s?theme=%s"></script>`, path.Join(context.Admin.GetRouter().Prefix, "assets", "javascripts", themeName+".js"), themeName))
 		}
 	}
 
@@ -807,14 +823,14 @@ func (context *Context) loadActions(action string) template.HTML {
 	}
 
 	for _, pattern := range actionPatterns {
-		for _, theme := range context.getThemes() {
+		for _, themeName := range context.getThemeNames() {
 			if resourcePath := context.resourcePath(); resourcePath != "" {
-				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), resourcePath, pattern)); err == nil {
+				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", themeName, resourcePath, pattern)); err == nil {
 					actionFiles = append(actionFiles, matches...)
 				}
 			}
 
-			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", theme.GetName(), pattern)); err == nil {
+			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", themeName, pattern)); err == nil {
 				actionFiles = append(actionFiles, matches...)
 			}
 		}
