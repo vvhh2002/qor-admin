@@ -94,8 +94,9 @@
 }
 
 .qor-slideout__body {
-    padding: 64px 24px 16px 24px;
-    height: 100%;
+    padding: 0 24px;
+    margin-top: 64px;
+    height: calc(100% - 64px);
     overflow: hidden;
     overflow-y: auto;
     .qor-action-alert {
