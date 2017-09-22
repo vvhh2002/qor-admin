@@ -28,8 +28,16 @@ func (admin Admin) registerCompositePrimaryKeyCallback() {
 			},
 		})
 
-		db.Callback().Query().Before("gorm:query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
-		db.Callback().RowQuery().Before("gorm:row_query").Register("qor_admin:composite_primary_key", compositePrimaryKeyQueryCallback)
+		callbackProc := db.Callback().Query().Before("gorm:query")
+		callbackName := "qor_admin:composite_primary_key"
+		if callbackProc.Get(callbackName) == nil {
+			callbackProc.Register(callbackName, compositePrimaryKeyQueryCallback)
+		}
+
+		callbackProc = db.Callback().RowQuery().Before("gorm:row_query")
+		if callbackProc.Get(callbackName) == nil {
+			callbackProc.Register(callbackName, compositePrimaryKeyQueryCallback)
+		}
 	}
 }
 
