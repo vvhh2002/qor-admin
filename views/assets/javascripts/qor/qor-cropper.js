@@ -359,6 +359,16 @@
                         _this.center($this);
                     }
 
+                    // Crop, CropOptions and Delete should be BOOL type, if empty should delete,
+                    if (data.Crop === '') {
+                        delete data.Crop;
+                    }
+
+                    if (data.CropOptions === '') {
+                        delete data.CropOptions;
+                    }
+
+                    delete data.Delete;
                     _this.$output.val(JSON.stringify(data));
 
                     // callback after load complete

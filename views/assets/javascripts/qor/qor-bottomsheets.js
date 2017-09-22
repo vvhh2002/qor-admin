@@ -352,11 +352,6 @@
         },
 
         submit: function(e) {
-            // will ingore submit event if need handle with other submit event: like select one, many...
-            if ($('body').data('qor.bottomsheets').resourseData.ingoreSubmit) {
-                return;
-            }
-
             let $body = this.$body,
                 form = e.target,
                 $form = $(form),
@@ -367,6 +362,11 @@
                 resourseData = $bottomsheets.data(),
                 ajaxType = resourseData.ajaxType,
                 $submit = $form.find(':submit');
+
+            // will ingore submit event if need handle with other submit event: like select one, many...
+            if (resourseData.ingoreSubmit) {
+                return;
+            }
 
             // will submit form as normal,
             // if you need download file after submit form or other things, please add
