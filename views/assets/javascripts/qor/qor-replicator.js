@@ -171,9 +171,7 @@
         bind: function() {
             let options = this.options;
 
-            this.$element
-                .on(EVENT_CLICK, options.addClass, $.proxy(this.add, this))
-                .on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
+            this.$element.on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
             !this.isInSlideout && $(document).on(EVENT_SUBMIT, 'form', this.removeData.bind(this));
             $(document)
@@ -185,11 +183,13 @@
             this.$element.off(EVENT_CLICK);
 
             !this.isInSlideout && $(document).off(EVENT_SUBMIT, 'form');
-            $(document).off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout').off(EVENT_SELECTCOREBEFORESEND);
+            $(document)
+                .off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout')
+                .off(EVENT_SELECTCOREBEFORESEND);
         },
 
         removeData: function() {
-            this.$element.find('.qor-fieldset--new').remove();
+            $('.qor-fieldset--new').remove();
         },
 
         add: function(e, data, isAutomatically) {
@@ -283,7 +283,11 @@
                 $item = $(e.target).closest(options.itemClass),
                 $alert;
 
-            $item.addClass('is-deleted').children(':visible').addClass('hidden').hide();
+            $item
+                .addClass('is-deleted')
+                .children(':visible')
+                .addClass('hidden')
+                .hide();
             $alert = $(options.alertTemplate.replace('{{name}}', this.parseName($item)));
             $alert.find(options.undoClass).one(
                 EVENT_CLICK,
@@ -294,7 +298,11 @@
                     }
 
                     $item.find('> .qor-fieldset__alert').remove();
-                    $item.removeClass('is-deleted').children('.hidden').removeClass('hidden').show();
+                    $item
+                        .removeClass('is-deleted')
+                        .children('.hidden')
+                        .removeClass('hidden')
+                        .show();
                     this.resetButton();
                     this.resetPositionButton();
                 }.bind(this)
