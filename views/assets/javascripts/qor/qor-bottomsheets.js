@@ -22,6 +22,7 @@
         EVENT_BOTTOMSHEET_BEFORESEND = 'bottomsheetBeforeSend.' + NAMESPACE,
         EVENT_BOTTOMSHEET_LOADED = 'bottomsheetLoaded.' + NAMESPACE,
         EVENT_BOTTOMSHEET_CLOSED = 'bottomsheetClosed.' + NAMESPACE,
+        EVENT_BOTTOMSHEET_SUBMIT = 'bottomsheetSubmitComplete.' + NAMESPACE,
         EVENT_HIDDEN = 'hidden.' + NAMESPACE,
         EVENT_KEYUP = 'keyup.' + NAMESPACE,
         CLASS_OPEN = 'qor-bottomsheets-open',
@@ -439,6 +440,8 @@
                     } else {
                         _this.refresh();
                     }
+
+                    $(document).trigger(EVENT_BOTTOMSHEET_SUBMIT);
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     var $error;

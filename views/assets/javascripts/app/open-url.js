@@ -32,7 +32,11 @@ $(function() {
         }
 
         $checked.each(function() {
-            IDs.push($(this).closest('tr').data('primary-key'));
+            IDs.push(
+                $(this)
+                    .closest('tr')
+                    .data('primary-key')
+            );
         });
 
         return IDs;
@@ -43,7 +47,7 @@ $(function() {
             $target = $(e.target),
             isNewButton = $this.hasClass('qor-button--new'),
             isEditButton = $this.hasClass('qor-button--edit'),
-            isInTable = $this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').length,
+            isInTable = ($this.is('.qor-table tr[data-url]') || $this.closest('.qor-js-table').length) && !$this.closest('.qor-slideout').length, // if table is in slideout, will open bottom sheet
             openData = $this.data(),
             actionData,
             openType = openData.openType,
@@ -51,11 +55,7 @@ $(function() {
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
         // if clicking item's menu actions
-        if (
-            $target.closest('.qor-button--actions').length ||
-            (!$target.data('url') && $target.is('a')) ||
-            (isInTable && isBottomsheetsOpened())
-        ) {
+        if ($target.closest('.qor-button--actions').length || (!$target.data('url') && $target.is('a')) || (isInTable && isBottomsheetsOpened())) {
             return;
         }
 
