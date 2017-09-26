@@ -125,7 +125,6 @@
                     _this.data = imageData || {};
                     if (isSVG(imageData.URL || imageData.Url)) {
                         _this.resetImage();
-                        return;
                     }
                     _this.build();
                     _this.bind();
@@ -136,7 +135,6 @@
                     data = JSON.parse(outputValue);
                     if (isSVG(data.URL || data.Url)) {
                         this.resetImage();
-                        return;
                     }
                 }
 
@@ -149,7 +147,6 @@
 
         resetImage: function() {
             this.$parent.addClass('is-svg');
-            this.$list.find(' li > img').attr('src', this.data.URL || this.data.Url);
         },
 
         build: function() {
@@ -183,10 +180,10 @@
             let $list = this.$list,
                 $img;
 
-            $list.find('li').append(QorCropper.TOGGLE);
-            $img = $list.find('img');
+            $img = $list.find('img').not('.is-svg');
 
             if ($img.length) {
+                $list.find('li').append(QorCropper.TOGGLE);
                 $img.wrap(QorCropper.CANVAS);
                 this.center($img);
             } else {
@@ -661,7 +658,12 @@
 
     QorCropper.CANVAS = '<div class="qor-cropper__canvas"></div>';
     QorCropper.LIST = '<ul><li><img></li></ul>';
-    QorCropper.FILE_LIST = '<div class="qor-file__list-item"><span><span>{{filename}}</span></span></div>';
+    QorCropper.FILE_LIST = `<div class="qor-file__list-item">
+                                <span><span>{{filename}}</span></span>
+                                <div class="qor-cropper__toggle">
+                                    <div class="qor-cropper__toggle--delete"><i class="material-icons">delete</i></div>
+                                </div>
+                            </div>`;
     QorCropper.MODAL = `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="mdl-card mdl-shadow--2dp" role="document">
                 <div class="mdl-card__title">
