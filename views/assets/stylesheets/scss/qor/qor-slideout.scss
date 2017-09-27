@@ -48,6 +48,10 @@
         margin: 24px 0;
         box-shadow: none;
     }
+    .qor-action-bulk-edit,
+    .qor-actions__filter-time {
+        display: none;
+    }
 }
 
 .qor-slideout__header {
