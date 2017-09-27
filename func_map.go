@@ -546,6 +546,10 @@ func (context *Context) GetScopes() (menus []*scopeMenu) {
 	scopes := context.Request.URL.Query()["scopes"]
 OUT:
 	for _, s := range context.Resource.scopes {
+		if s.Visible != nil && !s.Visible(context) {
+			continue
+		}
+
 		menu := scope{Scope: s}
 
 		for _, s := range scopes {
