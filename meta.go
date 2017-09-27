@@ -25,7 +25,7 @@ type Meta struct {
 	Valuer          func(interface{}, *qor.Context) interface{}
 	FormattedValuer func(interface{}, *qor.Context) interface{}
 	Resource        *Resource
-	Permission      *roles.Permission
+	Permission      roles.Permissioner
 	Config          MetaConfigInterface
 
 	Metas      []resource.Metaor
@@ -150,7 +150,7 @@ func (meta *Meta) setBaseResource(base *Resource) {
 }
 
 // SetPermission set meta's permission
-func (meta *Meta) SetPermission(permission *roles.Permission) {
+func (meta *Meta) SetPermission(permission roles.Permissioner) {
 	meta.Permission = permission
 	meta.Meta.Permission = permission
 	if meta.Resource != nil {
@@ -336,12 +336,12 @@ func (meta *Meta) updateMeta() {
 				if result != nil {
 					res := meta.baseResource.NewResource(result)
 					meta.Resource = res
-					meta.Meta.Permission = meta.Meta.Permission.Concat(res.Config.Permission)
+					meta.Meta.Permission = roles.ConcatPermissioner(meta.Meta.Permission, res.Config.Permission)
 				}
 			}
 
 			if meta.Resource != nil {
-				permission := meta.Resource.Permission.Concat(meta.Meta.Permission)
+				permission := roles.ConcatPermissioner(meta.Resource.Permission, meta.Meta.Permission)
 				meta.Meta.Resource = meta.Resource
 				meta.Resource.Permission = permission
 				meta.SetPermission(permission)
