@@ -3,7 +3,7 @@
 {{$allowed_actions := (allowed_actions $context.Resource.Actions $context.Action)}}
 {{$resource := .Resource}}
 
-
+{{if gt (len $allowed_actions) 0 }}
   <div class="qor-action-bulk-edit" data-toggle="qor.action.bulk">
     <div class="qor-action-forms hidden">
       {{range $action := $allowed_actions}}
@@ -33,4 +33,4 @@
       <button class="mdl-button mdl-button--accent qor-action--exit-bulk hidden" type="button">{{t "qor_admin.actions.exit_bulk_edit" "Exit Bulk Edit"}}</button>
     </div>
   </div>
-
+{{end}}
