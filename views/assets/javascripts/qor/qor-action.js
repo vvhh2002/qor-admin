@@ -51,20 +51,26 @@
 
         bind: function() {
             this.$element.on(EVENT_CLICK, $.proxy(this.click, this));
-            $(document).on(EVENT_CLICK, '.qor-table--bulking tr', this.click).on(EVENT_CLICK, ACTION_LINK, this.actionLink);
+            $(document)
+                .on(EVENT_CLICK, '.qor-table--bulking tr', this.click)
+                .on(EVENT_CLICK, ACTION_LINK, this.actionLink);
         },
 
         unbind: function() {
             this.$element.off(EVENT_CLICK, this.click);
 
-            $(document).off(EVENT_CLICK, '.qor-table--bulking tr', this.click).off(EVENT_CLICK, ACTION_LINK, this.actionLink);
+            $(document)
+                .off(EVENT_CLICK, '.qor-table--bulking tr', this.click)
+                .off(EVENT_CLICK, ACTION_LINK, this.actionLink);
         },
 
         initActions: function() {
             this.tables = $(QOR_TABLE).find('table').length;
 
             if (!this.tables) {
-                $(BUTTON_BULKS).find('button').attr('disabled', true);
+                $(BUTTON_BULKS)
+                    .find('button')
+                    .attr('disabled', true);
                 $(ACTION_LINK).attr('disabled', true);
             }
         },
@@ -77,7 +83,9 @@
 
             if (checkedInputs.length) {
                 checkedInputs.each(function() {
-                    let id = $(this).closest('tr').data('primary-key');
+                    let id = $(this)
+                        .closest('tr')
+                        .data('primary-key');
 
                     tempObj = {};
                     if (id) {
@@ -129,11 +137,18 @@
 
             if ($target.is('.qor-action--bulk')) {
                 this.$wrap.removeClass('hidden');
-                $(BUTTON_BULKS).find('button').toggleClass('hidden');
+                $(BUTTON_BULKS)
+                    .find('button')
+                    .toggleClass('hidden');
+                $('.qor-table__inner-list').remove();
                 this.appendTableCheckbox();
                 $(QOR_TABLE).addClass('qor-table--bulking');
-                $(ACTION_HEADER).find(ACTION_SELECTORS).addClass('hidden');
-                $(ACTION_HEADER).find(QOR_SEARCH).addClass('hidden');
+                $(ACTION_HEADER)
+                    .find(ACTION_SELECTORS)
+                    .addClass('hidden');
+                $(ACTION_HEADER)
+                    .find(QOR_SEARCH)
+                    .addClass('hidden');
                 if ($pageHeader.height() > triggerHeight) {
                     $pageBody.css('padding-top', $pageHeader.height());
                 }
@@ -141,18 +156,26 @@
 
             if ($target.is('.qor-action--exit-bulk')) {
                 this.$wrap.addClass('hidden');
-                $(BUTTON_BULKS).find('button').toggleClass('hidden');
+                $(BUTTON_BULKS)
+                    .find('button')
+                    .toggleClass('hidden');
                 this.removeTableCheckbox();
                 $(QOR_TABLE).removeClass('qor-table--bulking');
-                $(ACTION_HEADER).find(ACTION_SELECTORS).removeClass('hidden');
-                $(ACTION_HEADER).find(QOR_SEARCH).removeClass('hidden');
+                $(ACTION_HEADER)
+                    .find(ACTION_SELECTORS)
+                    .removeClass('hidden');
+                $(ACTION_HEADER)
+                    .find(QOR_SEARCH)
+                    .removeClass('hidden');
                 if (parseInt($pageBody.css('padding-top')) > triggerHeight) {
                     $pageBody.css('padding-top', '');
                 }
             }
 
             if ($(this).is('tr') && !$target.is('a')) {
-                let $firstTd = $(this).find('td').first();
+                let $firstTd = $(this)
+                    .find('td')
+                    .first();
 
                 // Manual make checkbox checked or not
                 if ($firstTd.find('.mdl-checkbox__input').get(0)) {
@@ -173,7 +196,9 @@
 
                     if (slideroutActionForm.length && hasPopoverForm) {
                         if (isChecked && !$alreadyHaveValue.length) {
-                            slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
+                            slideroutActionForm.prepend(
+                                '<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />'
+                            );
                         }
 
                         if (!isChecked && $alreadyHaveValue.length) {
@@ -213,7 +238,7 @@
             if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
                 window.QOR.qorConfirm(properties, function(confirm) {
                     if (confirm) {
-                        $.post(properties.url, { _method: properties.method }, function() {
+                        $.post(properties.url, {_method: properties.method}, function() {
                             window.location.reload();
                         });
                     } else {
@@ -312,10 +337,14 @@
         // Helper
         removeTableCheckbox: function() {
             $('.qor-page__body .mdl-data-table__select').each(function(i, e) {
-                $(e).parents('td').remove();
+                $(e)
+                    .parents('td')
+                    .remove();
             });
             $('.qor-page__body .mdl-data-table__select').each(function(i, e) {
-                $(e).parents('th').remove();
+                $(e)
+                    .parents('th')
+                    .remove();
             });
             $('.qor-table-container tr.is-selected').removeClass('is-selected');
             $('.qor-page__body table.mdl-data-table--selectable').removeClass('mdl-data-table--selectable');
@@ -325,17 +354,23 @@
         appendTableCheckbox: function() {
             // Only value change and the table isn't selectable will add checkboxes
             $('.qor-page__body .mdl-data-table__select').each(function(i, e) {
-                $(e).parents('td').remove();
+                $(e)
+                    .parents('td')
+                    .remove();
             });
             $('.qor-page__body .mdl-data-table__select').each(function(i, e) {
-                $(e).parents('th').remove();
+                $(e)
+                    .parents('th')
+                    .remove();
             });
             $('.qor-table-container tr.is-selected').removeClass('is-selected');
             $('.qor-page__body table').addClass('mdl-data-table--selectable');
 
             // init google material
             new window.MaterialDataTable($('.qor-page__body table').get(0));
-            $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")').clone().prependTo($('thead:not(".is-hidden") tr'));
+            $('thead.is-hidden tr th:not(".mdl-data-table__cell--non-numeric")')
+                .clone()
+                .prependTo($('thead:not(".is-hidden") tr'));
 
             let $fixedHeadCheckBox = $('thead:not(".is-fixed") .mdl-checkbox__input'),
                 isMediaLibrary = $('.qor-table--medialibrary').length,
@@ -345,8 +380,13 @@
 
             $fixedHeadCheckBox.on('click', function() {
                 if (!isMediaLibrary) {
-                    $('thead.is-fixed tr th').eq(0).find('label').click();
-                    $(this).closest('label').toggleClass('is-checked');
+                    $('thead.is-fixed tr th')
+                        .eq(0)
+                        .find('label')
+                        .click();
+                    $(this)
+                        .closest('label')
+                        .toggleClass('is-checked');
                 }
 
                 let slideroutActionForm = $('[data-toggle="qor-action-slideout"]').find('form'),
@@ -358,7 +398,9 @@
                         allPrimaryValues.each(function() {
                             let primaryValue = $(this).data('primary-key');
                             if (primaryValue) {
-                                slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
+                                slideroutActionForm.prepend(
+                                    '<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />'
+                                );
                             }
                         });
                     } else {
@@ -392,7 +434,9 @@
         if (hasAction && $checkedItem.length) {
             // insert checked value into sliderout form
             $checkedItem.each(function(i, e) {
-                let id = $(e).parents('tbody tr').data('primary-key');
+                let id = $(e)
+                    .parents('tbody tr')
+                    .data('primary-key');
                 if (id) {
                     $actionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + id + '" />');
                 }
