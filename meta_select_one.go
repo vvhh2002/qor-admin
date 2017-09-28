@@ -179,7 +179,7 @@ func (selectOneConfig *SelectOneConfig) prepareDataSource(field *gorm.StructFiel
 	if res != nil && (selectOneConfig.SelectMode == "select_async" || selectOneConfig.SelectMode == "bottom_sheet") {
 		if remoteDataResource := selectOneConfig.RemoteDataResource; remoteDataResource != nil {
 			if !remoteDataResource.mounted {
-				remoteDataResource.params = path.Join(routePrefix, res.ToParam(), field.Name)
+				remoteDataResource.params = path.Join(routePrefix, res.ToParam(), field.Name, fmt.Sprintf("%p", remoteDataResource))
 				res.GetAdmin().RegisterResourceRouters(remoteDataResource, "create", "update", "read", "delete")
 			}
 		} else {
