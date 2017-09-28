@@ -241,6 +241,10 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 
 		modelType := utils.ModelType(r.Value)
 		for r.ParentResource != nil {
+			if r.ParentResource.mounted == false {
+				return false
+			}
+
 			// don't register same resource as nested routes
 			if utils.ModelType(r.ParentResource.Value) == modelType {
 				return false
