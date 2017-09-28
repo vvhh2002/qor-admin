@@ -276,6 +276,8 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 			}
 		}
 	}
+
+	res.mounted = true
 }
 
 // RegisterRoute register route

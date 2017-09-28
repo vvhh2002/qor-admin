@@ -25,6 +25,7 @@ type Resource struct {
 
 	admin          *Admin
 	params         string
+	mounted        bool
 	scopes         []*Scope
 	filters        []*Filter
 	sortableAttrs  *[]string
