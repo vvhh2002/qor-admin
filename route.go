@@ -234,52 +234,52 @@ func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
 		}
 	}
 
-	// isValidSubResource := func(r *Resource) bool {
-	// 	if r == nil || r.ParentResource == nil {
-	// 		return false
-	// 	}
+	isValidSubResource := func(r *Resource) bool {
+		if r == nil || r.ParentResource == nil {
+			return false
+		}
 
-	// 	modelType := utils.ModelType(r.Value)
-	// 	for r.ParentResource != nil {
-	// 		if r.ParentResource.mounted == false {
-	// 			return false
-	// 		}
+		modelType := utils.ModelType(r.Value)
+		for r.ParentResource != nil {
+			if r.ParentResource.mounted == false {
+				return false
+			}
 
-	// 		// don't register same resource as nested routes
-	// 		if utils.ModelType(r.ParentResource.Value) == modelType {
-	// 			return false
-	// 		}
-	// 		r = r.ParentResource
-	// 	}
-	// 	return true
-	// }
+			// don't register same resource as nested routes
+			if utils.ModelType(r.ParentResource.Value) == modelType {
+				return false
+			}
+			r = r.ParentResource
+		}
+		return true
+	}
 
 	// Register Sub Resources
-	// if len(res.PrimaryFields) > 0 {
-	// 	for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
-	// 		if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-	// 			if len(meta.Resource.newSections) > 0 {
-	// 				admin.RegisterResourceRouters(meta.Resource, "create")
-	// 			}
-	// 		}
-	// 	}
+	if len(res.PrimaryFields) > 0 {
+		for _, meta := range res.ConvertSectionToMetas(res.NewAttrs()) {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
+				if len(meta.Resource.newSections) > 0 {
+					admin.RegisterResourceRouters(meta.Resource, "create")
+				}
+			}
+		}
 
-	// 	for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
-	// 		if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-	// 			if len(meta.Resource.showSections) > 0 {
-	// 				admin.RegisterResourceRouters(meta.Resource, "read")
-	// 			}
-	// 		}
-	// 	}
+		for _, meta := range res.ConvertSectionToMetas(res.ShowAttrs()) {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
+				if len(meta.Resource.showSections) > 0 {
+					admin.RegisterResourceRouters(meta.Resource, "read")
+				}
+			}
+		}
 
-	// 	for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
-	// 		if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
-	// 			if len(meta.Resource.editSections) > 0 {
-	// 				admin.RegisterResourceRouters(meta.Resource, "update", "delete")
-	// 			}
-	// 		}
-	// 	}
-	// }
+		for _, meta := range res.ConvertSectionToMetas(res.EditAttrs()) {
+			if meta.FieldStruct != nil && meta.FieldStruct.Relationship != nil && isValidSubResource(meta.Resource) {
+				if len(meta.Resource.editSections) > 0 {
+					admin.RegisterResourceRouters(meta.Resource, "update", "delete")
+				}
+			}
+		}
+	}
 }
 
 // RegisterRoute register route
