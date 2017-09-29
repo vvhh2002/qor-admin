@@ -42,6 +42,10 @@ func newRouteHandler(path string, handle requestHandler, configs ...*RouteConfig
 	if handler.Config.Permissioner == nil && handler.Config.Resource != nil {
 		handler.Config.Permissioner = handler.Config.Resource
 	}
+
+	if handler.Config.Resource != nil {
+		handler.Config.Resource.mounted = true
+	}
 	return &handler
 }
 
