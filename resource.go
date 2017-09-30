@@ -179,7 +179,8 @@ func (res *Resource) AddSubResource(fieldName string, config ...*Config) (subRes
 	)
 
 	if field, ok := scope.FieldByName(fieldName); ok && field.Relationship != nil {
-		subRes = admin.NewResource(reflect.New(field.Struct.Type).Interface(), config...)
+		modelType := utils.ModelType(reflect.New(field.Struct.Type).Interface())
+		subRes = admin.NewResource(reflect.New(modelType).Interface(), config...)
 		subRes.setupParentResource(field.StructField.Name, res)
 		admin.RegisterResourceRouters(subRes, "create", "update", "read", "delete")
 		return
