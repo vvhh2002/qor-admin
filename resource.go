@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -168,6 +169,88 @@ func (res *Resource) NewResource(value interface{}, config ...*Config) *Resource
 	subRes.ParentResource = res
 	subRes.configure()
 	return subRes
+}
+
+// AddSubResource register sub-resource
+func (res *Resource) AddSubResource(fieldName string, config ...*Config) (subRes *Resource, err error) {
+	var (
+		admin = res.GetAdmin()
+		scope = &gorm.Scope{Value: res.Value}
+	)
+
+	if field, ok := scope.FieldByName(fieldName); ok && field.Relationship != nil {
+		subRes = admin.NewResource(reflect.New(field.Struct.Type).Interface(), config...)
+		subRes.setupParentResource(field.StructField.Name, res)
+		admin.RegisterResourceRouters(subRes, "create", "update", "read", "delete")
+		return
+	}
+
+	err = errors.New("invalid sub resource")
+	return
+}
+
+func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
+	res.ParentResource = parent
+
+	findOneHandler := res.FindOneHandler
+	res.FindOneHandler = func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) (err error) {
+		if metaValues != nil {
+			return findOneHandler(value, metaValues, context)
+		}
+
+		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {
+			clone := context.Clone()
+			parentValue := parent.NewStruct()
+			if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
+				primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
+				err = context.GetDB().Model(parentValue).Where(primaryQuerySQL, primaryParams...).Related(value).Error
+			}
+		}
+		return
+	}
+
+	res.FindManyHandler = func(value interface{}, context *qor.Context) error {
+		var (
+			err         error
+			clone       = context.Clone()
+			parentValue = parent.NewStruct()
+		)
+
+		if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
+			parent.FindOneHandler(parentValue, nil, clone)
+			return context.GetDB().Model(parentValue).Related(value).Error
+		}
+		return err
+	}
+
+	res.SaveHandler = func(value interface{}, context *qor.Context) error {
+		var (
+			err         error
+			clone       = context.Clone()
+			parentValue = parent.NewStruct()
+		)
+
+		if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
+			parent.FindOneHandler(parentValue, nil, clone)
+			return context.GetDB().Model(parentValue).Association(fieldName).Append(value).Error
+		}
+		return err
+	}
+
+	res.DeleteHandler = func(value interface{}, context *qor.Context) (err error) {
+		var clone = context.Clone()
+		var parentValue = parent.NewStruct()
+		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {
+			primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
+			if err = context.GetDB().Where(primaryQuerySQL, primaryParams...).First(value).Error; err == nil {
+				if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
+					parent.FindOneHandler(parentValue, nil, clone)
+					return context.GetDB().Model(parentValue).Association(fieldName).Delete(value).Error
+				}
+			}
+		}
+		return
+	}
 }
 
 // Decode decode context into a value
