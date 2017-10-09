@@ -535,31 +535,31 @@ Attrs:
 
 // GetMeta get meta with name
 func (res *Resource) GetMeta(name string) *Meta {
+	var fallbackMeta *Meta
+
 	for _, meta := range res.Metas {
-		if meta.Name == name || meta.GetFieldName() == name {
+		if meta.Name == name {
+			return meta
+		}
+
+		if meta.GetFieldName() == name {
+			fallbackMeta = meta
+		}
+	}
+
+	if fallbackMeta == nil {
+		if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
+			meta := &Meta{Name: name, baseResource: res}
+			if field.IsPrimaryKey {
+				meta.Type = "hidden_primary_key"
+			}
+			meta.updateMeta()
+			res.Metas = append(res.Metas, meta)
 			return meta
 		}
 	}
-	return nil
-}
 
-// GetMetaOrNew get meta or initalize a new one
-func (res *Resource) GetMetaOrNew(name string) *Meta {
-	if meta := res.GetMeta(name); meta != nil {
-		return meta
-	}
-
-	if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
-		meta := &Meta{Name: name, baseResource: res}
-		if field.IsPrimaryKey {
-			meta.Type = "hidden_primary_key"
-		}
-		meta.updateMeta()
-		res.Metas = append(res.Metas, meta)
-		return meta
-	}
-
-	return nil
+	return fallbackMeta
 }
 
 func (res *Resource) allowedSections(sections []*Section, context *Context, roles ...roles.PermissionMode) []*Section {
@@ -571,7 +571,7 @@ func (res *Resource) allowedSections(sections []*Section, context *Context, role
 			var editableColumns []string
 			for _, column := range row {
 				for _, role := range roles {
-					meta := res.GetMetaOrNew(column)
+					meta := res.GetMeta(column)
 					if meta != nil && meta.HasPermission(role, context.Context) {
 						editableColumns = append(editableColumns, column)
 						break

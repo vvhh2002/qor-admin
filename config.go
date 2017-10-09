@@ -6,10 +6,10 @@ import "github.com/qor/roles"
 type Config struct {
 	Name       string
 	Menu       []string
-	Invisible  bool
-	Priority   int
-	PageCount  int
-	Singleton  bool
 	Permission *roles.Permission
 	Themes     []ThemeInterface
+	Priority   int
+	Singleton  bool
+	Invisible  bool
+	PageCount  int
 }
