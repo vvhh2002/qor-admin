@@ -146,7 +146,7 @@
         td {
             padding: 10px;
 
-            &[data-heading="ID"] {
+            &[data-heading='ID'] {
                 width: 42px;
                 padding: 10px 0 10px 10px;
             }
@@ -225,6 +225,10 @@
     box-sizing: border-box;
     z-index: $zindex-bottomsheets;
 
+    .qor-action-forms {
+        padding-top: 0;
+    }
+
     .qor-table--medialibrary {
         .mdl-card__supporting-text > p.qor-table--video {
             height: 162px;
@@ -241,7 +245,7 @@
                 left: 0;
                 right: 0;
                 height: 162px;
-                background-color: rgba(0, 0, 0, .1);
+                background-color: rgba(0, 0, 0, 0.1);
             }
         }
     }
@@ -276,7 +280,7 @@
         .qor-fieldset {
             padding: 4px 8px;
             box-shadow: none;
-            border: 1px solid rgba(0, 0, 0, .12);
+            border: 1px solid rgba(0, 0, 0, 0.12);
         }
 
         .qor-form {
@@ -344,17 +348,17 @@
                     top: 0;
 
                     > p {
-                        &[data-heading*="File"],
-                        &[data-heading*="Image"],
-                        &[data-heading*="file"],
-                        &[data-heading*="image"] {
+                        &[data-heading*='File'],
+                        &[data-heading*='Image'],
+                        &[data-heading*='file'],
+                        &[data-heading*='image'] {
                             height: 100%;
                         }
 
-                        &[data-heading*="Name"],
-                        &[data-heading*="Title"],
-                        &[data-heading*="name"],
-                        &[data-heading*="title"] {
+                        &[data-heading*='Name'],
+                        &[data-heading*='Title'],
+                        &[data-heading*='name'],
+                        &[data-heading*='title'] {
                             position: absolute;
                             bottom: 0;
                             left: 0;
@@ -366,7 +370,7 @@
                 > p {
                     margin-bottom: 0;
                     color: #fff;
-                    background-color: rgba(0, 0, 0, .1);
+                    background-color: rgba(0, 0, 0, 0.1);
 
                     &.qor-table--video {
                         iframe,
@@ -383,10 +387,10 @@
                     }
 
                     &.qor-table--video,
-                    &[data-heading*="File"],
-                    &[data-heading*="Image"],
-                    &[data-heading*="file"],
-                    &[data-heading*="image"] {
+                    &[data-heading*='File'],
+                    &[data-heading*='Image'],
+                    &[data-heading*='file'],
+                    &[data-heading*='image'] {
                         padding: 0;
                         height: auto;
                     }
@@ -402,7 +406,7 @@
                             z-index: 2;
                             height: 162px;
                             content: '';
-                            background-color: rgba(0, 0, 0, .1);
+                            background-color: rgba(0, 0, 0, 0.1);
                         }
                     }
                 }

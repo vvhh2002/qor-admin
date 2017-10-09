@@ -497,13 +497,26 @@
                         if (method === 'GET') {
                             let $response = $(response),
                                 $content,
+                                bodyClass,
                                 loadExtraResourceData = {
                                     $scripts: $response.filter('script'),
-                                    $links: $response.filter('link')
+                                    $links: $response.filter('link'),
+                                    url: url,
+                                    response: response
                                 },
-                                hasSearch = selectModal && $response.find('.qor-search-container').length;
+                                hasSearch = selectModal && $response.find('.qor-search-container').length,
+                                bodyHtml = response.match(/<\s*body.*>[\s\S]*<\s*\/body\s*>/gi);
 
                             $content = $response.find(CLASS_MAIN_CONTENT);
+
+                            if (bodyHtml) {
+                                bodyHtml = bodyHtml
+                                    .join('')
+                                    .replace(/<\s*body/gi, '<div')
+                                    .replace(/<\s*\/body/gi, '</div');
+                                bodyClass = $(bodyHtml).prop('class');
+                                $('body').addClass(bodyClass);
+                            }
 
                             if (!$content.length) {
                                 return;
