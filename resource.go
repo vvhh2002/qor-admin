@@ -562,25 +562,6 @@ func (res *Resource) GetMeta(name string) *Meta {
 	return fallbackMeta
 }
 
-// GetMetaOrNew get meta or initalize a new one
-func (res *Resource) GetMetaOrNew(name string) *Meta {
-	if meta := res.GetMeta(name); meta != nil {
-		return meta
-	}
-
-	if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
-		meta := &Meta{Name: name, baseResource: res}
-		if field.IsPrimaryKey {
-			meta.Type = "hidden_primary_key"
-		}
-		meta.updateMeta()
-		res.Metas = append(res.Metas, meta)
-		return meta
-	}
-
-	return nil
-}
-
 func (res *Resource) allowedSections(sections []*Section, context *Context, roles ...roles.PermissionMode) []*Section {
 	var newSections []*Section
 	for _, section := range sections {
@@ -590,7 +571,7 @@ func (res *Resource) allowedSections(sections []*Section, context *Context, role
 			var editableColumns []string
 			for _, column := range row {
 				for _, role := range roles {
-					meta := res.GetMetaOrNew(column)
+					meta := res.GetMeta(column)
 					if meta != nil && meta.HasPermission(role, context.Context) {
 						editableColumns = append(editableColumns, column)
 						break

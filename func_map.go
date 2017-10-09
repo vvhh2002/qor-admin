@@ -237,7 +237,7 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 		for _, column := range section.Rows {
 			columnsHTML := bytes.NewBufferString("")
 			for _, col := range column {
-				meta := section.Resource.GetMetaOrNew(col)
+				meta := section.Resource.GetMeta(col)
 				if meta != nil {
 					context.renderMeta(meta, value, prefix, kind, columnsHTML)
 				}
@@ -320,7 +320,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 
 			if len(sections) > 0 {
 				for _, field := range context.GetDB().NewScope(value).PrimaryFields() {
-					if meta := sections[0].Resource.GetMetaOrNew(field.Name); meta != nil {
+					if meta := sections[0].Resource.GetMeta(field.Name); meta != nil {
 						context.renderMeta(meta, value, newPrefix, kind, result)
 					}
 				}
