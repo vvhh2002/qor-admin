@@ -535,12 +535,31 @@ Attrs:
 
 // GetMeta get meta with name
 func (res *Resource) GetMeta(name string) *Meta {
+	var fallbackMeta *Meta
+
 	for _, meta := range res.Metas {
-		if meta.Name == name || meta.GetFieldName() == name {
+		if meta.Name == name {
+			return meta
+		}
+
+		if meta.GetFieldName() == name {
+			fallbackMeta = meta
+		}
+	}
+
+	if fallbackMeta == nil {
+		if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
+			meta := &Meta{Name: name, baseResource: res}
+			if field.IsPrimaryKey {
+				meta.Type = "hidden_primary_key"
+			}
+			meta.updateMeta()
+			res.Metas = append(res.Metas, meta)
 			return meta
 		}
 	}
-	return nil
+
+	return fallbackMeta
 }
 
 // GetMetaOrNew get meta or initalize a new one
