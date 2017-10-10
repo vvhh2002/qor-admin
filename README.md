@@ -490,6 +490,17 @@ r.Any("/admin/*w", gin.WrapH(mux))
 r.Run()
 ```
 
+* How to integrate with gorilla/mux
+```go
+adminMux := http.NewServeMux()
+Admin.MountTo("/admin", adminMux)
+
+r := mux.NewRouter()
+r.PathPrefix("/admin").Handler(adminMux)
+
+http.Handle("/", r)
+```
+
 ## License
 
 Released under the [MIT License](http://opensource.org/licenses/MIT).
