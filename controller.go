@@ -184,7 +184,7 @@ func (ac *Controller) Update(context *Context) {
 // Delete delete data
 func (ac *Controller) Delete(context *Context) {
 	res := context.Resource
-	status := http.StatusNoContent
+	status := http.StatusOK
 
 	if context.AddError(res.CallDelete(res.NewStruct(), context.Context)); context.HasError() {
 		context.Flash(string(context.t("qor_admin.form.failed_to_delete", "Failed to delete {{.Name}}", res)), "error")
