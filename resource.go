@@ -595,6 +595,14 @@ func (res *Resource) configure() {
 			if injector, ok := reflect.New(fieldStruct.Type).Interface().(resource.ConfigureResourceInterface); ok {
 				injector.ConfigureQorResource(res)
 			}
+		} else if fieldStruct.Type.Kind() == reflect.Struct {
+			fieldData := reflect.New(fieldStruct.Type).Interface()
+			_, configureMetaBeforeInitialize := fieldData.(resource.ConfigureMetaBeforeInitializeInterface)
+			_, configureMeta := fieldData.(resource.ConfigureMetaInterface)
+
+			if configureMetaBeforeInitialize || configureMeta {
+				res.Meta(&Meta{Name: fieldStruct.Name})
+			}
 		}
 	}
 
