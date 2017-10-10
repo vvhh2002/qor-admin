@@ -30,6 +30,7 @@ func TestEditPage(t *testing.T) {
 
 	h.ServeHTTP(rr, req)
 
+	// assert only form so that other sections won't break the tests
 	diff := htmltestingutils.PrettyHtmlDiff(rr.Body, "form", expectedBody)
 	if len(diff) > 0 {
 		t.Error(diff)
