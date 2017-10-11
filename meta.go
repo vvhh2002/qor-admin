@@ -28,6 +28,7 @@ type Meta struct {
 	Permission      *roles.Permission
 	Config          MetaConfigInterface
 
+	processors []func(*Meta)
 	Metas      []resource.Metaor
 	Collection interface{}
 	*resource.Meta
@@ -65,6 +66,11 @@ func (meta *Meta) GetResource() resource.Resourcer {
 		return nil
 	}
 	return meta.Resource
+}
+
+// AddProcessor add processor
+func (meta *Meta) AddProcessor(processor func(*Meta)) {
+	meta.processors = append(meta.processors, processor)
 }
 
 // DBName get meta's db name
