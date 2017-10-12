@@ -24,16 +24,30 @@ type Resource struct {
 	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 	ParentResource *Resource
 
-	admin          *Admin
-	params         string
-	mounted        bool
-	scopes         []*Scope
-	filters        []*Filter
-	sortableAttrs  *[]string
-	indexSections  []*Section
-	newSections    []*Section
-	editSections   []*Section
-	showSections   []*Section
+	admin         *Admin
+	params        string
+	mounted       bool
+	scopes        []*Scope
+	filters       []*Filter
+	sortableAttrs *[]string
+	indexSections []*Section
+	newSections   []*Section
+	editSections  []*Section
+	showSections  []*Section
+	sections      struct {
+		IndexSections                  []*Section
+		OverriddingIndexAttrs          bool
+		OverriddingIndexAttrsCallbacks []func()
+		NewSections                    []*Section
+		OverriddingNewAttrs            bool
+		OverriddingNewAttrsCallbacks   []func()
+		EditSections                   []*Section
+		OverriddingEditAttrs           bool
+		OverriddingEditAttrsCallbacks  []func()
+		ShowSections                   []*Section
+		OverriddingShowAttrs           bool
+		OverriddingShowAttrsCallbacks  []func()
+	}
 	isSetShowAttrs bool
 }
 
@@ -335,9 +349,29 @@ func (res *Resource) getAttrs(attrs []string) []string {
 //     // show all attributes except `State` in the index page
 //     order.IndexAttrs("-State")
 func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
+	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
+
+	res.sections.OverriddingIndexAttrs = true
 	res.setSections(&res.indexSections, values...)
 	res.SearchAttrs()
+
+	// don't call callbacks when overridding
+	if !overriddingIndexAttrs {
+		res.sections.OverriddingIndexAttrs = false
+
+		for _, callback := range res.sections.OverriddingIndexAttrsCallbacks {
+			callback()
+		}
+	}
+
 	return res.indexSections
+}
+
+// OverrideIndexAttrs override index attrs
+func (res *Resource) OverrideIndexAttrs(fc func()) {
+	res.sections.OverriddingIndexAttrs = true
+	res.sections.OverriddingIndexAttrsCallbacks = append(res.sections.OverriddingIndexAttrsCallbacks, fc)
+	fc()
 }
 
 // NewAttrs set attributes will be shown in the new page
