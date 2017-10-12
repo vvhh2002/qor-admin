@@ -68,9 +68,13 @@ func (meta *Meta) GetResource() resource.Resourcer {
 	return meta.Resource
 }
 
-// AddProcessor add processor
+// AddProcessor add processors, it will be call when add them and everytime reconfigure Meta
+// Which is useful when write plugins to overwrite Meta config
 func (meta *Meta) AddProcessor(processor func(*Meta)) {
-	meta.processors = append(meta.processors, processor)
+	if processor != nil {
+		processor(meta)
+		meta.processors = append(meta.processors, processor)
+	}
 }
 
 // DBName get meta's db name
