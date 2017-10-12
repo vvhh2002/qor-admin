@@ -35,7 +35,6 @@ type Resource struct {
 	editSections   []*Section
 	showSections   []*Section
 	isSetShowAttrs bool
-	cachedMetas    *map[string][]*Meta
 }
 
 // Meta register meta for admin resource
@@ -465,24 +464,6 @@ func (res *Resource) SearchAttrs(columns ...string) []string {
 	}
 
 	return columns
-}
-
-func (res *Resource) getCachedMetas(cacheKey string, fc func() []resource.Metaor) []*Meta {
-	if res.cachedMetas == nil {
-		res.cachedMetas = &map[string][]*Meta{}
-	}
-
-	if values, ok := (*res.cachedMetas)[cacheKey]; ok {
-		return values
-	}
-
-	values := fc()
-	var metas []*Meta
-	for _, value := range values {
-		metas = append(metas, value.(*Meta))
-	}
-	(*res.cachedMetas)[cacheKey] = metas
-	return metas
 }
 
 // GetMetas get metas with give attrs
