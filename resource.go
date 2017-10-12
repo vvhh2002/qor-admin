@@ -350,8 +350,8 @@ func (res *Resource) getAttrs(attrs []string) []string {
 //     order.IndexAttrs("-State")
 func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
-
 	res.sections.OverriddingIndexAttrs = true
+
 	res.setSections(&res.indexSections, values...)
 	res.SearchAttrs()
 
@@ -396,8 +396,28 @@ func (res *Resource) OverrideIndexAttrs(fc func()) {
 //       "ColorVariations",
 //     }
 func (res *Resource) NewAttrs(values ...interface{}) []*Section {
+	overriddingNewAttrs := res.sections.OverriddingNewAttrs
+	res.sections.OverriddingNewAttrs = true
+
 	res.setSections(&res.newSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingNewAttrs {
+		res.sections.OverriddingNewAttrs = false
+
+		for _, callback := range res.sections.OverriddingNewAttrsCallbacks {
+			callback()
+		}
+	}
+
 	return res.newSections
+}
+
+// OverrideNewAttrs override index attrs
+func (res *Resource) OverrideNewAttrs(fc func()) {
+	res.sections.OverriddingNewAttrs = true
+	res.sections.OverriddingNewAttrsCallbacks = append(res.sections.OverriddingNewAttrsCallbacks, fc)
+	fc()
 }
 
 // EditAttrs set attributes will be shown in the edit page
@@ -422,8 +442,28 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 //       "ColorVariations",
 //     }
 func (res *Resource) EditAttrs(values ...interface{}) []*Section {
+	overriddingEditAttrs := res.sections.OverriddingEditAttrs
+	res.sections.OverriddingEditAttrs = true
+
 	res.setSections(&res.editSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingEditAttrs {
+		res.sections.OverriddingEditAttrs = false
+
+		for _, callback := range res.sections.OverriddingEditAttrsCallbacks {
+			callback()
+		}
+	}
+
 	return res.editSections
+}
+
+// OverrideEditAttrs override index attrs
+func (res *Resource) OverrideEditAttrs(fc func()) {
+	res.sections.OverriddingEditAttrs = true
+	res.sections.OverriddingEditAttrsCallbacks = append(res.sections.OverriddingEditAttrsCallbacks, fc)
+	fc()
 }
 
 // ShowAttrs set attributes will be shown in the show page
@@ -448,15 +488,35 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 //       "ColorVariations",
 //     }
 func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
+	overriddingShowAttrs := res.sections.OverriddingShowAttrs
+	res.sections.OverriddingShowAttrs = true
+
 	if len(values) > 0 {
 		if values[len(values)-1] == false {
 			values = values[:len(values)-1]
-		} else {
-			res.isSetShowAttrs = true
 		}
 	}
+
 	res.setSections(&res.showSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingShowAttrs {
+		res.sections.OverriddingShowAttrs = false
+		res.isSetShowAttrs = true
+
+		for _, callback := range res.sections.OverriddingShowAttrsCallbacks {
+			callback()
+		}
+	}
+
 	return res.showSections
+}
+
+// OverrideShowAttrs override index attrs
+func (res *Resource) OverrideShowAttrs(fc func()) {
+	res.sections.OverriddingShowAttrs = true
+	res.sections.OverriddingShowAttrsCallbacks = append(res.sections.OverriddingShowAttrsCallbacks, fc)
+	fc()
 }
 
 // SortableAttrs set sortable attributes, sortable attributes could be click to order in qor table
