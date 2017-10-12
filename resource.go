@@ -489,11 +489,14 @@ func (res *Resource) OverrideEditAttrs(fc func()) {
 //     }
 func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 	overriddingShowAttrs := res.sections.OverriddingShowAttrs
+	settingShowAttrs := true
 	res.sections.OverriddingShowAttrs = true
 
 	if len(values) > 0 {
 		if values[len(values)-1] == false {
 			values = values[:len(values)-1]
+		} else {
+			settingShowAttrs = false
 		}
 	}
 
@@ -502,7 +505,9 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 	// don't call callbacks when overridding
 	if !overriddingShowAttrs {
 		res.sections.OverriddingShowAttrs = false
-		res.isSetShowAttrs = true
+		if settingShowAttrs && len(values) > 0 {
+			res.isSetShowAttrs = true
+		}
 
 		for _, callback := range res.sections.OverriddingShowAttrsCallbacks {
 			callback()
