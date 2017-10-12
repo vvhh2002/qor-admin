@@ -316,4 +316,8 @@ func (meta *Meta) updateMeta() {
 			}
 		}
 	}
+
+	for _, processor := range meta.processors {
+		processor(meta)
+	}
 }
