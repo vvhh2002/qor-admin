@@ -449,11 +449,11 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 
 	// don't call callbacks when overridding
 	if !overriddingEditAttrs {
-		res.sections.OverriddingEditAttrs = false
-
 		for _, callback := range res.sections.OverriddingEditAttrsCallbacks {
 			callback()
 		}
+
+		res.sections.OverriddingEditAttrs = false
 	}
 
 	return res.editSections
@@ -461,9 +461,14 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 
 // OverrideEditAttrs override index attrs
 func (res *Resource) OverrideEditAttrs(fc func()) {
+	overriddingEditAttrs := res.sections.OverriddingEditAttrs
 	res.sections.OverriddingEditAttrs = true
 	res.sections.OverriddingEditAttrsCallbacks = append(res.sections.OverriddingEditAttrsCallbacks, fc)
 	fc()
+
+	if !overriddingEditAttrs {
+		res.sections.OverriddingEditAttrs = false
+	}
 }
 
 // ShowAttrs set attributes will be shown in the show page
