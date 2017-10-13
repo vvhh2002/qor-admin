@@ -494,9 +494,8 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 
 	if len(values) > 0 {
 		if values[len(values)-1] == false {
-			values = values[:len(values)-1]
-		} else {
 			settingShowAttrs = false
+			values = values[:len(values)-1]
 		}
 	}
 
