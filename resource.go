@@ -24,18 +24,31 @@ type Resource struct {
 	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 	ParentResource *Resource
 
-	admin          *Admin
-	params         string
-	mounted        bool
-	scopes         []*Scope
-	filters        []*Filter
-	sortableAttrs  *[]string
-	indexSections  []*Section
-	newSections    []*Section
-	editSections   []*Section
-	showSections   []*Section
+	admin         *Admin
+	params        string
+	mounted       bool
+	scopes        []*Scope
+	filters       []*Filter
+	sortableAttrs *[]string
+	indexSections []*Section
+	newSections   []*Section
+	editSections  []*Section
+	showSections  []*Section
+	sections      struct {
+		IndexSections                  []*Section
+		OverriddingIndexAttrs          bool
+		OverriddingIndexAttrsCallbacks []func()
+		NewSections                    []*Section
+		OverriddingNewAttrs            bool
+		OverriddingNewAttrsCallbacks   []func()
+		EditSections                   []*Section
+		OverriddingEditAttrs           bool
+		OverriddingEditAttrsCallbacks  []func()
+		ShowSections                   []*Section
+		OverriddingShowAttrs           bool
+		OverriddingShowAttrsCallbacks  []func()
+	}
 	isSetShowAttrs bool
-	cachedMetas    *map[string][]*Meta
 }
 
 // Meta register meta for admin resource
@@ -336,9 +349,34 @@ func (res *Resource) getAttrs(attrs []string) []string {
 //     // show all attributes except `State` in the index page
 //     order.IndexAttrs("-State")
 func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
+	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
+	res.sections.OverriddingIndexAttrs = true
+
 	res.setSections(&res.indexSections, values...)
 	res.SearchAttrs()
+
+	// don't call callbacks when overridding
+	if !overriddingIndexAttrs {
+		for _, callback := range res.sections.OverriddingIndexAttrsCallbacks {
+			callback()
+		}
+
+		res.sections.OverriddingIndexAttrs = false
+	}
+
 	return res.indexSections
+}
+
+// OverrideIndexAttrs override index attrs
+func (res *Resource) OverrideIndexAttrs(fc func()) {
+	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
+	res.sections.OverriddingIndexAttrs = true
+	res.sections.OverriddingIndexAttrsCallbacks = append(res.sections.OverriddingIndexAttrsCallbacks, fc)
+	fc()
+
+	if !overriddingIndexAttrs {
+		res.sections.OverriddingIndexAttrs = false
+	}
 }
 
 // NewAttrs set attributes will be shown in the new page
@@ -363,8 +401,33 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 //       "ColorVariations",
 //     }
 func (res *Resource) NewAttrs(values ...interface{}) []*Section {
+	overriddingNewAttrs := res.sections.OverriddingNewAttrs
+	res.sections.OverriddingNewAttrs = true
+
 	res.setSections(&res.newSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingNewAttrs {
+		for _, callback := range res.sections.OverriddingNewAttrsCallbacks {
+			callback()
+		}
+
+		res.sections.OverriddingNewAttrs = false
+	}
+
 	return res.newSections
+}
+
+// OverrideNewAttrs override index attrs
+func (res *Resource) OverrideNewAttrs(fc func()) {
+	overriddingNewAttrs := res.sections.OverriddingNewAttrs
+	res.sections.OverriddingNewAttrs = true
+	res.sections.OverriddingNewAttrsCallbacks = append(res.sections.OverriddingNewAttrsCallbacks, fc)
+	fc()
+
+	if !overriddingNewAttrs {
+		res.sections.OverriddingNewAttrs = false
+	}
 }
 
 // EditAttrs set attributes will be shown in the edit page
@@ -389,8 +452,33 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 //       "ColorVariations",
 //     }
 func (res *Resource) EditAttrs(values ...interface{}) []*Section {
+	overriddingEditAttrs := res.sections.OverriddingEditAttrs
+	res.sections.OverriddingEditAttrs = true
+
 	res.setSections(&res.editSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingEditAttrs {
+		for _, callback := range res.sections.OverriddingEditAttrsCallbacks {
+			callback()
+		}
+
+		res.sections.OverriddingEditAttrs = false
+	}
+
 	return res.editSections
+}
+
+// OverrideEditAttrs override index attrs
+func (res *Resource) OverrideEditAttrs(fc func()) {
+	overriddingEditAttrs := res.sections.OverriddingEditAttrs
+	res.sections.OverriddingEditAttrs = true
+	res.sections.OverriddingEditAttrsCallbacks = append(res.sections.OverriddingEditAttrsCallbacks, fc)
+	fc()
+
+	if !overriddingEditAttrs {
+		res.sections.OverriddingEditAttrs = false
+	}
 }
 
 // ShowAttrs set attributes will be shown in the show page
@@ -415,15 +503,45 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 //       "ColorVariations",
 //     }
 func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
+	overriddingShowAttrs := res.sections.OverriddingShowAttrs
+	settingShowAttrs := true
+	res.sections.OverriddingShowAttrs = true
+
 	if len(values) > 0 {
 		if values[len(values)-1] == false {
+			settingShowAttrs = false
 			values = values[:len(values)-1]
-		} else {
-			res.isSetShowAttrs = true
 		}
 	}
+
 	res.setSections(&res.showSections, values...)
+
+	// don't call callbacks when overridding
+	if !overriddingShowAttrs {
+		if settingShowAttrs && len(values) > 0 {
+			res.isSetShowAttrs = true
+		}
+
+		for _, callback := range res.sections.OverriddingShowAttrsCallbacks {
+			callback()
+		}
+
+		res.sections.OverriddingShowAttrs = false
+	}
+
 	return res.showSections
+}
+
+// OverrideShowAttrs override index attrs
+func (res *Resource) OverrideShowAttrs(fc func()) {
+	overriddingShowAttrs := res.sections.OverriddingShowAttrs
+	res.sections.OverriddingShowAttrs = true
+	res.sections.OverriddingShowAttrsCallbacks = append(res.sections.OverriddingShowAttrsCallbacks, fc)
+	fc()
+
+	if !overriddingShowAttrs {
+		res.sections.OverriddingShowAttrs = false
+	}
 }
 
 // SortableAttrs set sortable attributes, sortable attributes could be click to order in qor table
@@ -465,24 +583,6 @@ func (res *Resource) SearchAttrs(columns ...string) []string {
 	}
 
 	return columns
-}
-
-func (res *Resource) getCachedMetas(cacheKey string, fc func() []resource.Metaor) []*Meta {
-	if res.cachedMetas == nil {
-		res.cachedMetas = &map[string][]*Meta{}
-	}
-
-	if values, ok := (*res.cachedMetas)[cacheKey]; ok {
-		return values
-	}
-
-	values := fc()
-	var metas []*Meta
-	for _, value := range values {
-		metas = append(metas, value.(*Meta))
-	}
-	(*res.cachedMetas)[cacheKey] = metas
-	return metas
 }
 
 // GetMetas get metas with give attrs
