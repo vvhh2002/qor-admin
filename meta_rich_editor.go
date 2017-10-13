@@ -7,9 +7,10 @@ import (
 )
 
 type RichEditorConfig struct {
-	AssetManager *Resource
-	Plugins      []RedactorPlugin
-	Settings     map[string]interface{}
+	AssetManager         *Resource
+	DisableHTMLSanitizer bool
+	Plugins              []RedactorPlugin
+	Settings             map[string]interface{}
 	metaConfig
 }
 
@@ -29,11 +30,13 @@ func (richEditorConfig *RichEditorConfig) ConfigureQorMeta(metaor resource.Metao
 			meta.Resource = nil
 		}
 
-		setter := meta.GetSetter()
-		meta.SetSetter(func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
-			metaValue.Value = utils.HTMLSanitizer.Sanitize(utils.ToString(metaValue.Value))
-			setter(resource, metaValue, context)
-		})
+		if !richEditorConfig.DisableHTMLSanitizer {
+			setter := meta.GetSetter()
+			meta.SetSetter(func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context) {
+				metaValue.Value = utils.HTMLSanitizer.Sanitize(utils.ToString(metaValue.Value))
+				setter(resource, metaValue, context)
+			})
+		}
 
 		if richEditorConfig.Settings == nil {
 			richEditorConfig.Settings = map[string]interface{}{}
