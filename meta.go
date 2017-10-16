@@ -28,7 +28,7 @@ type Meta struct {
 	Permission      *roles.Permission
 	Config          MetaConfigInterface
 
-	processors []func(*Meta)
+	processors []*MetaProcessor
 	Metas      []resource.Metaor
 	Collection interface{}
 	*resource.Meta
@@ -68,11 +68,25 @@ func (meta *Meta) GetResource() resource.Resourcer {
 	return meta.Resource
 }
 
+// MetaProcessor meta processor
+type MetaProcessor struct {
+	Name    string
+	Handler func(*Meta)
+}
+
 // AddProcessor add processors, it will be call when add them and everytime reconfigure Meta
 // Which is useful when write plugins to overwrite Meta config
-func (meta *Meta) AddProcessor(processor func(*Meta)) {
-	if processor != nil {
-		processor(meta)
+func (meta *Meta) AddProcessor(processor *MetaProcessor) {
+	if processor != nil && processor.Handler != nil {
+		processor.Handler(meta)
+
+		for idx, p := range meta.processors {
+			if p.Name == processor.Name {
+				meta.processors[idx] = processor
+				return
+			}
+		}
+
 		meta.processors = append(meta.processors, processor)
 	}
 }
@@ -318,6 +332,6 @@ func (meta *Meta) updateMeta() {
 	}
 
 	for _, processor := range meta.processors {
-		processor(meta)
+		processor.Handler(meta)
 	}
 }
