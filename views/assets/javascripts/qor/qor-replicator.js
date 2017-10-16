@@ -173,16 +173,16 @@
 
             this.$element.on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
-            !this.isInSlideout && $(document).on(EVENT_SUBMIT, 'form', this.removeData.bind(this));
+            !this.isInSlideout && $(document).on(EVENT_SUBMIT, 'form', this.removeData);
             $(document)
-                .on(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.removeData.bind(this))
-                .on(EVENT_SELECTCOREBEFORESEND, this.removeData.bind(this));
+                .on(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.removeDataFormSlideout)
+                .on(EVENT_SELECTCOREBEFORESEND, this.removeDataFromBottomsheet);
         },
 
         unbind: function() {
             this.$element.off(EVENT_CLICK);
 
-            !this.isInSlideout && $(document).off(EVENT_SUBMIT, 'form');
+            !this.isInSlideout && $(document).off(EVENT_SUBMIT, 'form', this.removeData);
             $(document)
                 .off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout')
                 .off(EVENT_SELECTCOREBEFORESEND);
@@ -190,6 +190,14 @@
 
         removeData: function() {
             $('.qor-fieldset--new').remove();
+        },
+
+        removeDataFormSlideout: function() {
+            $('.qor-slideout .qor-fieldset--new').remove();
+        },
+
+        removeDataFromBottomsheet: function() {
+            $('.qor-bottomsheets .qor-fieldset--new').remove();
         },
 
         add: function(e, data, isAutomatically) {
