@@ -38,13 +38,6 @@ func (middleware Middleware) Next(context *Context) {
 	}
 }
 
-// Router contains registered routers
-type Router struct {
-	Prefix      string
-	routers     map[string][]*routeHandler
-	middlewares []*Middleware
-}
-
 func newRouter() *Router {
 	return &Router{routers: map[string][]*routeHandler{
 		"GET":    {},
@@ -52,6 +45,13 @@ func newRouter() *Router {
 		"POST":   {},
 		"DELETE": {},
 	}}
+}
+
+// Router contains registered routers
+type Router struct {
+	Prefix      string
+	routers     map[string][]*routeHandler
+	middlewares []*Middleware
 }
 
 // Use reigster a middleware to the router
@@ -86,21 +86,6 @@ func (r *Router) GetMiddleware(name string) *Middleware {
 	return nil
 }
 
-var wildcardRouter = regexp.MustCompile(`/:\w+`)
-
-func (r *Router) sortRoutes(routes []*routeHandler) {
-	sort.SliceStable(routes, func(i, j int) bool {
-		iIsWildcard := wildcardRouter.MatchString(routes[i].Path)
-		jIsWildcard := wildcardRouter.MatchString(routes[j].Path)
-		// i regexp (true), j static (false) => false
-		// i static (true), j regexp (true) => true
-		if iIsWildcard != jIsWildcard {
-			return jIsWildcard
-		}
-		return len(routes[i].Path) > len(routes[j].Path)
-	})
-}
-
 // Get register a GET request handle with the given path
 func (r *Router) Get(path string, handle requestHandler, config ...*RouteConfig) {
 	r.routers["GET"] = append(r.routers["GET"], newRouteHandler(path, handle, config...))
@@ -123,6 +108,21 @@ func (r *Router) Put(path string, handle requestHandler, config ...*RouteConfig)
 func (r *Router) Delete(path string, handle requestHandler, config ...*RouteConfig) {
 	r.routers["DELETE"] = append(r.routers["DELETE"], newRouteHandler(path, handle, config...))
 	r.sortRoutes(r.routers["DELETE"])
+}
+
+var wildcardRouter = regexp.MustCompile(`/:\w+`)
+
+func (r *Router) sortRoutes(routes []*routeHandler) {
+	sort.SliceStable(routes, func(i, j int) bool {
+		iIsWildcard := wildcardRouter.MatchString(routes[i].Path)
+		jIsWildcard := wildcardRouter.MatchString(routes[j].Path)
+		// i regexp (true), j static (false) => false
+		// i static (true), j regexp (true) => true
+		if iIsWildcard != jIsWildcard {
+			return jIsWildcard
+		}
+		return len(routes[i].Path) > len(routes[j].Path)
+	})
 }
 
 // MountTo mount the service into mux (HTTP request multiplexer) with given path
@@ -181,102 +181,6 @@ func (admin *Admin) NewServeMux(prefix string) http.Handler {
 	})
 
 	return &serveMux{admin: admin}
-}
-
-// RegisterResourceRouters register resource to router
-func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
-	var (
-		primaryKeyParams = res.ParamIDName()
-		adminController  = &Controller{Admin: admin}
-	)
-
-	for _, action := range actions {
-		switch strings.ToLower(action) {
-		case "create":
-			if !res.Config.Singleton {
-				// New
-				res.RegisterRoute("GET", "/new", adminController.New, &RouteConfig{PermissionMode: roles.Create})
-			}
-
-			// Create
-			res.RegisterRoute("POST", "/", adminController.Create, &RouteConfig{PermissionMode: roles.Create})
-		case "update":
-			if res.Config.Singleton {
-				// Edit
-				res.RegisterRoute("GET", "/edit", adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
-
-				// Update
-				res.RegisterRoute("PUT", "/", adminController.Update, &RouteConfig{PermissionMode: roles.Update})
-			} else {
-				// Edit
-				res.RegisterRoute("GET", path.Join(primaryKeyParams, "edit"), adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
-
-				// Update
-				res.RegisterRoute("POST", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
-				res.RegisterRoute("PUT", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
-			}
-		case "read":
-			if res.Config.Singleton {
-				// Index
-				res.RegisterRoute("GET", "/", adminController.Show, &RouteConfig{PermissionMode: roles.Read})
-			} else {
-				// Index
-				res.RegisterRoute("GET", "/", adminController.Index, &RouteConfig{PermissionMode: roles.Read})
-
-				// Show
-				res.RegisterRoute("GET", primaryKeyParams, adminController.Show, &RouteConfig{PermissionMode: roles.Read})
-			}
-		case "delete":
-			if !res.Config.Singleton {
-				// Delete
-				res.RegisterRoute("DELETE", primaryKeyParams, adminController.Delete, &RouteConfig{PermissionMode: roles.Delete})
-			}
-		}
-	}
-
-	// FIXME Register Sub Resources into Routers, Generate Available Metas, Generate API based on request formats
-}
-
-// RegisterRoute register route
-func (res *Resource) RegisterRoute(method string, relativePath string, handler requestHandler, config *RouteConfig) {
-	if config == nil {
-		config = &RouteConfig{}
-	}
-	config.Resource = res
-
-	var (
-		prefix string
-		param  = res.ToParam()
-		router = res.GetAdmin().router
-	)
-
-	if prefix = func(r *Resource) string {
-		currentParam := param
-
-		for r.ParentResource != nil {
-			parentPath := r.ParentResource.ToParam()
-			// don't register same resource as nested routes
-			if parentPath == param {
-				return ""
-			}
-			currentParam = path.Join(parentPath, r.ParentResource.ParamIDName(), currentParam)
-			r = r.ParentResource
-		}
-		return "/" + strings.Trim(currentParam, "/")
-	}(res); prefix == "" {
-		return
-	}
-
-	switch strings.ToUpper(method) {
-	case "GET":
-		router.Get(path.Join(prefix, relativePath), handler, config)
-	case "POST":
-		router.Post(path.Join(prefix, relativePath), handler, config)
-	case "PUT":
-		router.Put(path.Join(prefix, relativePath), handler, config)
-	case "DELETE":
-		router.Delete(path.Join(prefix, relativePath), handler, config)
-	}
 }
 
 type serveMux struct {
@@ -357,5 +261,99 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for _, middleware := range admin.router.middlewares {
 		middleware.Handler(context, middleware)
 		break
+	}
+}
+
+// RegisterResourceRouters register resource to router
+func (admin *Admin) RegisterResourceRouters(res *Resource, actions ...string) {
+	var (
+		primaryKeyParams = res.ParamIDName()
+		adminController  = &Controller{Admin: admin}
+	)
+
+	for _, action := range actions {
+		switch strings.ToLower(action) {
+		case "create":
+			if !res.Config.Singleton {
+				// New
+				res.RegisterRoute("GET", "/new", adminController.New, &RouteConfig{PermissionMode: roles.Create})
+			}
+
+			// Create
+			res.RegisterRoute("POST", "/", adminController.Create, &RouteConfig{PermissionMode: roles.Create})
+		case "update":
+			if res.Config.Singleton {
+				// Edit
+				res.RegisterRoute("GET", "/edit", adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
+
+				// Update
+				res.RegisterRoute("PUT", "/", adminController.Update, &RouteConfig{PermissionMode: roles.Update})
+			} else {
+				// Edit
+				res.RegisterRoute("GET", path.Join(primaryKeyParams, "edit"), adminController.Edit, &RouteConfig{PermissionMode: roles.Update})
+
+				// Update
+				res.RegisterRoute("POST", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
+				res.RegisterRoute("PUT", primaryKeyParams, adminController.Update, &RouteConfig{PermissionMode: roles.Update})
+			}
+		case "read":
+			if res.Config.Singleton {
+				// Index
+				res.RegisterRoute("GET", "/", adminController.Show, &RouteConfig{PermissionMode: roles.Read})
+			} else {
+				// Index
+				res.RegisterRoute("GET", "/", adminController.Index, &RouteConfig{PermissionMode: roles.Read})
+
+				// Show
+				res.RegisterRoute("GET", primaryKeyParams, adminController.Show, &RouteConfig{PermissionMode: roles.Read})
+			}
+		case "delete":
+			if !res.Config.Singleton {
+				// Delete
+				res.RegisterRoute("DELETE", primaryKeyParams, adminController.Delete, &RouteConfig{PermissionMode: roles.Delete})
+			}
+		}
+	}
+}
+
+// RegisterRoute register route
+func (res *Resource) RegisterRoute(method string, relativePath string, handler requestHandler, config *RouteConfig) {
+	if config == nil {
+		config = &RouteConfig{}
+	}
+	config.Resource = res
+
+	var (
+		prefix string
+		param  = res.ToParam()
+		router = res.GetAdmin().router
+	)
+
+	if prefix = func(r *Resource) string {
+		currentParam := param
+
+		for r.ParentResource != nil {
+			parentPath := r.ParentResource.ToParam()
+			// don't register same resource as nested routes
+			if parentPath == param {
+				return ""
+			}
+			currentParam = path.Join(parentPath, r.ParentResource.ParamIDName(), currentParam)
+			r = r.ParentResource
+		}
+		return "/" + strings.Trim(currentParam, "/")
+	}(res); prefix == "" {
+		return
+	}
+
+	switch strings.ToUpper(method) {
+	case "GET":
+		router.Get(path.Join(prefix, relativePath), handler, config)
+	case "POST":
+		router.Post(path.Join(prefix, relativePath), handler, config)
+	case "PUT":
+		router.Put(path.Join(prefix, relativePath), handler, config)
+	case "DELETE":
+		router.Delete(path.Join(prefix, relativePath), handler, config)
 	}
 }
