@@ -41,10 +41,10 @@ type Resource struct {
 		OverriddingEditAttrsCallbacks  []func()
 		ShowSections                   []*Section
 		OverriddingShowAttrs           bool
+		ConfiguredShowAttrs            bool
 		OverriddingShowAttrsCallbacks  []func()
 		SortableAttrs                  *[]string
 	}
-	isSetShowAttrs bool
 }
 
 // Meta register meta for admin resource
@@ -515,7 +515,7 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 	// don't call callbacks when overridding
 	if !overriddingShowAttrs {
 		if settingShowAttrs && len(values) > 0 {
-			res.isSetShowAttrs = true
+			res.sections.ConfiguredShowAttrs = true
 		}
 
 		for _, callback := range res.sections.OverriddingShowAttrsCallbacks {

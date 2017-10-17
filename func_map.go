@@ -817,7 +817,7 @@ func (context *Context) loadActions(action string) template.HTML {
 	case "index", "show", "edit", "new":
 		actionPatterns = []string{filepath.Join("actions", action, "*.tmpl"), "actions/*.tmpl"}
 
-		if !context.Resource.isSetShowAttrs && action == "edit" {
+		if !context.Resource.sections.ConfiguredShowAttrs && action == "edit" {
 			actionPatterns = []string{filepath.Join("actions", "show", "*.tmpl"), "actions/*.tmpl"}
 		}
 	case "global":
@@ -1117,7 +1117,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"defined_resource_show_page": func(res *Resource) bool {
 			if res != nil {
 				if r := context.Admin.GetResource(res.Name); r != nil {
-					return r.isSetShowAttrs
+					return r.sections.ConfiguredShowAttrs
 				}
 			}
 

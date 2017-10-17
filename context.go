@@ -186,7 +186,7 @@ func (context *Context) Render(name string, results ...interface{}) template.HTM
 func (context *Context) Execute(name string, result interface{}) {
 	var tmpl *template.Template
 
-	if name == "show" && !context.Resource.isSetShowAttrs {
+	if name == "show" && !context.Resource.sections.ConfiguredShowAttrs {
 		name = "edit"
 	}
 
@@ -225,7 +225,7 @@ func (context *Context) JSON(action string, result interface{}) {
 }
 
 func (context *Context) Encode(action string, result interface{}) error {
-	if action == "show" && !context.Resource.isSetShowAttrs {
+	if action == "show" && !context.Resource.sections.ConfiguredShowAttrs {
 		action = "edit"
 	}
 
