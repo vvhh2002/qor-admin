@@ -100,7 +100,7 @@ func (res *Resource) Meta(meta *Meta) *Meta {
 		meta.baseResource = res
 	}
 
-	meta.updateMeta()
+	meta.configure()
 	return meta
 }
 
@@ -625,7 +625,7 @@ Attrs:
 					break
 				}
 			}
-			meta.updateMeta()
+			meta.configure()
 		}
 
 		metas = append(metas, meta)
@@ -654,7 +654,7 @@ func (res *Resource) GetMeta(name string) *Meta {
 			if field.IsPrimaryKey {
 				meta.Type = "hidden_primary_key"
 			}
-			meta.updateMeta()
+			meta.configure()
 			res.Metas = append(res.Metas, meta)
 			return meta
 		}

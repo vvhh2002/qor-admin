@@ -99,15 +99,6 @@ func (meta *Meta) DBName() string {
 	return ""
 }
 
-func getField(fields []*gorm.StructField, name string) (*gorm.StructField, bool) {
-	for _, field := range fields {
-		if field.Name == name || field.DBName == name {
-			return field, true
-		}
-	}
-	return nil, false
-}
-
 // SetPermission set meta's permission
 func (meta *Meta) SetPermission(permission *roles.Permission) {
 	meta.Permission = permission
@@ -134,7 +125,7 @@ func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) 
 	return true
 }
 
-func (meta *Meta) updateMeta() {
+func (meta *Meta) configure() {
 	if meta.Meta == nil {
 		meta.Meta = &resource.Meta{
 			Name:            meta.Name,
