@@ -15,10 +15,11 @@ import (
 	"github.com/qor/qor/utils"
 )
 
+// filterRegexp used to parse url query to get filters
+var filterRegexp = regexp.MustCompile(`^filters\[(.*?)\]`)
+
 // PaginationPageCount default pagination page count
 var PaginationPageCount = 20
-
-type scopeFunc func(db *gorm.DB, context *qor.Context) *gorm.DB
 
 // Pagination is used to hold pagination related information when rendering tables
 type Pagination struct {
@@ -76,22 +77,6 @@ func (s *Searcher) Filter(filter *Filter, values *resource.MetaValues) *Searcher
 	return newSearcher
 }
 
-// FindMany find many records based on current conditions
-func (s *Searcher) FindMany() (interface{}, error) {
-	var (
-		err     error
-		context = s.parseContext()
-		result  = s.Resource.NewSlice()
-	)
-
-	if context.HasError() {
-		return result, context.Errors
-	}
-
-	err = s.Resource.CallFindMany(result, context)
-	return result, err
-}
-
 // FindOne find one record based on current conditions
 func (s *Searcher) FindOne() (interface{}, error) {
 	var (
@@ -108,9 +93,24 @@ func (s *Searcher) FindOne() (interface{}, error) {
 	return result, err
 }
 
-var filterRegexp = regexp.MustCompile(`^filters\[(.*?)\]`)
+// FindMany find many records based on current conditions
+func (s *Searcher) FindMany() (interface{}, error) {
+	var (
+		err     error
+		context = s.parseContext()
+		result  = s.Resource.NewSlice()
+	)
 
-func (s *Searcher) callScopes(context *qor.Context) *qor.Context {
+	if context.HasError() {
+		return result, context.Errors
+	}
+
+	err = s.Resource.CallFindMany(result, context)
+	return result, err
+}
+
+// filterData filter data by scopes, filters, order by and keyword
+func (s *Searcher) filterData(context *qor.Context) *qor.Context {
 	db := context.GetDB()
 
 	// call default scopes
@@ -194,7 +194,7 @@ func (s *Searcher) parseContext() *qor.Context {
 		}
 	}
 
-	searcher.callScopes(context)
+	searcher.filterData(context)
 
 	db := context.GetDB()
 
