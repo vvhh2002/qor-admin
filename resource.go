@@ -24,17 +24,12 @@ type Resource struct {
 	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 	ParentResource *Resource
 
-	admin         *Admin
-	params        string
-	mounted       bool
-	scopes        []*Scope
-	filters       []*Filter
-	sortableAttrs *[]string
-	indexSections []*Section
-	newSections   []*Section
-	editSections  []*Section
-	showSections  []*Section
-	sections      struct {
+	admin    *Admin
+	params   string
+	mounted  bool
+	scopes   []*Scope
+	filters  []*Filter
+	sections struct {
 		IndexSections                  []*Section
 		OverriddingIndexAttrs          bool
 		OverriddingIndexAttrsCallbacks []func()
@@ -47,6 +42,7 @@ type Resource struct {
 		ShowSections                   []*Section
 		OverriddingShowAttrs           bool
 		OverriddingShowAttrsCallbacks  []func()
+		SortableAttrs                  *[]string
 	}
 	isSetShowAttrs bool
 }
@@ -352,7 +348,7 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
 	res.sections.OverriddingIndexAttrs = true
 
-	res.setSections(&res.indexSections, values...)
+	res.setSections(&res.sections.IndexSections, values...)
 	res.SearchAttrs()
 
 	// don't call callbacks when overridding
@@ -364,7 +360,7 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 		res.sections.OverriddingIndexAttrs = false
 	}
 
-	return res.indexSections
+	return res.sections.IndexSections
 }
 
 // OverrideIndexAttrs override index attrs
@@ -404,7 +400,7 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 	overriddingNewAttrs := res.sections.OverriddingNewAttrs
 	res.sections.OverriddingNewAttrs = true
 
-	res.setSections(&res.newSections, values...)
+	res.setSections(&res.sections.NewSections, values...)
 
 	// don't call callbacks when overridding
 	if !overriddingNewAttrs {
@@ -415,7 +411,7 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 		res.sections.OverriddingNewAttrs = false
 	}
 
-	return res.newSections
+	return res.sections.NewSections
 }
 
 // OverrideNewAttrs override index attrs
@@ -455,7 +451,7 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 	overriddingEditAttrs := res.sections.OverriddingEditAttrs
 	res.sections.OverriddingEditAttrs = true
 
-	res.setSections(&res.editSections, values...)
+	res.setSections(&res.sections.EditSections, values...)
 
 	// don't call callbacks when overridding
 	if !overriddingEditAttrs {
@@ -466,7 +462,7 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 		res.sections.OverriddingEditAttrs = false
 	}
 
-	return res.editSections
+	return res.sections.EditSections
 }
 
 // OverrideEditAttrs override index attrs
@@ -514,7 +510,7 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 		}
 	}
 
-	res.setSections(&res.showSections, values...)
+	res.setSections(&res.sections.ShowSections, values...)
 
 	// don't call callbacks when overridding
 	if !overriddingShowAttrs {
@@ -529,7 +525,7 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 		res.sections.OverriddingShowAttrs = false
 	}
 
-	return res.showSections
+	return res.sections.ShowSections
 }
 
 // OverrideShowAttrs override index attrs
@@ -546,20 +542,20 @@ func (res *Resource) OverrideShowAttrs(fc func()) {
 
 // SortableAttrs set sortable attributes, sortable attributes could be click to order in qor table
 func (res *Resource) SortableAttrs(columns ...string) []string {
-	if len(columns) != 0 || res.sortableAttrs == nil {
+	if len(columns) != 0 || res.sections.SortableAttrs == nil {
 		if len(columns) == 0 {
-			columns = res.ConvertSectionToStrings(res.indexSections)
+			columns = res.ConvertSectionToStrings(res.sections.IndexSections)
 		}
-		res.sortableAttrs = &[]string{}
+		res.sections.SortableAttrs = &[]string{}
 		scope := res.GetAdmin().Config.DB.NewScope(res.Value)
 		for _, column := range columns {
 			if field, ok := scope.FieldByName(column); ok && field.DBName != "" {
-				attrs := append(*res.sortableAttrs, column)
-				res.sortableAttrs = &attrs
+				attrs := append(*res.sections.SortableAttrs, column)
+				res.sections.SortableAttrs = &attrs
 			}
 		}
 	}
-	return *res.sortableAttrs
+	return *res.sections.SortableAttrs
 }
 
 // SearchAttrs set search attributes, when search resources, will use those columns to search
@@ -568,7 +564,7 @@ func (res *Resource) SortableAttrs(columns ...string) []string {
 func (res *Resource) SearchAttrs(columns ...string) []string {
 	if len(columns) != 0 || res.SearchHandler == nil {
 		if len(columns) == 0 {
-			columns = res.ConvertSectionToStrings(res.indexSections)
+			columns = res.ConvertSectionToStrings(res.sections.IndexSections)
 		}
 
 		if len(columns) > 0 {
