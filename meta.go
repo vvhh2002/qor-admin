@@ -17,6 +17,7 @@ import (
 
 // Meta meta struct definition
 type Meta struct {
+	*resource.Meta
 	Name            string
 	Type            string
 	Label           string
@@ -24,15 +25,14 @@ type Meta struct {
 	Setter          func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context)
 	Valuer          func(interface{}, *qor.Context) interface{}
 	FormattedValuer func(interface{}, *qor.Context) interface{}
-	Resource        *Resource
 	Permission      *roles.Permission
 	Config          MetaConfigInterface
+	Metas           []resource.Metaor
+	Collection      interface{}
+	Resource        *Resource
 
-	processors []*MetaProcessor
-	Metas      []resource.Metaor
-	Collection interface{}
-	*resource.Meta
 	baseResource *Resource
+	processors   []*MetaProcessor
 }
 
 // metaConfig meta config
