@@ -6,6 +6,7 @@ import (
 	"github.com/qor/qor/utils"
 )
 
+// RichEditorConfig rich editor meta config
 type RichEditorConfig struct {
 	AssetManager         *Resource
 	DisableHTMLSanitizer bool
@@ -14,6 +15,7 @@ type RichEditorConfig struct {
 	metaConfig
 }
 
+// RedactorPlugin register redactor plugins into rich editor
 type RedactorPlugin struct {
 	Name   string
 	Source string

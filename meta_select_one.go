@@ -70,6 +70,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 	}
 }
 
+// ConfigureQORAdminFilter configure admin filter
 func (selectOneConfig *SelectOneConfig) ConfigureQORAdminFilter(filter *Filter) {
 	var structField *gorm.StructField
 	if field, ok := filter.Resource.GetAdmin().Config.DB.NewScope(filter.Resource.Value).FieldByName(filter.Name); ok {
@@ -84,6 +85,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQORAdminFilter(filter *Filter) 
 	filter.Type = "select_one"
 }
 
+// FilterValue filter value
 func (selectOneConfig *SelectOneConfig) FilterValue(filter *Filter, context *Context) interface{} {
 	var (
 		prefix  = fmt.Sprintf("filters[%v].", filter.Name)

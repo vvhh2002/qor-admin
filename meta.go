@@ -2,7 +2,6 @@ package admin
 
 import (
 	"database/sql"
-	"errors"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -15,88 +14,29 @@ import (
 	"github.com/qor/roles"
 )
 
-// Meta meta struct definition
-type Meta struct {
-	*resource.Meta
-	Name            string
-	Type            string
-	Label           string
-	FieldName       string
-	Setter          func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context)
-	Valuer          func(interface{}, *qor.Context) interface{}
-	FormattedValuer func(interface{}, *qor.Context) interface{}
-	Permission      *roles.Permission
-	Config          MetaConfigInterface
-	Metas           []resource.Metaor
-	Collection      interface{}
-	Resource        *Resource
-
-	baseResource *Resource
-	processors   []*MetaProcessor
-}
-
-// metaConfig meta config
-type metaConfig struct {
-}
-
-// GetTemplate get customized template for meta
-func (metaConfig) GetTemplate(context *Context, metaType string) ([]byte, error) {
-	return nil, errors.New("not implemented")
-}
-
 // MetaConfigInterface meta config interface
 type MetaConfigInterface interface {
 	resource.MetaConfigInterface
 }
 
-// GetMetas get sub metas
-func (meta *Meta) GetMetas() []resource.Metaor {
-	if len(meta.Metas) > 0 {
-		return meta.Metas
-	} else if meta.Resource == nil {
-		return []resource.Metaor{}
-	} else {
-		return meta.Resource.GetMetas([]string{})
-	}
-}
+// Meta meta struct definition
+type Meta struct {
+	*resource.Meta
+	Name            string
+	FieldName       string
+	Label           string
+	Type            string
+	Setter          func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context)
+	Valuer          func(interface{}, *qor.Context) interface{}
+	FormattedValuer func(interface{}, *qor.Context) interface{}
+	Permission      *roles.Permission
+	Config          MetaConfigInterface
+	Collection      interface{}
+	Resource        *Resource
 
-// GetResource get resource from meta
-func (meta *Meta) GetResource() resource.Resourcer {
-	if meta.Resource == nil {
-		return nil
-	}
-	return meta.Resource
-}
-
-// MetaProcessor meta processor
-type MetaProcessor struct {
-	Name    string
-	Handler func(*Meta)
-}
-
-// AddProcessor add processors, it will be call when add them and everytime reconfigure Meta
-// Which is useful when write plugins to overwrite Meta config
-func (meta *Meta) AddProcessor(processor *MetaProcessor) {
-	if processor != nil && processor.Handler != nil {
-		processor.Handler(meta)
-
-		for idx, p := range meta.processors {
-			if p.Name == processor.Name {
-				meta.processors[idx] = processor
-				return
-			}
-		}
-
-		meta.processors = append(meta.processors, processor)
-	}
-}
-
-// DBName get meta's db name
-func (meta *Meta) DBName() string {
-	if meta.FieldStruct != nil {
-		return meta.FieldStruct.DBName
-	}
-	return ""
+	metas        []resource.Metaor
+	baseResource *Resource
+	processors   []*MetaProcessor
 }
 
 // SetPermission set meta's permission
@@ -123,6 +63,47 @@ func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) 
 	}
 
 	return true
+}
+
+// GetResource get resource from meta
+func (meta *Meta) GetResource() resource.Resourcer {
+	if meta.Resource == nil {
+		return nil
+	}
+	return meta.Resource
+}
+
+// GetMetas get sub metas
+func (meta *Meta) GetMetas() []resource.Metaor {
+	if len(meta.metas) > 0 {
+		return meta.metas
+	} else if meta.Resource == nil {
+		return []resource.Metaor{}
+	} else {
+		return meta.Resource.GetMetas([]string{})
+	}
+}
+
+// MetaProcessor meta processor which will be run each time update Meta
+type MetaProcessor struct {
+	Name    string
+	Handler func(*Meta)
+}
+
+// AddProcessor add meta processors, it will be run when add them and each time update Meta
+func (meta *Meta) AddProcessor(processor *MetaProcessor) {
+	if processor != nil && processor.Handler != nil {
+		processor.Handler(meta)
+
+		for idx, p := range meta.processors {
+			if p.Name == processor.Name {
+				meta.processors[idx] = processor
+				return
+			}
+		}
+
+		meta.processors = append(meta.processors, processor)
+	}
 }
 
 func (meta *Meta) configure() {

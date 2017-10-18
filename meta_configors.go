@@ -1,11 +1,21 @@
 package admin
 
 import (
+	"errors"
 	"time"
 
 	"github.com/qor/qor"
 	"github.com/qor/qor/utils"
 )
+
+// metaConfig meta config
+type metaConfig struct {
+}
+
+// GetTemplate get customized template for meta
+func (metaConfig) GetTemplate(context *Context, metaType string) ([]byte, error) {
+	return nil, errors.New("not implemented")
+}
 
 var defaultMetaConfigorMaps = map[string]func(*Meta){
 	"date": func(meta *Meta) {
