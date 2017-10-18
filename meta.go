@@ -307,3 +307,11 @@ func (meta *Meta) configure() {
 		processor.Handler(meta)
 	}
 }
+
+// DBName get meta's db name, used in index page for sorting
+func (meta *Meta) DBName() string {
+	if meta.FieldStruct != nil {
+		return meta.FieldStruct.DBName
+	}
+	return ""
+}
