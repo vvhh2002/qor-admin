@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"path"
 	"reflect"
 	"strings"
 
@@ -73,6 +74,16 @@ func (res *Resource) ToParam() string {
 // ParamIDName return param name for primary key like :product_id
 func (res Resource) ParamIDName() string {
 	return fmt.Sprintf(":%v_id", inflection.Singular(utils.ToParamString(res.Name)))
+}
+
+// RoutePrefix return route prefix of resource
+func (res *Resource) RoutePrefix() string {
+	var params string
+	for res.ParentResource != nil {
+		params = path.Join(res.ParentResource.ToParam(), res.ParentResource.ParamIDName(), params)
+		res = res.ParentResource
+	}
+	return params
 }
 
 // GetPrimaryValue get priamry value from request
