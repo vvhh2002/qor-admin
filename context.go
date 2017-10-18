@@ -22,11 +22,10 @@ type Context struct {
 	Content      template.HTML
 	Action       string
 	Settings     map[string]interface{}
-	Result       interface{}
 	RouteHandler *routeHandler
+	Result       interface{}
 
-	usedThemes []string
-	funcMaps   template.FuncMap
+	funcMaps template.FuncMap
 }
 
 // NewContext new admin context
@@ -34,7 +33,7 @@ func (admin *Admin) NewContext(w http.ResponseWriter, r *http.Request) *Context 
 	return &Context{Context: &qor.Context{Config: admin.Config, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
 }
 
-// Funcs set FuncMap for templates
+// Funcs register FuncMap for templates
 func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
 	if context.funcMaps == nil {
 		context.funcMaps = template.FuncMap{}
@@ -54,20 +53,6 @@ func (context *Context) Flash(message string, typ string) {
 	})
 }
 
-func (context *Context) clone() *Context {
-	return &Context{
-		Context:  context.Context,
-		Searcher: context.Searcher,
-		Resource: context.Resource,
-		Admin:    context.Admin,
-		Result:   context.Result,
-		Content:  context.Content,
-		Settings: context.Settings,
-		Action:   context.Action,
-		funcMaps: context.funcMaps,
-	}
-}
-
 // Get get context's Settings
 func (context *Context) Get(key string) interface{} {
 	return context.Settings[key]
@@ -78,22 +63,7 @@ func (context *Context) Set(key string, value interface{}) {
 	context.Settings[key] = value
 }
 
-func (context *Context) resourcePath() string {
-	if context.Resource == nil {
-		return ""
-	}
-	return context.Resource.ToParam()
-}
-
-func (context *Context) setResource(res *Resource) *Context {
-	if res != nil {
-		context.Resource = res
-		context.ResourceID = res.GetPrimaryValue(context.Request)
-	}
-	context.Searcher = &Searcher{Context: context}
-	return context
-}
-
+// Asset access template based on current context
 func (context *Context) Asset(layouts ...string) ([]byte, error) {
 	var prefixes, themes []string
 
@@ -133,6 +103,48 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 	}
 
 	return []byte(""), fmt.Errorf("template not found: %v", layouts)
+}
+
+// GetSearchableResources get defined searchable resources has performance
+func (context *Context) GetSearchableResources() (resources []*Resource) {
+	if admin := context.Admin; admin != nil {
+		for _, res := range admin.searchResources {
+			if res.HasPermission(roles.Read, context.Context) {
+				resources = append(resources, res)
+			}
+		}
+	}
+	return
+}
+
+func (context *Context) clone() *Context {
+	return &Context{
+		Context:  context.Context,
+		Searcher: context.Searcher,
+		Resource: context.Resource,
+		Admin:    context.Admin,
+		Result:   context.Result,
+		Content:  context.Content,
+		Settings: context.Settings,
+		Action:   context.Action,
+		funcMaps: context.funcMaps,
+	}
+}
+
+func (context *Context) resourcePath() string {
+	if context.Resource == nil {
+		return ""
+	}
+	return context.Resource.ToParam()
+}
+
+func (context *Context) setResource(res *Resource) *Context {
+	if res != nil {
+		context.Resource = res
+		context.ResourceID = res.GetPrimaryValue(context.Request)
+	}
+	context.Searcher = &Searcher{Context: context}
+	return context
 }
 
 // renderText render text based on data
@@ -224,6 +236,7 @@ func (context *Context) JSON(action string, result interface{}) {
 	}
 }
 
+// Encode encode result for an action
 func (context *Context) Encode(action string, result interface{}) error {
 	if action == "show" && !context.Resource.sections.ConfiguredShowAttrs {
 		action = "edit"
@@ -236,16 +249,4 @@ func (context *Context) Encode(action string, result interface{}) error {
 		Result:   result,
 	}
 	return context.Admin.Transformer.Encode(context.Writer, encoder)
-}
-
-// GetSearchableResources get defined searchable resources has performance
-func (context *Context) GetSearchableResources() (resources []*Resource) {
-	if admin := context.Admin; admin != nil {
-		for _, res := range admin.searchResources {
-			if res.HasPermission(roles.Read, context.Context) {
-				resources = append(resources, res)
-			}
-		}
-	}
-	return
 }

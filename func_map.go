@@ -866,12 +866,6 @@ func (context *Context) getThemeNames() (themes []string) {
 		}
 	}
 
-	for _, usedTheme := range context.usedThemes {
-		if _, ok := themesMap[usedTheme]; !ok {
-			themes = append(themes, usedTheme)
-		}
-	}
-
 	return
 }
 
