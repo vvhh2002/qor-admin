@@ -31,7 +31,7 @@
           {{end}}
 
           <td class="mdl-data-table__cell--non-numeric qor-table__actions">
-            {{$allowed_actions := allowed_actions $resource.Actions "menu_item" $result}}
+            {{$allowed_actions := allowed_actions $resource.GetActions "menu_item" $result}}
 
             {{if $allowed_actions}}
               <button id="actions-for-{{$uniqueKey}}" class="mdl-button mdl-js-button mdl-button--icon qor-button--actions">

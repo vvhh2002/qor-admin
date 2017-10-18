@@ -31,7 +31,7 @@ type Context struct {
 
 // NewContext new admin context
 func (admin *Admin) NewContext(w http.ResponseWriter, r *http.Request) *Context {
-	return &Context{Context: &qor.Context{Config: admin.Config.Config, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
+	return &Context{Context: &qor.Context{Config: admin.Config, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
 }
 
 // Funcs set FuncMap for templates
@@ -48,7 +48,7 @@ func (context *Context) Funcs(funcMaps template.FuncMap) *Context {
 
 // Flash set flash message
 func (context *Context) Flash(message string, typ string) {
-	context.Admin.Config.SessionManager.Flash(context.Writer, context.Request, session.Message{
+	context.Admin.SessionManager.Flash(context.Writer, context.Request, session.Message{
 		Message: template.HTML(message),
 		Type:    typ,
 	})
@@ -122,12 +122,12 @@ func (context *Context) Asset(layouts ...string) ([]byte, error) {
 
 	for _, layout := range layouts {
 		for _, prefix := range prefixes {
-			if content, err := context.Admin.Config.AssetFS.Asset(filepath.Join(prefix, layout)); err == nil {
+			if content, err := context.Admin.AssetFS.Asset(filepath.Join(prefix, layout)); err == nil {
 				return content, nil
 			}
 		}
 
-		if content, err := context.Admin.Config.AssetFS.Asset(layout); err == nil {
+		if content, err := context.Admin.AssetFS.Asset(layout); err == nil {
 			return content, nil
 		}
 	}
@@ -235,7 +235,7 @@ func (context *Context) Encode(action string, result interface{}) error {
 		Context:  context,
 		Result:   result,
 	}
-	return context.Admin.Config.Transformer.Encode(context.Writer, encoder)
+	return context.Admin.Transformer.Encode(context.Writer, encoder)
 }
 
 // GetSearchableResources get defined searchable resources has performance

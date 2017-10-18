@@ -100,6 +100,11 @@ func (res *Resource) Action(action *Action) *Action {
 	return action
 }
 
+// GetActions get registered filters
+func (res *Resource) GetActions() []*Action {
+	return res.actions
+}
+
 // GetAction get defined action
 func (res *Resource) GetAction(name string) *Action {
 	for _, action := range res.actions {

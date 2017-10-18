@@ -1,6 +1,6 @@
 {{$context := .}}
 {{$result := .Result}}
-{{$allowed_actions := (allowed_actions $context.Resource.Actions $context.Action)}}
+{{$allowed_actions := (allowed_actions $context.Resource.GetActions $context.Action)}}
 {{$resource := .Resource}}
 
 {{if gt (len $allowed_actions) 0 }}
