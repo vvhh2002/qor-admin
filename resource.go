@@ -20,13 +20,11 @@ type Resource struct {
 	*resource.Resource
 	Config         *Config
 	Metas          []*Meta
-	Actions        []*Action
-	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 	ParentResource *Resource
+	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 
 	admin    *Admin
-	params   string
-	mounted  bool
+	actions  []*Action
 	scopes   []*Scope
 	filters  []*Filter
 	sections struct {
@@ -45,6 +43,9 @@ type Resource struct {
 		OverriddingShowAttrsCallbacks  []func()
 		SortableAttrs                  *[]string
 	}
+
+	params  string
+	mounted bool
 }
 
 // Meta register meta for admin resource

@@ -12,7 +12,7 @@ import (
 
 // Action register action for qor resource
 func (res *Resource) Action(action *Action) *Action {
-	for _, a := range res.Actions {
+	for _, a := range res.actions {
 		if a.Name == action.Name {
 			if action.Label != "" {
 				a.Label = action.Label
@@ -75,7 +75,7 @@ func (res *Resource) Action(action *Action) *Action {
 		}
 	}
 
-	res.Actions = append(res.Actions, action)
+	res.actions = append(res.actions, action)
 
 	// Register Actions into Router
 	{
@@ -102,7 +102,7 @@ func (res *Resource) Action(action *Action) *Action {
 
 // GetAction get defined action
 func (res *Resource) GetAction(name string) *Action {
-	for _, action := range res.Actions {
+	for _, action := range res.actions {
 		if action.Name == name {
 			return action
 		}
