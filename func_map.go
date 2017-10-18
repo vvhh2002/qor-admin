@@ -782,7 +782,7 @@ func (context *Context) loadThemeJavaScripts() template.HTML {
 }
 
 func (context *Context) loadAdminJavaScripts() template.HTML {
-	var siteName = context.Admin.SiteName
+	var siteName = context.Admin.Config.SiteName
 	if siteName == "" {
 		siteName = "application"
 	}
@@ -795,7 +795,7 @@ func (context *Context) loadAdminJavaScripts() template.HTML {
 }
 
 func (context *Context) loadAdminStyleSheets() template.HTML {
-	var siteName = context.Admin.SiteName
+	var siteName = context.Admin.Config.SiteName
 	if siteName == "" {
 		siteName = "application"
 	}
@@ -829,23 +829,23 @@ func (context *Context) loadActions(action string) template.HTML {
 	for _, pattern := range actionPatterns {
 		for _, themeName := range context.getThemeNames() {
 			if resourcePath := context.resourcePath(); resourcePath != "" {
-				if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", themeName, resourcePath, pattern)); err == nil {
+				if matches, err := context.Admin.Config.AssetFS.Glob(filepath.Join("themes", themeName, resourcePath, pattern)); err == nil {
 					actionFiles = append(actionFiles, matches...)
 				}
 			}
 
-			if matches, err := context.Admin.AssetFS.Glob(filepath.Join("themes", themeName, pattern)); err == nil {
+			if matches, err := context.Admin.Config.AssetFS.Glob(filepath.Join("themes", themeName, pattern)); err == nil {
 				actionFiles = append(actionFiles, matches...)
 			}
 		}
 
 		if resourcePath := context.resourcePath(); resourcePath != "" {
-			if matches, err := context.Admin.AssetFS.Glob(filepath.Join(resourcePath, pattern)); err == nil {
+			if matches, err := context.Admin.Config.AssetFS.Glob(filepath.Join(resourcePath, pattern)); err == nil {
 				actionFiles = append(actionFiles, matches...)
 			}
 		}
 
-		if matches, err := context.Admin.AssetFS.Glob(pattern); err == nil {
+		if matches, err := context.Admin.Config.AssetFS.Glob(pattern); err == nil {
 			actionFiles = append(actionFiles, matches...)
 		}
 	}
@@ -890,8 +890,8 @@ func (context *Context) loadActions(action string) template.HTML {
 }
 
 func (context *Context) logoutURL() string {
-	if context.Admin.Auth != nil {
-		return context.Admin.Auth.LogoutURL(context)
+	if context.Admin.Config.Auth != nil {
+		return context.Admin.Config.Auth.LogoutURL(context)
 	}
 	return ""
 }
@@ -1040,8 +1040,10 @@ func (context *Context) FuncMap() template.FuncMap {
 		"formatted_value_of":   context.FormattedValueOf,
 		"raw_value_of":         context.RawValueOf,
 
-		"t":          context.t,
-		"flashes":    func() []session.Message { return context.Admin.SessionManager.Flashes(context.Writer, context.Request) },
+		"t": context.t,
+		"flashes": func() []session.Message {
+			return context.Admin.Config.SessionManager.Flashes(context.Writer, context.Request)
+		},
 		"pagination": context.Pagination,
 		"escape":     html.EscapeString,
 		"raw":        func(str string) template.HTML { return template.HTML(utils.HTMLSanitizer.Sanitize(str)) },

@@ -20,7 +20,6 @@ import (
 // Admin is a struct that used to generate admin/api interface
 type Admin struct {
 	Config           *AdminConfig
-	AssetFS          assetfs.Interface
 	menus            []*Menu
 	resources        []*Resource
 	searchResources  []*Resource
@@ -32,8 +31,10 @@ type Admin struct {
 // AdminConfig admin config struct
 type AdminConfig struct {
 	*qor.Config
+	// SiteName set site's name, the name will be used as admin HTML title and admin interface will auto load javascripts, stylesheets files based on its value
 	SiteName       string
 	Auth           Auth
+	AssetFS        assetfs.Interface
 	SessionManager session.ManagerInterface
 	I18n           I18n
 	*Transformer
@@ -45,17 +46,29 @@ type ResourceNamer interface {
 }
 
 // New new admin with configuration
-func New(config *qor.Config) *Admin {
+func New(config interface{}) *Admin {
 	admin := Admin{
-		Config:           config,
 		funcMaps:         make(template.FuncMap),
 		router:           newRouter(),
-		metaConfigorMaps: metaConfigorMaps,
-		Transformer:      DefaultTransformer,
+		metaConfigorMaps: defaultMetaConfigorMaps,
 	}
 
-	admin.SessionManager = manager.SessionManager
-	admin.SetAssetFS(assetfs.AssetFS().NameSpace("admin"))
+	if c, ok := config.(*qor.Config); ok {
+		admin.Config = &AdminConfig{Config: c}
+	} else if c, ok := config.(*AdminConfig); ok {
+		admin.Config = c
+	} else {
+		admin.Config = &AdminConfig{}
+	}
+
+	if admin.Config.SessionManager == nil {
+		admin.Config.SessionManager = manager.SessionManager
+	}
+
+	if admin.Config.AssetFS == nil {
+		admin.Config.AssetFS = assetfs.AssetFS().NameSpace("admin")
+	}
+
 	admin.registerCompositePrimaryKeyCallback()
 	return &admin
 }
@@ -63,20 +76,20 @@ func New(config *qor.Config) *Admin {
 // SetSiteName set site's name, the name will be used as admin HTML title and admin interface will auto load javascripts, stylesheets files based on its value
 // For example, if you named it as `Qor Demo`, admin will look up `qor_demo.js`, `qor_demo.css` in QOR view paths, and load them if found
 func (admin *Admin) SetSiteName(siteName string) {
-	admin.SiteName = siteName
+	admin.Config.SiteName = siteName
 }
 
 // SetAuth set admin's authorization gateway
 func (admin *Admin) SetAuth(auth Auth) {
-	admin.Auth = auth
+	admin.Config.Auth = auth
 }
 
 // SetAssetFS set AssetFS for admin
 func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
-	admin.AssetFS = assetFS
+	admin.Config.AssetFS = assetFS
 	globalAssetFSes = append(globalAssetFSes, assetFS)
 
-	admin.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
+	admin.Config.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
 	admin.RegisterViewPath("github.com/qor/admin/views")
 
 	for _, viewPath := range globalViewPaths {
@@ -86,9 +99,9 @@ func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 
 // RegisterViewPath register view path for admin
 func (admin *Admin) RegisterViewPath(pth string) {
-	if admin.AssetFS.RegisterPath(filepath.Join(root, "vendor", pth)) != nil {
+	if admin.Config.AssetFS.RegisterPath(filepath.Join(root, "vendor", pth)) != nil {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
-			if admin.AssetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
+			if admin.Config.AssetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
 				break
 			}
 		}
@@ -237,12 +250,12 @@ type I18n interface {
 func (admin *Admin) T(context *qor.Context, key string, value string, values ...interface{}) template.HTML {
 	locale := utils.GetLocale(context)
 
-	if admin.I18n == nil {
+	if admin.Config.I18n == nil {
 		if result, err := cldr.Parse(locale, value, values...); err == nil {
 			return template.HTML(result)
 		}
 		return template.HTML(key)
 	}
 
-	return admin.I18n.Default(value).T(locale, key, values...)
+	return admin.Config.I18n.Default(value).T(locale, key, values...)
 }

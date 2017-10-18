@@ -7,7 +7,7 @@ import (
 	"github.com/qor/qor/utils"
 )
 
-var metaConfigorMaps = map[string]func(*Meta){
+var defaultMetaConfigorMaps = map[string]func(*Meta){
 	"date": func(meta *Meta) {
 		if meta.FormattedValuer == nil {
 			meta.SetFormattedValuer(func(value interface{}, context *qor.Context) interface{} {

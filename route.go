@@ -218,9 +218,9 @@ func (serveMux *serveMux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// Set Current User
 	var currentUser qor.CurrentUser
 	var permissionMode roles.PermissionMode
-	if admin.Auth != nil {
-		if currentUser = admin.Auth.GetCurrentUser(context); currentUser == nil {
-			http.Redirect(w, req, admin.Auth.LoginURL(context), http.StatusSeeOther)
+	if admin.Config.Auth != nil {
+		if currentUser = admin.Config.Auth.GetCurrentUser(context); currentUser == nil {
+			http.Redirect(w, req, admin.Config.Auth.LoginURL(context), http.StatusSeeOther)
 			return
 		}
 		context.CurrentUser = currentUser
