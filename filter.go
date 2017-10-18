@@ -30,11 +30,6 @@ type FilterArgument struct {
 	Context  *qor.Context
 }
 
-// GetFilters get registered filters
-func (res *Resource) GetFilters() []*Filter {
-	return res.filters
-}
-
 // Filter register filter for qor resource
 func (res *Resource) Filter(filter *Filter) {
 	filter.Resource = res
@@ -78,4 +73,19 @@ func (res *Resource) Filter(filter *Filter) {
 	} else {
 		utils.ExitWithMsg("Invalid filter definition %v for resource %v", filter.Name, res.Name)
 	}
+}
+
+// GetFilters get registered filters
+func (res *Resource) GetFilters() []*Filter {
+	return res.filters
+}
+
+// GetFilter get defined action
+func (res *Resource) GetFilter(name string) *Filter {
+	for _, action := range res.filters {
+		if action.Name == name {
+			return action
+		}
+	}
+	return nil
 }

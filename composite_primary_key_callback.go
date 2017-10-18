@@ -41,6 +41,7 @@ func (admin Admin) registerCompositePrimaryKeyCallback() {
 	}
 }
 
+// DisableCompositePrimaryKeyMode disable composite primary key mode
 var DisableCompositePrimaryKeyMode = "composite_primary_key:query:disable"
 
 func compositePrimaryKeyQueryCallback(scope *gorm.Scope) {

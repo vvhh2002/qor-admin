@@ -17,17 +17,6 @@ import (
 	"github.com/theplant/cldr"
 )
 
-// Admin is a struct that used to generate admin/api interface
-type Admin struct {
-	*AdminConfig
-	menus            []*Menu
-	resources        []*Resource
-	searchResources  []*Resource
-	router           *Router
-	funcMaps         template.FuncMap
-	metaConfigorMaps map[string]func(*Meta)
-}
-
 // AdminConfig admin config struct
 type AdminConfig struct {
 	*qor.Config
@@ -40,9 +29,15 @@ type AdminConfig struct {
 	*Transformer
 }
 
-// ResourceNamer is an interface for models that defined method `ResourceName`
-type ResourceNamer interface {
-	ResourceName() string
+// Admin is a struct that used to generate admin/api interface
+type Admin struct {
+	*AdminConfig
+	menus            []*Menu
+	resources        []*Resource
+	searchResources  []*Resource
+	router           *Router
+	funcMaps         template.FuncMap
+	metaConfigorMaps map[string]func(*Meta)
 }
 
 // New new admin with configuration
@@ -95,7 +90,7 @@ func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 	admin.AssetFS = assetFS
 	globalAssetFSes = append(globalAssetFSes, assetFS)
 
-	admin.AssetFS.RegisterPath(filepath.Join(root, "app/views/qor"))
+	admin.AssetFS.RegisterPath(filepath.Join(utils.AppRoot, "app/views/qor"))
 	admin.RegisterViewPath("github.com/qor/admin/views")
 
 	for _, viewPath := range globalViewPaths {
@@ -105,7 +100,7 @@ func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 
 // RegisterViewPath register view path for admin
 func (admin *Admin) RegisterViewPath(pth string) {
-	if admin.AssetFS.RegisterPath(filepath.Join(root, "vendor", pth)) != nil {
+	if admin.AssetFS.RegisterPath(filepath.Join(utils.AppRoot, "vendor", pth)) != nil {
 		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
 			if admin.AssetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
 				break
@@ -243,13 +238,6 @@ func (admin *Admin) GetResource(name string) (resource *Resource) {
 // AddSearchResource make a resource searchable from search center
 func (admin *Admin) AddSearchResource(resources ...*Resource) {
 	admin.searchResources = append(admin.searchResources, resources...)
-}
-
-// I18n define admin's i18n interface
-type I18n interface {
-	Scope(scope string) I18n
-	Default(value string) I18n
-	T(locale string, key string, args ...interface{}) template.HTML
 }
 
 // T call i18n backend to translate

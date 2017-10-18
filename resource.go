@@ -16,6 +16,18 @@ import (
 	"github.com/qor/roles"
 )
 
+// Config resource config struct
+type Config struct {
+	Name       string
+	Menu       []string
+	Permission *roles.Permission
+	Themes     []ThemeInterface
+	Priority   int
+	Singleton  bool
+	Invisible  bool
+	PageCount  int
+}
+
 // Resource is the most important thing for qor admin, every model is defined as a resource, qor admin will genetate management interface based on its definition
 type Resource struct {
 	*resource.Resource
