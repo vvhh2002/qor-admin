@@ -19,14 +19,16 @@ import (
 type Resource struct {
 	*resource.Resource
 	Config         *Config
-	Metas          []*Meta
 	ParentResource *Resource
 	SearchHandler  func(keyword string, context *qor.Context) *gorm.DB
 
+	params   string
 	admin    *Admin
+	metas    []*Meta
 	actions  []*Action
 	scopes   []*Scope
 	filters  []*Filter
+	mounted  bool
 	sections struct {
 		IndexSections                  []*Section
 		OverriddingIndexAttrs          bool
@@ -43,80 +45,11 @@ type Resource struct {
 		OverriddingShowAttrsCallbacks  []func()
 		SortableAttrs                  *[]string
 	}
-
-	params  string
-	mounted bool
-}
-
-// Meta register meta for admin resource
-func (res *Resource) Meta(meta *Meta) *Meta {
-	if oldMeta := res.GetMeta(meta.Name); oldMeta != nil {
-		if meta.Type != "" {
-			oldMeta.Type = meta.Type
-			oldMeta.Config = nil
-		}
-
-		if meta.Label != "" {
-			oldMeta.Label = meta.Label
-		}
-
-		if meta.FieldName != "" {
-			oldMeta.FieldName = meta.FieldName
-		}
-
-		if meta.Setter != nil {
-			oldMeta.Setter = meta.Setter
-		}
-
-		if meta.Valuer != nil {
-			oldMeta.Valuer = meta.Valuer
-		}
-
-		if meta.FormattedValuer != nil {
-			oldMeta.FormattedValuer = meta.FormattedValuer
-		}
-
-		if meta.Resource != nil {
-			oldMeta.Resource = meta.Resource
-		}
-
-		if meta.Permission != nil {
-			oldMeta.Permission = meta.Permission
-		}
-
-		if meta.Config != nil {
-			oldMeta.Config = meta.Config
-		}
-
-		if meta.Collection != nil {
-			oldMeta.Collection = meta.Collection
-		}
-		meta = oldMeta
-	} else {
-		res.Metas = append(res.Metas, meta)
-		meta.baseResource = res
-	}
-
-	meta.configure()
-	return meta
 }
 
 // GetAdmin get admin from resource
 func (res Resource) GetAdmin() *Admin {
 	return res.admin
-}
-
-// GetPrimaryValue get priamry value from request
-func (res Resource) GetPrimaryValue(request *http.Request) string {
-	if request != nil {
-		return request.URL.Query().Get(res.ParamIDName())
-	}
-	return ""
-}
-
-// ParamIDName return param name for primary key like :product_id
-func (res Resource) ParamIDName() string {
-	return fmt.Sprintf(":%v_id", inflection.Singular(utils.ToParamString(res.Name)))
 }
 
 // ToParam used as urls to register routes for resource
@@ -135,6 +68,19 @@ func (res *Resource) ToParam() string {
 		}
 	}
 	return res.params
+}
+
+// ParamIDName return param name for primary key like :product_id
+func (res Resource) ParamIDName() string {
+	return fmt.Sprintf(":%v_id", inflection.Singular(utils.ToParamString(res.Name)))
+}
+
+// GetPrimaryValue get priamry value from request
+func (res Resource) GetPrimaryValue(request *http.Request) string {
+	if request != nil {
+		return request.URL.Query().Get(res.ParamIDName())
+	}
+	return ""
 }
 
 // UseTheme use them for resource, will auto load the theme's javascripts, stylesheets for this resource
@@ -276,7 +222,7 @@ func (res *Resource) allAttrs() []string {
 
 Fields:
 	for _, field := range scope.GetModelStruct().StructFields {
-		for _, meta := range res.Metas {
+		for _, meta := range res.metas {
 			if field.Name == meta.FieldName {
 				attrs = append(attrs, meta.Name)
 				continue Fields
@@ -309,7 +255,7 @@ Fields:
 	}
 
 MetaIncluded:
-	for _, meta := range res.Metas {
+	for _, meta := range res.metas {
 		for _, attr := range attrs {
 			if attr == meta.FieldName || attr == meta.Name {
 				continue MetaIncluded
@@ -364,7 +310,7 @@ func (res *Resource) IndexAttrs(values ...interface{}) []*Section {
 	return res.sections.IndexSections
 }
 
-// OverrideIndexAttrs override index attrs
+// OverrideIndexAttrs register function that will be run everytime index attrs changed
 func (res *Resource) OverrideIndexAttrs(fc func()) {
 	overriddingIndexAttrs := res.sections.OverriddingIndexAttrs
 	res.sections.OverriddingIndexAttrs = true
@@ -415,7 +361,7 @@ func (res *Resource) NewAttrs(values ...interface{}) []*Section {
 	return res.sections.NewSections
 }
 
-// OverrideNewAttrs override index attrs
+// OverrideNewAttrs register function that will be run everytime new attrs changed
 func (res *Resource) OverrideNewAttrs(fc func()) {
 	overriddingNewAttrs := res.sections.OverriddingNewAttrs
 	res.sections.OverriddingNewAttrs = true
@@ -466,7 +412,7 @@ func (res *Resource) EditAttrs(values ...interface{}) []*Section {
 	return res.sections.EditSections
 }
 
-// OverrideEditAttrs override index attrs
+// OverrideEditAttrs register function that will be run everytime edit attrs changed
 func (res *Resource) OverrideEditAttrs(fc func()) {
 	overriddingEditAttrs := res.sections.OverriddingEditAttrs
 	res.sections.OverriddingEditAttrs = true
@@ -529,7 +475,7 @@ func (res *Resource) ShowAttrs(values ...interface{}) []*Section {
 	return res.sections.ShowSections
 }
 
-// OverrideShowAttrs override index attrs
+// OverrideShowAttrs register function that will be run everytime show attrs changed
 func (res *Resource) OverrideShowAttrs(fc func()) {
 	overriddingShowAttrs := res.sections.OverriddingShowAttrs
 	res.sections.OverriddingShowAttrs = true
@@ -541,7 +487,7 @@ func (res *Resource) OverrideShowAttrs(fc func()) {
 	}
 }
 
-// SortableAttrs set sortable attributes, sortable attributes could be click to order in qor table
+// SortableAttrs set sortable attributes, sortable attributes are clickable to sort data in index page
 func (res *Resource) SortableAttrs(columns ...string) []string {
 	if len(columns) != 0 || res.sections.SortableAttrs == nil {
 		if len(columns) == 0 {
@@ -559,9 +505,9 @@ func (res *Resource) SortableAttrs(columns ...string) []string {
 	return *res.sections.SortableAttrs
 }
 
-// SearchAttrs set search attributes, when search resources, will use those columns to search
-//     // Search products with its name, code, category's name, brand's name
+// SearchAttrs set searchable attributes, e.g:
 //	   product.SearchAttrs("Name", "Code", "Category.Name", "Brand.Name")
+//     // Search products with its name, code, category's name, brand's name
 func (res *Resource) SearchAttrs(columns ...string) []string {
 	if len(columns) != 0 || res.SearchHandler == nil {
 		if len(columns) == 0 {
@@ -580,6 +526,59 @@ func (res *Resource) SearchAttrs(columns ...string) []string {
 	}
 
 	return columns
+}
+
+// Meta register meta for admin resource
+func (res *Resource) Meta(meta *Meta) *Meta {
+	if oldMeta := res.GetMeta(meta.Name); oldMeta != nil {
+		if meta.Type != "" {
+			oldMeta.Type = meta.Type
+			oldMeta.Config = nil
+		}
+
+		if meta.Label != "" {
+			oldMeta.Label = meta.Label
+		}
+
+		if meta.FieldName != "" {
+			oldMeta.FieldName = meta.FieldName
+		}
+
+		if meta.Setter != nil {
+			oldMeta.Setter = meta.Setter
+		}
+
+		if meta.Valuer != nil {
+			oldMeta.Valuer = meta.Valuer
+		}
+
+		if meta.FormattedValuer != nil {
+			oldMeta.FormattedValuer = meta.FormattedValuer
+		}
+
+		if meta.Resource != nil {
+			oldMeta.Resource = meta.Resource
+		}
+
+		if meta.Permission != nil {
+			oldMeta.Permission = meta.Permission
+		}
+
+		if meta.Config != nil {
+			oldMeta.Config = meta.Config
+		}
+
+		if meta.Collection != nil {
+			oldMeta.Collection = meta.Collection
+		}
+		meta = oldMeta
+	} else {
+		res.metas = append(res.metas, meta)
+		meta.baseResource = res
+	}
+
+	meta.configure()
+	return meta
 }
 
 // GetMetas get metas with give attrs
@@ -607,7 +606,7 @@ Attrs:
 		}
 
 		var meta *Meta
-		for _, m := range res.Metas {
+		for _, m := range res.metas {
 			if m.GetName() == attr {
 				meta = m
 				break
@@ -635,7 +634,7 @@ Attrs:
 func (res *Resource) GetMeta(name string) *Meta {
 	var fallbackMeta *Meta
 
-	for _, meta := range res.Metas {
+	for _, meta := range res.metas {
 		if meta.Name == name {
 			return meta
 		}
@@ -652,7 +651,7 @@ func (res *Resource) GetMeta(name string) *Meta {
 				meta.Type = "hidden_primary_key"
 			}
 			meta.configure()
-			res.Metas = append(res.Metas, meta)
+			res.metas = append(res.metas, meta)
 			return meta
 		}
 	}
