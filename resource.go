@@ -517,7 +517,7 @@ func (res *Resource) SortableAttrs(columns ...string) []string {
 			columns = res.ConvertSectionToStrings(res.sections.IndexSections)
 		}
 		res.sections.SortableAttrs = &[]string{}
-		scope := res.GetAdmin().Config.DB.NewScope(res.Value)
+		scope := res.GetAdmin().DB.NewScope(res.Value)
 		for _, column := range columns {
 			if field, ok := scope.FieldByName(column); ok && field.DBName != "" {
 				attrs := append(*res.sections.SortableAttrs, column)
@@ -668,7 +668,7 @@ func (res *Resource) GetMeta(name string) *Meta {
 	}
 
 	if fallbackMeta == nil {
-		if field, ok := res.GetAdmin().Config.DB.NewScope(res.Value).FieldByName(name); ok {
+		if field, ok := res.GetAdmin().DB.NewScope(res.Value).FieldByName(name); ok {
 			meta := &Meta{Name: name, baseResource: res}
 			if field.IsPrimaryKey {
 				meta.Type = "hidden_primary_key"

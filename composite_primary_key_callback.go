@@ -10,7 +10,7 @@ import (
 var primaryKeyRegexp = regexp.MustCompile(`primary_key\[.+_.+\]`)
 
 func (admin Admin) registerCompositePrimaryKeyCallback() {
-	if db := admin.Config.DB; db != nil {
+	if db := admin.DB; db != nil {
 		// register middleware
 		router := admin.GetRouter()
 		router.Use(&Middleware{

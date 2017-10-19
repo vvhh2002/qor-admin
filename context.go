@@ -30,7 +30,7 @@ type Context struct {
 
 // NewContext new admin context
 func (admin *Admin) NewContext(w http.ResponseWriter, r *http.Request) *Context {
-	return &Context{Context: &qor.Context{Config: admin.Config, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
+	return &Context{Context: &qor.Context{Config: &qor.Config{DB: admin.DB}, Request: r, Writer: w}, Admin: admin, Settings: map[string]interface{}{}}
 }
 
 // Funcs register FuncMap for templates

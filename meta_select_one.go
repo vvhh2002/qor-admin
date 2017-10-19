@@ -73,7 +73,7 @@ func (selectOneConfig *SelectOneConfig) ConfigureQorMeta(metaor resource.Metaor)
 // ConfigureQORAdminFilter configure admin filter
 func (selectOneConfig *SelectOneConfig) ConfigureQORAdminFilter(filter *Filter) {
 	var structField *gorm.StructField
-	if field, ok := filter.Resource.GetAdmin().Config.DB.NewScope(filter.Resource.Value).FieldByName(filter.Name); ok {
+	if field, ok := filter.Resource.GetAdmin().DB.NewScope(filter.Resource.Value).FieldByName(filter.Name); ok {
 		structField = field.StructField
 	}
 

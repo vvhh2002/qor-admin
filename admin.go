@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/inflection"
 	"github.com/qor/assetfs"
 	"github.com/qor/qor"
@@ -19,9 +20,9 @@ import (
 
 // AdminConfig admin config struct
 type AdminConfig struct {
-	*qor.Config
 	// SiteName set site's name, the name will be used as admin HTML title and admin interface will auto load javascripts, stylesheets files based on its value
 	SiteName       string
+	DB             *gorm.DB
 	Auth           Auth
 	AssetFS        assetfs.Interface
 	SessionManager session.ManagerInterface
@@ -49,7 +50,7 @@ func New(config interface{}) *Admin {
 	}
 
 	if c, ok := config.(*qor.Config); ok {
-		admin.AdminConfig = &AdminConfig{Config: c}
+		admin.AdminConfig = &AdminConfig{DB: c.DB}
 	} else if c, ok := config.(*AdminConfig); ok {
 		admin.AdminConfig = c
 	} else {
