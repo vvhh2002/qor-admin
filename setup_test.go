@@ -23,7 +23,7 @@ func init() {
 
 func NewTestHandler() (h http.Handler, adm *admin.Admin, d *gorm.DB) {
 	adm = NewDummyAdmin()
-	d = adm.Config.DB
+	d = adm.DB
 	h = adm.NewServeMux("/admin")
 	return
 }
