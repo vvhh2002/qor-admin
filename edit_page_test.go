@@ -165,7 +165,7 @@ Registered At
 </div>
 
 <div class="qor-field__edit qor-field__datetimepicker" data-picker-type="datetime">
-<input class="mdl-textfield__input qor-datetimepicker__input" placeholder="YYYY-MM-DD HH:MM" type="text" id="user_1_registered_at" name="QorResource.RegisteredAt" value="" >
+<input class="mdl-textfield__input qor-datetimepicker__input" placeholder=" YYYY-MM-DD HH:MM " type="text" id="user_1_registered_at" name="QorResource.RegisteredAt" value="" >
 
 <div>
   <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
