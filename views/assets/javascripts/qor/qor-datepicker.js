@@ -46,6 +46,15 @@
 
     QorDatepicker.prototype = {
         init: function() {
+            if (
+                this.$element
+                    .closest(CLASS_PARENT)
+                    .find(this.pickerData.targetInput)
+                    .is(':disabled')
+            ) {
+                this.$element.remove();
+                return;
+            }
             this.bind();
         },
 
@@ -83,7 +92,11 @@
                 datepickerOptions.startDate = new Date();
             }
 
-            $modal.find(CLASS_EMBEDDED).on(EVENT_CHANGE, $.proxy(this.change, this)).qorDatepicker(datepickerOptions).triggerHandler(EVENT_CHANGE);
+            $modal
+                .find(CLASS_EMBEDDED)
+                .on(EVENT_CHANGE, $.proxy(this.change, this))
+                .qorDatepicker(datepickerOptions)
+                .triggerHandler(EVENT_CHANGE);
 
             $modal.find(CLASS_SAVE).on(EVENT_CLICK, $.proxy(this.pick, this));
 
@@ -95,7 +108,15 @@
                 return;
             }
 
-            this.$modal.find(CLASS_EMBEDDED).off(EVENT_CHANGE, this.change).qorDatepicker('destroy').end().find(CLASS_SAVE).off(EVENT_CLICK, this.pick).end().remove();
+            this.$modal
+                .find(CLASS_EMBEDDED)
+                .off(EVENT_CHANGE, this.change)
+                .qorDatepicker('destroy')
+                .end()
+                .find(CLASS_SAVE)
+                .off(EVENT_CLICK, this.pick)
+                .end()
+                .remove();
         },
 
         change: function(e) {
