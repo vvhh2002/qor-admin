@@ -81,6 +81,12 @@
         min-height: 400px;
     }
 
+    .qor-bottomsheets__tab-content {
+        .qor-table {
+            margin: 0;
+        }
+    }
+
     .select2-container {
         width: 100% !important;
         .select2-selection {

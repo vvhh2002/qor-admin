@@ -40,7 +40,7 @@
                 $template = $element.find('> .qor-field__block > .qor-fieldset--new'),
                 fieldsetName;
 
-            this.isInSlideout = $element.closest('.qor-slideout').length;
+            this.singlePage = !($element.closest('.qor-slideout').length && $element.closest('.qor-bottomsheets').length);
             this.hasInlineReplicator = $element.find(CLASS_CONTAINER).length;
             this.maxitems = $element.data('maxItem');
             this.isSortable = $element.hasClass('qor-fieldset-sortable');
@@ -173,30 +173,33 @@
 
             this.$element.on(EVENT_CLICK, options.addClass, $.proxy(this.add, this)).on(EVENT_CLICK, options.delClass, $.proxy(this.del, this));
 
-            !this.isInSlideout && $(document).on(EVENT_SUBMIT, 'form', this.removeData);
+            this.singlePage && $(document).on(EVENT_SUBMIT, '.mdl-layout__container form', this.clearFieldData);
             $(document)
-                .on(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.removeDataFormSlideout)
-                .on(EVENT_SELECTCOREBEFORESEND, this.removeDataFromBottomsheet);
+                .on(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.clearFieldDataInSlideout)
+                .on(EVENT_SELECTCOREBEFORESEND, this.clearFieldDataInBottomsheet);
         },
 
         unbind: function() {
             this.$element.off(EVENT_CLICK);
 
-            !this.isInSlideout && $(document).off(EVENT_SUBMIT, 'form', this.removeData);
+            this.singlePage && $(document).off(EVENT_SUBMIT, '.mdl-layout__container form', this.clearFieldData);
             $(document)
-                .off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout')
-                .off(EVENT_SELECTCOREBEFORESEND);
+                .off(EVENT_SLIDEOUTBEFORESEND, '.qor-slideout', this.clearFieldDataInSlideout)
+                .off(EVENT_SELECTCOREBEFORESEND, this.clearFieldDataInBottomsheet);
         },
 
-        removeData: function() {
+        clearFieldData: function() {
+            alert(1);
             $('.qor-fieldset--new').remove();
         },
 
-        removeDataFormSlideout: function() {
+        clearFieldDataInSlideout: function() {
+            alert(2);
             $('.qor-slideout .qor-fieldset--new').remove();
         },
 
-        removeDataFromBottomsheet: function() {
+        clearFieldDataInBottomsheet: function() {
+            alert(3);
             $('.qor-bottomsheets .qor-fieldset--new').remove();
         },
 

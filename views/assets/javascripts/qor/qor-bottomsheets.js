@@ -358,7 +358,7 @@
                 $form = $(form),
                 _this = this,
                 url = $form.prop('action'),
-                formData = new FormData(form),
+                formData,
                 $bottomsheets = $form.closest('.qor-bottomsheets'),
                 resourseData = $bottomsheets.data(),
                 ajaxType = resourseData.ajaxType,
@@ -381,6 +381,8 @@
 
             $(document).trigger(EVENT_BOTTOMSHEET_BEFORESEND);
             e.preventDefault();
+
+            formData = new FormData(form);
 
             $.ajax(url, {
                 method: $form.prop('method'),
@@ -545,11 +547,7 @@
                                     .data('ingoreSubmit', true)
                                     .data('selectId', resourseData.selectId)
                                     .data('loadInline', true);
-                                if (
-                                    selectModal != 'one' &&
-                                    !data.selectNohint &&
-                                    (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')
-                                ) {
+                                if (selectModal != 'one' && !data.selectNohint && (typeof resourseData.maxItem === 'undefined' || resourseData.maxItem != '1')) {
                                     $body.addClass('has-hint');
                                 }
                                 if (selectModal == 'mediabox' && !this.scriptAdded) {
