@@ -189,17 +189,14 @@
         },
 
         clearFieldData: function() {
-            alert(1);
             $('.qor-fieldset--new').remove();
         },
 
         clearFieldDataInSlideout: function() {
-            alert(2);
             $('.qor-slideout .qor-fieldset--new').remove();
         },
 
         clearFieldDataInBottomsheet: function() {
-            alert(3);
             $('.qor-bottomsheets .qor-fieldset--new').remove();
         },
 
