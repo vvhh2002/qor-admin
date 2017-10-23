@@ -26,9 +26,9 @@ type Meta struct {
 	FieldName       string
 	Label           string
 	Type            string
-	Setter          func(resource interface{}, metaValue *resource.MetaValue, context *qor.Context)
-	Valuer          func(interface{}, *qor.Context) interface{}
-	FormattedValuer func(interface{}, *qor.Context) interface{}
+	Setter          func(record interface{}, metaValue *resource.MetaValue, context *qor.Context)
+	Valuer          func(record interface{}, context *qor.Context) (result interface{})
+	FormattedValuer func(record interface{}, context *qor.Context) (result interface{})
 	Permission      *roles.Permission
 	Config          MetaConfigInterface
 	Collection      interface{}
