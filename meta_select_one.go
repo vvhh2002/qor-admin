@@ -21,10 +21,10 @@ type SelectOneConfig struct {
 	DefaultCreating          bool
 	SelectionTemplate        string
 	SelectMode               string // select, select_async, bottom_sheet
-	PrimaryField             string
 	Select2ResultTemplate    template.JS
 	Select2SelectionTemplate template.JS
 	RemoteDataResource       *Resource
+	PrimaryField             string
 	metaConfig
 	getCollection func(interface{}, *Context) [][]string
 }

@@ -20,6 +20,7 @@ type SelectManyConfig struct {
 	Select2ResultTemplate    template.JS
 	Select2SelectionTemplate template.JS
 	RemoteDataResource       *Resource
+	PrimaryField             string
 	SelectOneConfig
 }
 
@@ -39,6 +40,7 @@ func (selectManyConfig *SelectManyConfig) ConfigureQorMeta(metaor resource.Metao
 		selectManyConfig.SelectOneConfig.DefaultCreating = selectManyConfig.DefaultCreating
 		selectManyConfig.SelectOneConfig.Placeholder = selectManyConfig.Placeholder
 		selectManyConfig.SelectOneConfig.RemoteDataResource = selectManyConfig.RemoteDataResource
+		selectManyConfig.SelectOneConfig.PrimaryField = selectManyConfig.PrimaryField
 
 		selectManyConfig.SelectOneConfig.ConfigureQorMeta(meta)
 
