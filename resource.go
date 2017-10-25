@@ -184,9 +184,18 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 			parentValue := parent.NewStruct()
 			if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
 				primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
-				err = context.GetDB().Model(parentValue).Where(primaryQuerySQL, primaryParams...).Related(value).Error
+				result := context.GetDB().Model(parentValue).Where(primaryQuerySQL, primaryParams...).Related(value)
+
+				if result.Error != nil {
+					err = result.Error
+				}
+
+				if result.RowsAffected == 0 {
+					err = gorm.ErrRecordNotFound
+				}
 			}
 		}
+
 		return
 	}
 

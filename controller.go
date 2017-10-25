@@ -110,6 +110,10 @@ func (ac *Controller) renderSingleton(context *Context) (interface{}, bool, erro
 	} else {
 		result, err = context.FindOne()
 	}
+
+	if err == gorm.ErrRecordNotFound {
+		context.Writer.WriteHeader(http.StatusNotFound)
+	}
 	return result, false, err
 }
 
@@ -121,6 +125,7 @@ func (ac *Controller) Show(context *Context) {
 	}
 
 	context.AddError(err)
+
 	responder.With("html", func() {
 		context.Execute("show", result)
 	}).With([]string{"json", "xml"}, func() {
