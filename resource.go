@@ -709,15 +709,22 @@ func (res *Resource) allowedSections(sections []*Section, context *Context, role
 }
 
 func (res *Resource) configure() {
-	modelType := utils.ModelType(res.Value)
+	var configureModel func(value interface{})
 
-	for i := 0; i < modelType.NumField(); i++ {
-		if fieldStruct := modelType.Field(i); fieldStruct.Anonymous {
-			if injector, ok := reflect.New(fieldStruct.Type).Interface().(resource.ConfigureResourceInterface); ok {
-				injector.ConfigureQorResource(res)
+	configureModel = func(value interface{}) {
+		modelType := utils.ModelType(value)
+		for i := 0; i < modelType.NumField(); i++ {
+			if fieldStruct := modelType.Field(i); fieldStruct.Anonymous {
+				if injector, ok := reflect.New(fieldStruct.Type).Interface().(resource.ConfigureResourceInterface); ok {
+					injector.ConfigureQorResource(res)
+				} else {
+					configureModel(reflect.New(fieldStruct.Type).Interface())
+				}
 			}
 		}
 	}
+
+	configureModel(res.Value)
 
 	scope := gorm.Scope{Value: res.Value}
 	for _, field := range scope.Fields() {
