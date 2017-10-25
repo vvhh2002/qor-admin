@@ -14,6 +14,7 @@ type Filter struct {
 	Type       string
 	Operations []string // eq, cont, gt, gteq, lt, lteq
 	Resource   *Resource
+	Visible    func(context *Context) bool
 	Handler    func(*gorm.DB, *FilterArgument) *gorm.DB
 	Config     FilterConfigInterface
 }

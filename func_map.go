@@ -127,6 +127,7 @@ func (context *Context) FuncMap() template.FuncMap {
 
 		"get_menus":                 context.getMenus,
 		"get_scopes":                context.getScopes,
+		"get_filters":               context.getFilters,
 		"get_formatted_errors":      context.getFormattedErrors,
 		"load_actions":              context.loadActions,
 		"allowed_actions":           context.AllowedActions,
@@ -778,6 +779,20 @@ OUT:
 		}
 	}
 	return menus
+}
+
+// getFilters get filters from current context
+func (context *Context) getFilters() (filters []*Filter) {
+	if context.Resource == nil {
+		return
+	}
+
+	for _, f := range context.Resource.filters {
+		if f.Visible == nil || f.Visible(context) {
+			filters = append(filters, f)
+		}
+	}
+	return
 }
 
 func (context *Context) hasCreatePermission(permissioner HasPermissioner) bool {
