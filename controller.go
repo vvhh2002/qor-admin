@@ -224,10 +224,10 @@ func (ac *Controller) Action(context *Context) {
 			actionArgument.Argument = result
 		}
 
-		err := action.Handler(&actionArgument)
+		context.AddError(action.Handler(&actionArgument))
 
 		if !actionArgument.SkipDefaultResponse {
-			if err == nil {
+			if !context.HasError() {
 				message := string(context.t("qor_admin.actions.executed_successfully", "Action {{.Name}}: Executed successfully", action))
 				responder.With("html", func() {
 					context.Flash(message, "success")
@@ -238,11 +238,13 @@ func (ac *Controller) Action(context *Context) {
 			} else {
 				context.Writer.WriteHeader(HTTPUnprocessableEntity)
 				responder.With("html", func() {
-					context.AddError(err)
 					context.Execute("action", action)
 				}).With([]string{"json", "xml"}, func() {
-					message := string(context.t("qor_admin.actions.executed_failed", "Action {{.Name}}: Failed to execute", action))
-					context.Encode("OK", map[string]string{"error": message, "status": "error"})
+					var errs []string
+					for _, err := range context.GetErrors() {
+						errs = append(errs, err.Error())
+					}
+					context.Encode("OK", map[string]interface{}{"errors": errs, "status": "error"})
 				}).Respond(context.Request)
 			}
 		}
