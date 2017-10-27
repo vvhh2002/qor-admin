@@ -196,9 +196,7 @@
 
                     if (slideroutActionForm.length && hasPopoverForm) {
                         if (isChecked && !$alreadyHaveValue.length) {
-                            slideroutActionForm.prepend(
-                                '<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />'
-                            );
+                            slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
                         }
 
                         if (!isChecked && $alreadyHaveValue.length) {
@@ -228,7 +226,11 @@
                 undoUrl = properties.undoUrl,
                 isUndo = $actionButton.hasClass(CLASS_IS_UNDO),
                 isInSlideout = $actionButton.closest(QOR_SLIDEOUT).length,
-                needDisableButtons = $element && !isInSlideout;
+                needDisableButtons = $element && !isInSlideout,
+                $body = $element
+                    .closest('.qor-page__header')
+                    .parent()
+                    .find('.qor-page__body');
 
             if (properties.fromIndex && (!ajaxForm.formData || !ajaxForm.formData.length)) {
                 window.alert(ajaxForm.properties.errorNoItem);
@@ -238,8 +240,27 @@
             if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
                 window.QOR.qorConfirm(properties, function(confirm) {
                     if (confirm) {
-                        $.post(properties.url, {_method: properties.method}, function() {
-                            window.location.reload();
+                        $.ajax(url, {
+                            method: properties.method,
+                            beforeSend: function() {
+                                $actionButton.prop('disabled', true);
+                            },
+                            success: function() {
+                                window.location.reload();
+                            },
+                            error: function(err) {
+                                let $error;
+
+                                $body.find('.qor-error').remove();
+                                if (err.status === 422 && !err.responseJSON) {
+                                    $error = $(err.responseText).find('.qor-error');
+                                    $body.prepend($error);
+                                } else {
+                                    window.alert('Error: ' + err.statusText);
+                                }
+
+                                $actionButton.prop('disabled', false);
+                            }
                         });
                     } else {
                         return;
@@ -312,13 +333,22 @@
                             window.location.reload();
                         }
                     },
-                    error: function(xhr, textStatus, errorThrown) {
+                    error: function(err) {
+                        let $error;
+
                         if (undoUrl) {
                             $actionButton.prop('disabled', false);
                         } else if (needDisableButtons) {
                             _this.switchButtons($element);
                         }
-                        window.alert([textStatus, errorThrown].join(': '));
+
+                        $body.find('.qor-error').remove();
+                        if (err.status === 422 && !err.responseJSON) {
+                            $error = $(err.responseText).find('.qor-error');
+                            $body.prepend($error);
+                        } else {
+                            window.alert('Error: ' + err.statusText);
+                        }
                     }
                 });
             }
@@ -398,9 +428,7 @@
                         allPrimaryValues.each(function() {
                             let primaryValue = $(this).data('primary-key');
                             if (primaryValue) {
-                                slideroutActionForm.prepend(
-                                    '<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />'
-                                );
+                                slideroutActionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + primaryValue + '" />');
                             }
                         });
                     } else {

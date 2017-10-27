@@ -274,10 +274,10 @@
                             _this.refresh();
                         }
                     },
-                    error: function(xhr, textStatus, errorThrown) {
+                    error: function(err) {
                         var $error;
 
-                        if (xhr.status === 422) {
+                        if (err.status === 422) {
                             $body.find('.qor-error').remove();
                             $form
                                 .find('.qor-field')
@@ -285,7 +285,7 @@
                                 .find('.qor-field__error')
                                 .remove();
 
-                            $error = $(xhr.responseText).find('.qor-error');
+                            $error = $(err.responseText).find('.qor-error');
                             $form.before($error);
 
                             $error.find('> li > label').each(function() {
@@ -303,7 +303,7 @@
 
                             $slideout.scrollTop(0);
                         } else {
-                            window.alert([textStatus, errorThrown].join(': '));
+                            window.alert(err.statusText);
                         }
                     },
                     complete: function() {
