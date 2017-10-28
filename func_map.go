@@ -622,7 +622,9 @@ func (context *Context) isEqual(value interface{}, hasValue interface{}) bool {
 		scope := &gorm.Scope{Value: value}
 		return fmt.Sprint(scope.PrimaryKeyValue()) == result
 	} else if reflectValue.Kind() == reflect.String {
-		return reflectValue.Interface().(string) == result
+		// type UserType string, alias type will panic if do
+		// return reflectValue.Interface().(string) == result
+		return fmt.Sprint(reflectValue.Interface()) == result
 	} else {
 		return fmt.Sprint(reflectValue.Interface()) == result
 	}
