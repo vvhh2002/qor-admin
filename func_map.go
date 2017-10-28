@@ -542,6 +542,7 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 
 	defer func() {
 		if r := recover(); r != nil {
+			fmt.Println(r)
 			debug.PrintStack()
 			writer.WriteString(fmt.Sprintf("Get error when render template for meta %v (%v): %v", meta.Name, meta.Type, r))
 		}
