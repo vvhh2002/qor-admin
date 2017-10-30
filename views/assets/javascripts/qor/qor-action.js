@@ -242,6 +242,7 @@
                     if (confirm) {
                         $.ajax(url, {
                             method: properties.method,
+                            dataType: properties.datatype,
                             beforeSend: function() {
                                 $actionButton.prop('disabled', true);
                             },
@@ -249,16 +250,7 @@
                                 window.location.reload();
                             },
                             error: function(err) {
-                                let $error;
-
-                                $body.find('.qor-error').remove();
-                                if (err.status === 422 && !err.responseJSON) {
-                                    $error = $(err.responseText).find('.qor-error');
-                                    $body.prepend($error);
-                                } else {
-                                    window.alert('Error: ' + err.statusText);
-                                }
-
+                                window.QOR.handleAjaxError(err, $body);
                                 $actionButton.prop('disabled', false);
                             }
                         });
@@ -334,21 +326,13 @@
                         }
                     },
                     error: function(err) {
-                        let $error;
-
                         if (undoUrl) {
                             $actionButton.prop('disabled', false);
                         } else if (needDisableButtons) {
                             _this.switchButtons($element);
                         }
 
-                        $body.find('.qor-error').remove();
-                        if (err.status === 422 && !err.responseJSON) {
-                            $error = $(err.responseText).find('.qor-error');
-                            $body.prepend($error);
-                        } else {
-                            window.alert('Error: ' + err.statusText);
-                        }
+                        window.QOR.handleAjaxError(err, $body);
                     }
                 });
             }
@@ -439,18 +423,18 @@
         }
     };
     QorAction.FLASHMESSAGETMPL = `<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">
-          <button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
-            <i class="material-icons">close</i>
-          </button>
-          <span class="qor-alert-message">
-            [[#message]]
-              [[message]]
-            [[/message]]
-            [[#error]]
-              [[error]]
-            [[/error]]
-          </span>
-        </div>`;
+                                    <button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    <span class="qor-alert-message">
+                                        [[#message]]
+                                            [[message]]
+                                        [[/message]]
+                                        [[#error]]
+                                            [[error]]
+                                        [[/error]]
+                                    </span>
+                                </div>`;
 
     QorAction.DEFAULTS = {};
 

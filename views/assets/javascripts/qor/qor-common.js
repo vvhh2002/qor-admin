@@ -144,4 +144,35 @@ $(function() {
 
     $.fn.qorSliderAfterShow.converVideoLinks = converVideoLinks;
     converVideoLinks();
+
+    // ********************************Qor Handle AJAX error********************
+    QOR.handleAjaxError = function(err, $body) {
+        let $error,
+            rJSON = err.responseJSON,
+            rText = err.responseText;
+
+        $body.find('.qor-error').remove();
+        if (err.status === 422) {
+            if (rJSON) {
+                let errors = rJSON.errors,
+                    $errorContent = '';
+
+                $error = $('<ul class="qor-error" id="errors"/>').prependTo($body);
+                for (let i = 0; i < errors.length; i++) {
+                    $errorContent += `<li>
+                                        <label for="">
+                                        <i class="material-icons">error</i>
+                                            <span>${errors[i]}</span>
+                                        </label>
+                                    </li>`;
+                }
+                $error.html($errorContent);
+            } else {
+                $error = $(rText).find('.qor-error');
+                $body.prepend($error);
+            }
+        } else {
+            window.alert('Server Error!');
+        }
+    };
 });
