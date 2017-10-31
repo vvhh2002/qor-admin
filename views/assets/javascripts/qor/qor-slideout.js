@@ -209,12 +209,11 @@
         },
 
         submit: function(e) {
-            var $slideout = this.$slideout;
-            var $body = this.$body;
-            var form = e.target;
-            var $form = $(form);
-            var _this = this;
-            var $submit = $form.find(':submit');
+            let $slideout = this.$slideout,
+                form = e.target,
+                $form = $(form),
+                _this = this,
+                $submit = $form.find(':submit');
 
             $slideout.trigger(EVENT_SLIDEOUT_BEFORESEND);
 
@@ -275,36 +274,8 @@
                         }
                     },
                     error: function(err) {
-                        var $error;
-
-                        if (err.status === 422) {
-                            $body.find('.qor-error').remove();
-                            $form
-                                .find('.qor-field')
-                                .removeClass('is-error')
-                                .find('.qor-field__error')
-                                .remove();
-
-                            $error = $(err.responseText).find('.qor-error');
-                            $form.before($error);
-
-                            $error.find('> li > label').each(function() {
-                                var $label = $(this);
-                                var id = $label.attr('for');
-
-                                if (id) {
-                                    $form
-                                        .find('#' + id)
-                                        .closest('.qor-field')
-                                        .addClass('is-error')
-                                        .append($label.clone().addClass('qor-field__error'));
-                                }
-                            });
-
-                            $slideout.scrollTop(0);
-                        } else {
-                            window.alert(err.statusText);
-                        }
+                        window.QOR.handleAjaxError(err, $slideout.find('.qor-slideout__body'));
+                        $slideout.scrollTop(0);
                     },
                     complete: function() {
                         $submit.prop('disabled', false);

@@ -65,13 +65,6 @@
         }
     }
 
-    function clearObject(obj) {
-        for (let prop in obj) {
-            if (obj.hasOwnProperty(prop)) obj[prop] = '';
-        }
-        return obj;
-    }
-
     function replaceText(str, data) {
         if (typeof str === 'string') {
             if (typeof data === 'object') {
@@ -257,9 +250,12 @@
                 file,
                 $alert = this.$parent.find('.qor-fieldset__alert');
 
+            this.$list.show();
+
+            delete this.data.Delete;
+
             if ($alert.length) {
                 $alert.remove();
-                this.data = clearObject(this.data);
             }
 
             if (files && files.length) {
@@ -272,6 +268,7 @@
                 } else {
                     this.$list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
                 }
+                this.$output.val(JSON.stringify(this.data));
             }
         },
 
