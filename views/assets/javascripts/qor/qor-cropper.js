@@ -187,6 +187,7 @@
         unwrap: function() {
             let $list = this.$list;
 
+            console.log('unwrap');
             $list.find(CLASS_TOGGLE).remove();
             $list.find(CLASS_CANVAS).each(function() {
                 let $this = $(this);
@@ -248,9 +249,10 @@
         read: function(e) {
             let files = e.target.files,
                 file,
+                $list = this.$list,
                 $alert = this.$parent.find('.qor-fieldset__alert');
 
-            this.$list.show();
+            $list.show();
 
             delete this.data.Delete;
 
@@ -266,7 +268,7 @@
                     this.load(URL.createObjectURL(file));
                     this.$parent.find('.qor-medialibrary__image-desc').show();
                 } else {
-                    this.$list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
+                    $list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
                 }
                 this.$output.val(JSON.stringify(this.data));
             }
@@ -276,21 +278,17 @@
             let options = this.options,
                 _this = this,
                 $list = this.$list,
-                $ul = $list.find('ul'),
+                $ul = $(QorCropper.LIST),
                 data = this.data || {},
                 fileType = this.fileType,
                 $image,
                 imageLength;
 
-            if (!$ul.length || !$ul.find('li').length) {
-                $ul = $(QorCropper.LIST);
-                $list.html($ul);
-                this.wrap();
-            }
-
-            $ul.show(); // show ul when it is hidden
-
+            $list.find('ul').remove();
+            $list.html($ul);
             $image = $list.find('img');
+            this.wrap();
+
             imageLength = $image.length;
             $image
                 .one('load', function() {
