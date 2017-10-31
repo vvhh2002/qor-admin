@@ -445,17 +445,9 @@
 
                     $(document).trigger(EVENT_BOTTOMSHEET_SUBMIT);
                 },
-                error: function(xhr, textStatus, errorThrown) {
-                    var $error;
-
-                    if (xhr.status === 422) {
-                        $body.find('.qor-error').remove();
-                        $error = $(xhr.responseText).find('.qor-error');
-                        $form.before($error);
-                        $('.qor-bottomsheets .qor-page__body').scrollTop(0);
-                    } else {
-                        window.alert([textStatus, errorThrown].join(': '));
-                    }
+                error: function(err) {
+                    window.QOR.handleAjaxError(err, $body);
+                    $('.qor-bottomsheets .qor-page__body').scrollTop(0);
                 },
                 complete: function() {
                     $submit.prop('disabled', false);

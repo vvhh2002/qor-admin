@@ -111,29 +111,9 @@
                             _this.refresh();
                         }
                     },
-                    error: function(xhr, textStatus, errorThrown) {
-                        let error;
-
-                        if (xhr.responseJSON) {
-                            error = `<ul class="qor-error">
-                                        <li><label>
-                                            <i class="material-icons">error</i>
-                                            <span>${xhr.responseJSON.errors[0]}</span>
-                                        </label></li>
-                                    </ul>`;
-                        } else {
-                            error = `<ul class="qor-error">${$(xhr.responseText)
-                                .find('#errors')
-                                .html()}</ul>`;
-                        }
-
+                    error: function(err) {
+                        window.QOR.handleAjaxError(err, $form.parent());
                         $('.qor-bottomsheets .qor-page__body').scrollTop(0);
-
-                        if (xhr.status === 422 && error) {
-                            $form.before(error);
-                        } else {
-                            window.alert([textStatus, errorThrown].join(': '));
-                        }
                     },
                     complete: function() {
                         $submit.prop('disabled', false);

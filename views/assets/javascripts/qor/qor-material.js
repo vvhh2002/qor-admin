@@ -12,12 +12,12 @@
 })(function($) {
     'use strict';
 
-    var componentHandler = window.componentHandler;
-    var NAMESPACE = 'qor.material';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_UPDATE = 'update.' + NAMESPACE;
-    var SELECTOR_COMPONENT = '[class*="mdl-js"],[class*="mdl-tooltip"]';
+    let componentHandler = window.componentHandler,
+        NAMESPACE = 'qor.material',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_UPDATE = 'update.' + NAMESPACE,
+        SELECTOR_COMPONENT = '[class*="mdl-js"],[class*="mdl-tooltip"]';
 
     function enable(target) {
         /*jshint undef:false */
