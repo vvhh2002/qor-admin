@@ -41,7 +41,6 @@
                 fieldsetName;
 
             this.singlePage = !($element.closest('.qor-slideout').length && $element.closest('.qor-bottomsheets').length);
-            this.hasInlineReplicator = $element.find(CLASS_CONTAINER).length;
             this.maxitems = $element.data('maxItem');
             this.isSortable = $element.hasClass('qor-fieldset-sortable');
 
@@ -121,6 +120,7 @@
                 return;
             }
             template = this.initTemplate(this.template);
+
             this.template = template.template;
             this.index = template.index;
         },
@@ -142,7 +142,7 @@
 
         initTemplate: function(template) {
             let i,
-                hasInlineReplicator = this.hasInlineReplicator;
+                deepLevel = this.$element.parents(CLASS_CONTAINER).length;
 
             template = template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function(attribute, name, value) {
                 value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function(input, prefix, index, suffix) {
@@ -151,10 +151,28 @@
                             i = index;
                         }
 
-                        if (hasInlineReplicator && /\[\d+\]/.test(prefix)) {
-                            return input.replace(/\[\d+\]/, '[{{index}}]');
+                        if (deepLevel) {
+                            // assume input = QorResource.SerializableMeta.Menus[1].SubMenus[2].Items[3].URL
+                            // if deepLevel = 1, input should be QorResource.SerializableMeta.Menus[1].SubMenus[{{index}}].Items[3].URL
+                            // if deepLevel = 2, input should be QorResource.SerializableMeta.Menus[1].SubMenus[2].Items[{{index}}].URL
+
+                            let newInput = '',
+                                splitStr = input.split(/\[\d+\]/), // ["QorResource.SerializableMeta.Menus", ".SubMenus", ".Items", ".URL"]
+                                sortNumbers = input.match(/\[\d+\]/g); // ["[1]", "[2]", "[3]"]
+
+                            for (let j = 0; j < splitStr.length; j++) {
+                                let str = '';
+                                if (j === deepLevel) {
+                                    str = '[{{index}}]';
+                                } else if (j < sortNumbers.length) {
+                                    str = sortNumbers[j];
+                                }
+                                newInput += splitStr[j] + str;
+                            }
+
+                            return newInput;
                         } else {
-                            return prefix + '[{{index}}]' + suffix;
+                            return input.replace(/\[\d+\]/, '[{{index}}]');
                         }
                     }
                 });
@@ -201,31 +219,28 @@
         },
 
         add: function(e, data, isAutomatically) {
-            var options = this.options,
+            let options = this.options,
                 $item,
-                template;
+                template,
+                $target = $(e.target).closest(options.addClass);
 
             if (this.maxitems <= this.getCurrentItems()) {
                 return false;
             }
 
-            if (!isAutomatically) {
-                var $target = $(e.target).closest(options.addClass),
-                    templateName = $target.data('template'),
+            if (this.isMultipleTemplate) {
+                let templateName = $target.data('template'),
                     parents = $target.closest(this.$element),
                     parentsChildren = parents.children(options.childrenClass),
                     $fieldset = $target.closest(options.childrenClass).children('fieldset');
-            }
 
-            if (this.isMultipleTemplate) {
-                this.parseNestTemplate(templateName);
                 template = this.template[templateName];
-
                 $item = $(template.replace(/\{\{index\}\}/g, this.multipleIndex));
 
-                for (var dataKey in $target.data()) {
+                // get input kind from add button then add into QorResource.Rules[1].Kind input
+                for (let dataKey in $target.data()) {
                     if (dataKey.match(/^sync/)) {
-                        var k = dataKey.replace(/^sync/, '');
+                        let k = dataKey.replace(/^sync/, '');
                         $item.find("input[name*='." + k + "']").val($target.data(dataKey));
                     }
                 }
@@ -318,23 +333,6 @@
             this.resetButton();
             this.resetPositionButton();
             $item.append($alert);
-        },
-
-        parseNestTemplate: function(templateType) {
-            let $element = this.$element,
-                parentForm = $element.parents('.qor-fieldset-container'),
-                index;
-
-            if (parentForm.length) {
-                index = $element.closest('.qor-fieldset').data('itemIndex');
-                if (index) {
-                    if (templateType) {
-                        this.template[templateType] = this.template[templateType].replace(/\[\d+\]/g, '[' + index + ']');
-                    } else {
-                        this.template = this.template.replace(/\[\d+\]/g, '[' + index + ']');
-                    }
-                }
-            }
         },
 
         parseName: function($item) {
