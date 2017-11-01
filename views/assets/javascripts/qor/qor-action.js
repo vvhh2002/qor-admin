@@ -242,7 +242,7 @@
                     if (confirm) {
                         $.ajax(url, {
                             method: properties.method,
-                            dataType: properties.datatype,
+                            dataType: 'json',
                             beforeSend: function() {
                                 $actionButton.prop('disabled', true);
                             },
@@ -266,7 +266,7 @@
                 $.ajax(url, {
                     method: properties.method,
                     data: ajaxForm.formData,
-                    dataType: properties.datatype,
+                    dataType: properties.datatype || 'html',
                     beforeSend: function() {
                         if (undoUrl) {
                             $actionButton.prop('disabled', true);
