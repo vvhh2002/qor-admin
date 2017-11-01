@@ -200,6 +200,7 @@ func (ac *Controller) Delete(context *Context) {
 		http.Redirect(context.Writer, context.Request, path.Join(ac.GetRouter().Prefix, res.ToParam()), http.StatusFound)
 	}).With([]string{"json", "xml"}, func() {
 		context.Writer.WriteHeader(status)
+		context.Encode("OK", map[string]interface{}{"status": "ok"})
 	}).Respond(context.Request)
 }
 
