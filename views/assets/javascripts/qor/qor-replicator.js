@@ -145,7 +145,7 @@
                 deepLevel = this.$element.parents(CLASS_CONTAINER).length;
 
             template = template.replace(/(\w+)\="(\S*\[\d+\]\S*)"/g, function(attribute, name, value) {
-                value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function(input, prefix, index, suffix) {
+                value = value.replace(/^(\S*)\[(\d+)\]([^\[\]]*)$/, function(input, prefix, index) {
                     if (input === value) {
                         if (name === 'name' && !i) {
                             i = index;
@@ -182,7 +182,7 @@
 
             return {
                 template: template,
-                index: parseFloat(i)
+                index: parseFloat(i) + 5 //make sure the index is different from original.
             };
         },
 
