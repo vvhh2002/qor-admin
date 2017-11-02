@@ -10,7 +10,6 @@
         factory(jQuery);
     }
 })(function($) {
-
     'use strict';
 
     var $window = $(window);
@@ -65,9 +64,7 @@
         unbind: function() {
             this.$element.off(EVENT_CLICK, this.check);
 
-            this.$content.
-            off(EVENT_SCROLL, this.toggle).
-            off(EVENT_RESIZE, this.resize);
+            this.$content.off(EVENT_SCROLL, this.toggle).off(EVENT_RESIZE, this.resize);
         },
 
         build: function() {
@@ -75,7 +72,6 @@
                 return;
             }
 
-            var $this = this.$element;
             var $thead = this.$thead;
             var $clone = this.$clone;
             var self = this;
@@ -83,17 +79,18 @@
             var pageBodyTop = this.$content.offset().top + $(CLASS_HEADER).height();
 
             if (!$clone) {
-                this.$clone = $clone = $thead.clone().prependTo($this).css({ top: pageBodyTop });
+                this.$clone = $clone = $thead.clone().css({top: pageBodyTop});
+                $thead.after($clone);
             }
 
-            $clone.
-            addClass([CLASS_IS_FIXED, CLASS_IS_HIDDEN].join(' ')).
-            find('> tr').
-            children().
-            each(function(i) {
-                $(this).outerWidth($items.eq(i).outerWidth());
-                self.fixedHeaderWidth.push($(this).outerWidth());
-            });
+            $clone
+                .addClass([CLASS_IS_FIXED, CLASS_IS_HIDDEN].join(' '))
+                .find('> tr')
+                .children()
+                .each(function(i) {
+                    $(this).outerWidth($items.eq(i).outerWidth());
+                    self.fixedHeaderWidth.push($(this).outerWidth());
+                });
         },
 
         unbuild: function() {
@@ -103,7 +100,13 @@
         buildCheck: function() {
             var $this = this.$element;
             // disable fixer if have multiple tables or in search page or in media library list page
-            if ($('.qor-page__body .qor-js-table').length > 1 || $('.qor-global-search--container').length > 0 || $this.hasClass('qor-table--medialibrary') || $this.is(':hidden') || $this.find('tbody > tr:visible').length <= 1) {
+            if (
+                $('.qor-page__body .qor-js-table').length > 1 ||
+                $('.qor-global-search--container').length > 0 ||
+                $this.hasClass('qor-table--medialibrary') ||
+                $this.is(':hidden') ||
+                $this.find('tbody > tr:visible').length <= 1
+            ) {
                 return true;
             }
             return false;
@@ -116,11 +119,13 @@
             if ($target.is('.qor-js-check-all')) {
                 checked = $target.prop('checked');
 
-                $target.
-                closest('thead').
-                siblings('thead').
-                find('.qor-js-check-all').prop('checked', checked).
-                closest('.mdl-checkbox').toggleClass('is-checked', checked);
+                $target
+                    .closest('thead')
+                    .siblings('thead')
+                    .find('.qor-js-check-all')
+                    .prop('checked', checked)
+                    .closest('.mdl-checkbox')
+                    .toggleClass('is-checked', checked);
             }
         },
 
@@ -144,16 +149,19 @@
                 });
                 var notEqualWidth = _.difference(self.fixedHeaderWidth, self.headerWidth);
                 if (notEqualWidth.length) {
-                    $('thead.is-fixed').find('>tr').children().each(function(i) {
-                        $(this).outerWidth(self.headerWidth[i]);
-                    });
+                    $('thead.is-fixed')
+                        .find('>tr')
+                        .children()
+                        .each(function(i) {
+                            $(this).outerWidth(self.headerWidth[i]);
+                        });
                     this.isEqualed = true;
                 }
             }
             if (scrollTop > offsetTop - headerHeight) {
-                $clone.css({ 'margin-left': -scrollLeft }).removeClass(CLASS_IS_HIDDEN);
+                $clone.css({'margin-left': -scrollLeft}).removeClass(CLASS_IS_HIDDEN);
             } else {
-                $clone.css({ 'margin-left': '0' }).addClass(CLASS_IS_HIDDEN);
+                $clone.css({'margin-left': '0'}).addClass(CLASS_IS_HIDDEN);
             }
         },
 
@@ -187,7 +195,7 @@
                 $this.data(NAMESPACE, (data = new QorFixer(this, options)));
             }
 
-            if (typeof options === 'string' && $.isFunction(fn = data[options])) {
+            if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
                 fn.call(data);
             }
         });
@@ -202,16 +210,15 @@
             paddingHeight: 2 // Fix sub header height bug
         };
 
-        $(document).
-        on(EVENT_DISABLE, function(e) {
-            QorFixer.plugin.call($(selector, e.target), 'destroy');
-        }).
-        on(EVENT_ENABLE, function(e) {
-            QorFixer.plugin.call($(selector, e.target), options);
-        }).
-        triggerHandler(EVENT_ENABLE);
+        $(document)
+            .on(EVENT_DISABLE, function(e) {
+                QorFixer.plugin.call($(selector, e.target), 'destroy');
+            })
+            .on(EVENT_ENABLE, function(e) {
+                QorFixer.plugin.call($(selector, e.target), options);
+            })
+            .triggerHandler(EVENT_ENABLE);
     });
 
     return QorFixer;
-
 });
