@@ -117,7 +117,7 @@ func (context *Context) FuncMap() template.FuncMap {
 		"new_resource_path":  context.newResourcePath,
 		"defined_resource_show_page": func(res *Resource) bool {
 			if res != nil {
-				if r := context.Admin.GetResource(res.Name); r != nil {
+				if r := context.Admin.GetResource(utils.ModelType(res.Value).String()); r != nil {
 					return r.sections.ConfiguredShowAttrs
 				}
 			}
