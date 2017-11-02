@@ -2,10 +2,8 @@ package admin
 
 import (
 	"html/template"
-	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/inflection"
@@ -102,7 +100,7 @@ func (admin *Admin) SetAssetFS(assetFS assetfs.Interface) {
 // RegisterViewPath register view path for admin
 func (admin *Admin) RegisterViewPath(pth string) {
 	if admin.AssetFS.RegisterPath(filepath.Join(utils.AppRoot, "vendor", pth)) != nil {
-		for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
+		for _, gopath := range utils.GOPATH() {
 			if admin.AssetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
 				break
 			}

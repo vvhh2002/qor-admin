@@ -2,10 +2,8 @@ package admin
 
 import (
 	"html/template"
-	"os"
 	"path/filepath"
 	"reflect"
-	"strings"
 
 	"github.com/qor/assetfs"
 	"github.com/qor/qor"
@@ -41,7 +39,7 @@ func RegisterViewPath(pth string) {
 
 	for _, assetFS := range globalAssetFSes {
 		if assetFS.RegisterPath(filepath.Join(utils.AppRoot, "vendor", pth)) != nil {
-			for _, gopath := range strings.Split(os.Getenv("GOPATH"), ":") {
+			for _, gopath := range utils.GOPATH() {
 				if assetFS.RegisterPath(filepath.Join(gopath, "src", pth)) == nil {
 					break
 				}
