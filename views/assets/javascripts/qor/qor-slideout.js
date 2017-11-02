@@ -274,8 +274,10 @@
                         }
                     },
                     error: function(err) {
-                        window.QOR.handleAjaxError(err, $slideout.find('.qor-slideout__body'));
-                        $slideout.scrollTop(0);
+                        let $body = $slideout.find('.qor-slideout__body');
+
+                        window.QOR.handleAjaxError(err, $body);
+                        $body.scrollTop(0);
                     },
                     complete: function() {
                         $submit.prop('disabled', false);
