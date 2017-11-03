@@ -187,7 +187,6 @@
         unwrap: function() {
             let $list = this.$list;
 
-            console.log('unwrap');
             $list.find(CLASS_TOGGLE).remove();
             $list.find(CLASS_CANVAS).each(function() {
                 let $this = $(this);
@@ -270,11 +269,10 @@
                 } else {
                     $list.empty().html(QorCropper.FILE_LIST.replace('{{filename}}', file.name));
                 }
-                this.$output.val(JSON.stringify(this.data));
             }
         },
 
-        load: function(url, callback) {
+        load: function(url, fromExternal, callback) {
             let options = this.options,
                 _this = this,
                 $list = this.$list,
@@ -284,8 +282,12 @@
                 $image,
                 imageLength;
 
-            $list.find('ul').remove();
-            $list.html($ul);
+            // media box will use load method, has it's own html structure.
+            if (!fromExternal) {
+                $list.find('ul').remove();
+                $list.html($ul);
+            }
+
             $image = $list.find('img');
             this.wrap();
 
@@ -361,6 +363,7 @@
                     }
 
                     delete data.Delete;
+
                     _this.$output.val(JSON.stringify(data));
 
                     // callback after load complete
