@@ -54,8 +54,15 @@ $(function() {
             hasSlideoutTheme = $this.parents('.qor-theme-slideout').length,
             isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
 
+        e.stopPropagation();
         // if clicking item's menu actions
-        if ($target.closest('.qor-button--actions').length || (!$target.data('url') && $target.is('a')) || (isInTable && isBottomsheetsOpened())) {
+        if (
+            $this.data('ajax-form') ||
+            $target.closest('.qor-table--bulking').length ||
+            $target.closest('.qor-button--actions').length ||
+            (!$target.data('url') && $target.is('a')) ||
+            (isInTable && isBottomsheetsOpened())
+        ) {
             return;
         }
 

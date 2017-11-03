@@ -18,10 +18,11 @@
         EVENT_CLICK = 'click.' + NAMESPACE,
         EVENT_UNDO = 'undo.' + NAMESPACE,
         CLASS_ACTION_FORMS = '.qor-action-forms',
-        CLASS_MENU_ACTIONS = '.qor-table__actions a[data-url],[data-url][data-method=POST],[data-url][data-method=PUT],[data-url][data-method=DELETE]',
+        CLASS_MENU_ACTIONS = '[data-ajax-form="true"][data-method]',
         CLASS_BUTTON_BULKS = '.qor-action-bulk-buttons',
         CLASS_TABLE = '.qor-page .qor-table-container',
         CLASS_TABLE_BULK = '.qor-table--bulking',
+        CLASS_TABLE_BULK_TR = '.qor-table--bulking tbody tr',
         CLASS_IS_UNDO = 'is_undo',
         CLASS_TABLE_MDL = 'mdl-data-table--selectable',
         CLASS_SLIDEOUT = '.qor-slideout',
@@ -44,18 +45,19 @@
         },
 
         bind: function() {
-            this.$element
-                .on(EVENT_CLICK, '[data-ajax-form]', this.clickAjaxButton.bind(this))
-                .on(EVENT_CLICK, '.qor-action--bulk', this.renderBulkTable.bind(this))
-                .on(EVENT_CLICK, '.qor-action--exit-bulk', this.removeBulkTable.bind(this));
+            this.$element.on(EVENT_CLICK, '.qor-action--bulk', this.renderBulkTable.bind(this)).on(EVENT_CLICK, '.qor-action--exit-bulk', this.removeBulkTable.bind(this));
 
-            $(document).on(EVENT_CLICK, '.qor-table--bulking tbody tr', this.handleBulkTableClick.bind(this));
+            $(document)
+                .on(EVENT_CLICK, CLASS_TABLE_BULK_TR, this.handleBulkTableClick.bind(this))
+                .on(EVENT_CLICK, CLASS_MENU_ACTIONS, this.clickAjaxButton.bind(this));
         },
 
         unbind: function() {
             this.$element.off(EVENT_CLICK);
 
-            $(document).off(EVENT_CLICK, '.qor-table--bulking tbody tr', this.handleBulkTableClick);
+            $(document)
+                .off(EVENT_CLICK, CLASS_TABLE_BULK_TR, this.handleBulkTableClick)
+                .off(EVENT_CLICK, CLASS_MENU_ACTIONS, this.clickAjaxButton);
         },
 
         initActions: function() {
@@ -405,10 +407,6 @@
             })
             .on(EVENT_ENABLE, function(e) {
                 QorAction.plugin.call($(selector, e.target), options);
-            })
-            .on(EVENT_CLICK, CLASS_MENU_ACTIONS, function() {
-                new QorAction().actionSubmit(this);
-                return false;
             })
             .triggerHandler(EVENT_ENABLE);
     });
