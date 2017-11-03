@@ -52,7 +52,7 @@ $(function() {
             actionData,
             openType = openData.openType,
             hasSlideoutTheme = $this.parents('.qor-theme-slideout').length,
-            isActionButton = ($this.hasClass('qor-action-button') || $this.hasClass('qor-action--button')) && !openType;
+            isActionButton = $this.hasClass('qor-action-button') || $this.hasClass('qor-action--button');
 
         e.stopPropagation();
         // if clicking item's menu actions
@@ -79,7 +79,7 @@ $(function() {
 
         if (!openData.method || openData.method.toUpperCase() == 'GET') {
             // Open in BottmSheet: is action button, open type is bottom-sheet
-            if (isActionButton || openType == 'bottomsheet') {
+            if (openType == 'bottomsheet' || isActionButton) {
                 // if is bulk action and no item selected
                 if (isActionButton && !actionData && $this.closest('[data-toggle="qor.action.bulk"]').length) {
                     window.QOR.qorConfirm(openData.errorNoItem);
@@ -91,8 +91,8 @@ $(function() {
             }
 
             // Slideout or New Page: table items, new button, edit button
-            if (isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton || openType == 'slideout') {
-                if (hasSlideoutTheme || openType == 'slideout') {
+            if (openType == 'slideout' || isInTable || (isNewButton && !isBottomsheetsOpened()) || isEditButton) {
+                if (openType == 'slideout' || hasSlideoutTheme) {
                     if ($this.hasClass(CLASS_IS_SELECTED)) {
                         Slideout.hide();
                         toggleSelectedCss();
