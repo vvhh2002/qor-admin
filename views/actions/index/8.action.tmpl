@@ -5,7 +5,7 @@
 
 {{if gt (len $allowed_actions) 0 }}
   <div class="qor-action-bulk-edit" data-toggle="qor.action.bulk">
-    <div class="qor-action-forms hidden">
+    <div class="qor-action-forms" style="display: none;">
       {{range $action := $allowed_actions}}
         {{if (and $action.URL (eq $action.Method "GET"))}}
           <a class="mdl-button mdl-button--colored mdl-button--raised qor-action-button qor-action-button--link" href="{{call $action.URL $result $context}}">
