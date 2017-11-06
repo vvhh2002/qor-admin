@@ -148,10 +148,16 @@ $(function() {
     // ********************************Qor Handle AJAX error********************
     QOR.handleAjaxError = function(err, $body) {
         let $error,
+            $form = $body.find('.qor-form-container:first'),
             rJSON = err.responseJSON,
             rText = err.responseText;
 
+        if ($form.length) {
+            $body = $form;
+        }
+
         $body.find('.qor-error').remove();
+
         if (err.status === 422) {
             if (rJSON) {
                 let errors = rJSON.errors,
