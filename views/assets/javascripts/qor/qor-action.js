@@ -399,6 +399,13 @@
         let options = {},
             selector = '[data-toggle="qor.action.bulk"]';
 
+        if (!$(selector).length) {
+            $(document).on(EVENT_CLICK, CLASS_MENU_ACTIONS, function() {
+                new QorAction().actionSubmit(this);
+                return false;
+            });
+        }
+
         $(document)
             .on(EVENT_DISABLE, function(e) {
                 QorAction.plugin.call($(selector, e.target), 'destroy');
