@@ -154,8 +154,7 @@
         },
 
         enableTableMDL: function() {
-            let $table = $(CLASS_TABLE).find('table'),
-                $fixedLabel = $table.find('thead.is-fixed .mdl-checkbox__input');
+            let $table = $(CLASS_TABLE).find('table');
 
             $table
                 .removeAttr('data-upgraded')
@@ -168,8 +167,7 @@
         },
 
         disableTableMDL: function() {
-            let $table = $(CLASS_TABLE).find('table'),
-                $fixedLabel = $table.find('thead.is-fixed .mdl-checkbox__input');
+            let $table = $(CLASS_TABLE).find('table');
 
             $table
                 .removeClass(CLASS_TABLE_MDL)

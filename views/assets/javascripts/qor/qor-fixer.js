@@ -12,22 +12,18 @@
 })(function($) {
     'use strict';
 
-    var $window = $(window);
-    var _ = window._;
-    var NAMESPACE = 'qor.fixer';
-    var EVENT_ENABLE = 'enable.' + NAMESPACE;
-    var EVENT_DISABLE = 'disable.' + NAMESPACE;
-    var EVENT_CLICK = 'click.' + NAMESPACE;
-    var EVENT_RESIZE = 'resize.' + NAMESPACE;
-    var EVENT_SCROLL = 'scroll.' + NAMESPACE;
-    var CLASS_IS_HIDDEN = 'is-hidden';
-    var CLASS_IS_FIXED = 'is-fixed';
-    var CLASS_HEADER = '.qor-page__header';
+    let $window = $(window),
+        NAMESPACE = 'qor.fixer',
+        EVENT_ENABLE = 'enable.' + NAMESPACE,
+        EVENT_DISABLE = 'disable.' + NAMESPACE,
+        EVENT_RESIZE = 'resize.' + NAMESPACE,
+        EVENT_SCROLL = 'scroll.' + NAMESPACE,
+        CLASS_FIXED_TABLE = 'qor-table-fixed-header',
+        CLASS_HEADER = '.qor-page__header';
 
     function QorFixer(element, options) {
         this.$element = $(element);
         this.options = $.extend({}, QorFixer.DEFAULTS, $.isPlainObject(options) && options);
-        this.$clone = null;
         this.init();
     }
 
@@ -37,67 +33,32 @@
         init: function() {
             var options = this.options;
             var $this = this.$element;
-            if (this.buildCheck()) {
+            if (this.isNeedBuild()) {
                 return;
             }
-            this.$thead = $this.find('thead:first');
-            this.$tbody = $this.find('tbody:first');
+            this.$thead = $this.find('thead');
+            this.$tbody = $this.find('tbody');
+
             this.$header = $(options.header);
             this.$subHeader = $(options.subHeader);
             this.$content = $(options.content);
             this.marginBottomPX = parseInt(this.$subHeader.css('marginBottom'));
             this.paddingHeight = options.paddingHeight;
-            this.fixedHeaderWidth = [];
-            this.isEqualed = false;
 
             this.resize();
             this.bind();
         },
 
         bind: function() {
-            this.$element.on(EVENT_CLICK, $.proxy(this.check, this));
-
-            this.$content.on(EVENT_SCROLL, $.proxy(this.toggle, this));
-            $window.on(EVENT_RESIZE, $.proxy(this.resize, this));
+            this.$content.on(EVENT_SCROLL, this.toggle.bind(this));
+            $window.on(EVENT_RESIZE, this.resize.bind(this));
         },
 
         unbind: function() {
-            this.$element.off(EVENT_CLICK, this.check);
-
             this.$content.off(EVENT_SCROLL, this.toggle).off(EVENT_RESIZE, this.resize);
         },
 
-        build: function() {
-            if (!this.$content.length) {
-                return;
-            }
-
-            var $thead = this.$thead;
-            var $clone = this.$clone;
-            var self = this;
-            var $items = $thead.find('> tr').children();
-            var pageBodyTop = this.$content.offset().top + $(CLASS_HEADER).height();
-
-            if (!$clone) {
-                this.$clone = $clone = $thead.clone().css({top: pageBodyTop});
-                $thead.after($clone);
-            }
-
-            $clone
-                .addClass([CLASS_IS_FIXED, CLASS_IS_HIDDEN].join(' '))
-                .find('> tr')
-                .children()
-                .each(function(i) {
-                    $(this).outerWidth($items.eq(i).outerWidth());
-                    self.fixedHeaderWidth.push($(this).outerWidth());
-                });
-        },
-
-        unbuild: function() {
-            this.$clone.remove();
-        },
-
-        buildCheck: function() {
+        isNeedBuild: function() {
             var $this = this.$element;
             // disable fixer if have multiple tables or in search page or in media library list page
             if (
@@ -112,56 +73,38 @@
             return false;
         },
 
-        check: function(e) {
-            var $target = $(e.target);
-            var checked;
+        build: function() {
+            let headerWidth = [],
+                $items = this.$tbody.find('> tr:first').children();
 
-            if ($target.is('.qor-js-check-all')) {
-                checked = $target.prop('checked');
+            $items.each(function() {
+                headerWidth.push($(this).outerWidth());
+            });
 
-                $target
-                    .closest('thead')
-                    .siblings('thead')
-                    .find('.qor-js-check-all')
-                    .prop('checked', checked)
-                    .closest('.mdl-checkbox')
-                    .toggleClass('is-checked', checked);
-            }
+            this.$thead
+                .find('>tr')
+                .children()
+                .each(function(i) {
+                    $(this).outerWidth(headerWidth[i]);
+                });
         },
 
         toggle: function() {
             if (!this.$content.length) {
                 return;
             }
-            var self = this;
-            var $clone = this.$clone;
-            var $thead = this.$thead;
-            var scrollTop = this.$content.scrollTop();
-            var scrollLeft = this.$content.scrollLeft();
-            var offsetTop = this.$subHeader.outerHeight() + this.paddingHeight + this.marginBottomPX;
-            var headerHeight = $('.qor-page__header').outerHeight();
+            let $element = this.$element,
+                $thead = this.$thead,
+                scrollTop = this.$content.scrollTop(),
+                offsetTop = this.$subHeader.outerHeight() + this.paddingHeight + this.marginBottomPX,
+                headerHeight = $('.qor-page__header').outerHeight(),
+                pageTop = this.$content.offset().top + $(CLASS_HEADER).height();
 
-            if (!this.isEqualed) {
-                this.headerWidth = [];
-                var $items = $thead.find('> tr').children();
-                $items.each(function() {
-                    self.headerWidth.push($(this).outerWidth());
-                });
-                var notEqualWidth = _.difference(self.fixedHeaderWidth, self.headerWidth);
-                if (notEqualWidth.length) {
-                    $('thead.is-fixed')
-                        .find('>tr')
-                        .children()
-                        .each(function(i) {
-                            $(this).outerWidth(self.headerWidth[i]);
-                        });
-                    this.isEqualed = true;
-                }
-            }
             if (scrollTop > offsetTop - headerHeight) {
-                $clone.css({'margin-left': -scrollLeft}).removeClass(CLASS_IS_HIDDEN);
+                $thead.css({top: pageTop});
+                $element.addClass(CLASS_FIXED_TABLE);
             } else {
-                $clone.css({'margin-left': '0'}).addClass(CLASS_IS_HIDDEN);
+                $element.removeClass(CLASS_FIXED_TABLE);
             }
         },
 
@@ -175,7 +118,6 @@
                 return;
             }
             this.unbind();
-            this.unbuild();
             this.$element.removeData(NAMESPACE);
         }
     };
