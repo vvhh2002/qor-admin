@@ -52,6 +52,7 @@ $(function() {
             actionData,
             openType = openData.openType,
             hasSlideoutTheme = $this.parents('.qor-theme-slideout').length,
+            isInSlideout = $this.closest('.qor-slideout').length,
             isActionButton = $this.hasClass('qor-action-button') || $this.hasClass('qor-action--button');
 
         e.stopPropagation();
@@ -84,7 +85,7 @@ $(function() {
 
             if ((openType == 'bottomsheet' || isActionButton) && openType != 'slideout') {
                 // if is bulk action and no item selected
-                if (isActionButton && !actionData && $this.closest('[data-toggle="qor.action.bulk"]').length) {
+                if (isActionButton && !actionData && $this.closest('[data-toggle="qor.action.bulk"]').length && !isInSlideout) {
                     window.QOR.qorConfirm(openData.errorNoItem);
                     return false;
                 }

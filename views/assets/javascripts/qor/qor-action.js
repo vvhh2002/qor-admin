@@ -12,6 +12,7 @@
 })(function($) {
     'use strict';
     let Mustache = window.Mustache,
+        QOR = window.QOR,
         NAMESPACE = 'qor.action',
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
@@ -97,12 +98,8 @@
         },
 
         actionSubmit: function($action) {
-            let $target = $($action);
-            this.$actionButton = $target;
-            if ($target.data().method) {
-                this.submit();
-                return false;
-            }
+            this.submit($action);
+            return false;
         },
 
         handleBulkTableClick: function(e) {
@@ -143,7 +140,6 @@
             $('.qor-table__inner-list').remove();
             this.toggleBulkButtons();
             this.enableTableMDL();
-
             this.adjustPageBodyStyle(true);
         },
 
@@ -154,28 +150,19 @@
         },
 
         enableTableMDL: function() {
-            let $table = $(CLASS_TABLE).find('table');
-
-            $table
+            $(CLASS_TABLE)
+                .find('table')
                 .removeAttr('data-upgraded')
                 .addClass(CLASS_TABLE_MDL)
                 .trigger('enable');
-
-            // .find('thead:first th:first')
-            // .clone()
-            // .prependTo($('thead.is-fixed tr'));
         },
 
         disableTableMDL: function() {
-            let $table = $(CLASS_TABLE).find('table');
-
-            $table
+            $(CLASS_TABLE)
+                .find('table')
                 .removeClass(CLASS_TABLE_MDL)
                 .find('tr')
-                .removeClass('is-selected');
-
-            $table
-                .find('tr')
+                .removeClass('is-selected')
                 .find('td:first,th:first')
                 .remove();
         },
@@ -197,12 +184,9 @@
         clickAjaxButton: function(e) {
             let $target = $(e.target);
 
-            this.$actionButton = $target;
-            if ($target.data().ajaxForm) {
-                this.collectFormData();
-                this.ajaxForm.properties = $target.data();
-                this.submit();
-            }
+            this.collectFormData();
+            this.ajaxForm.properties = $target.data();
+            this.submit($target);
             return false;
         },
 
@@ -212,127 +196,110 @@
             return Mustache.render(flashMessageTmpl, data);
         },
 
-        submit: function() {
+        submit: function($actionButton) {
             let _this = this,
-                $parent,
-                $element = this.$element,
-                $actionButton = this.$actionButton,
                 ajaxForm = this.ajaxForm || {},
-                properties = ajaxForm.properties || $actionButton.data(),
-                url = properties.url,
-                undoUrl = properties.undoUrl,
-                isUndo = $actionButton.hasClass(CLASS_IS_UNDO),
-                isInSlideout = $actionButton.closest(CLASS_SLIDEOUT).length,
-                needDisableButtons = $element && !isInSlideout,
-                $body = $element
-                    .closest('.qor-page__header')
-                    .parent()
-                    .find('.qor-page__body');
+                properties = ajaxForm.properties || $actionButton.data();
 
             if (properties.fromIndex && (!ajaxForm.formData || !ajaxForm.formData.length)) {
-                window.alert(ajaxForm.properties.errorNoItem);
+                QOR.qorConfirm(ajaxForm.properties.errorNoItem);
                 return;
             }
 
-            if (properties.confirm && properties.ajaxForm && !properties.fromIndex) {
-                window.QOR.qorConfirm(properties, function(confirm) {
+            if (properties.confirm) {
+                QOR.qorConfirm(properties, function(confirm) {
                     if (confirm) {
-                        $.ajax(url, {
-                            method: properties.method,
-                            dataType: 'json',
-                            beforeSend: function() {
-                                $actionButton.prop('disabled', true);
-                            },
-                            success: function() {
-                                window.location.reload();
-                            },
-                            error: function(err) {
-                                window.QOR.handleAjaxError(err, $body);
-                                $actionButton.prop('disabled', false);
-                            }
-                        });
+                        _this.handleAjaxSubmit(ajaxForm, $actionButton);
                     } else {
                         return;
                     }
                 });
             } else {
-                if (isUndo) {
-                    url = properties.undoUrl;
-                }
+                this.handleAjaxSubmit(ajaxForm, $actionButton);
+            }
+        },
 
-                $.ajax(url, {
-                    method: properties.method,
-                    data: ajaxForm.formData,
-                    dataType: properties.datatype || 'html',
-                    beforeSend: function() {
-                        if (undoUrl) {
-                            $actionButton.prop('disabled', true);
-                        } else if (needDisableButtons) {
-                            _this.switchButtons($element, 1);
+        handleAjaxSubmit: function(ajaxForm, $actionButton) {
+            let _this = this,
+                $element = this.$element,
+                properties = ajaxForm.properties || $actionButton.data(),
+                url = properties.url,
+                undoUrl = properties.undoUrl,
+                isUndo = $actionButton.hasClass(CLASS_IS_UNDO),
+                isInSlideout = $actionButton.closest(CLASS_SLIDEOUT).length,
+                needDisableButtons = $element.length && !isInSlideout,
+                $body = $element
+                    .closest('.qor-page__header')
+                    .parent()
+                    .find('.qor-page__body');
+
+            if (isUndo) {
+                url = undoUrl; // notification has undo url
+            }
+
+            $.ajax(url, {
+                method: properties.method,
+                data: ajaxForm.formData,
+                dataType: properties.datatype || 'json',
+                beforeSend: function() {
+                    if (undoUrl) {
+                        $actionButton.prop('disabled', true);
+                    } else if (needDisableButtons) {
+                        _this.switchButtons($element, 1);
+                    }
+                },
+                success: function(data, status, response) {
+                    let contentType = response.getResponseHeader('content-type'),
+                        disposition = response.getResponseHeader('Content-Disposition');
+
+                    // handle file download from form submit
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+                            matches = fileNameRegex.exec(disposition),
+                            fileData = {},
+                            fileName = '';
+
+                        if (matches != null && matches[1]) {
+                            fileName = matches[1].replace(/['"]/g, '');
                         }
-                    },
-                    success: function(data, status, response) {
-                        let contentType = response.getResponseHeader('content-type'),
-                            // handle file download from form submit
-                            disposition = response.getResponseHeader('Content-Disposition');
 
-                        if (disposition && disposition.indexOf('attachment') !== -1) {
-                            var fileNameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-                                matches = fileNameRegex.exec(disposition),
-                                fileData = {},
-                                fileName = '';
-
-                            if (matches != null && matches[1]) {
-                                fileName = matches[1].replace(/['"]/g, '');
-                            }
-
-                            if (properties.method) {
-                                fileData = $.extend({}, ajaxForm.normalFormData, {
-                                    _method: properties.method
-                                });
-                            }
-
-                            window.QOR.qorAjaxHandleFile(url, contentType, fileName, fileData);
-
-                            if (undoUrl) {
-                                $actionButton.prop('disabled', false);
-                            } else {
-                                _this.switchButtons($element);
-                            }
-
-                            return;
+                        if (properties.method) {
+                            fileData = $.extend({}, ajaxForm.normalFormData, {
+                                _method: properties.method
+                            });
                         }
 
-                        // has undo action
+                        QOR.qorAjaxHandleFile(url, contentType, fileName, fileData);
+
                         if (undoUrl) {
-                            $element.triggerHandler(EVENT_UNDO, [$actionButton, isUndo, data]);
-                            isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
                             $actionButton.prop('disabled', false);
-                            return;
-                        }
-
-                        if (contentType.indexOf('json') > -1) {
-                            // render notification
-                            $('.qor-alert').remove();
-                            needDisableButtons && _this.switchButtons($element);
-                            isInSlideout ? ($parent = $(CLASS_SLIDEOUT)) : ($parent = $('.mdl-layout__content'));
-                            $parent.find('.qor-page__body').prepend(_this.renderFlashMessage(data));
                         } else {
-                            // properties.fromIndex || properties.fromMenu
-                            window.location.reload();
-                        }
-                    },
-                    error: function(err) {
-                        if (undoUrl) {
-                            $actionButton.prop('disabled', false);
-                        } else if (needDisableButtons) {
                             _this.switchButtons($element);
                         }
 
-                        window.QOR.handleAjaxError(err, $body);
+                        return;
                     }
-                });
-            }
+
+                    // has undo action
+                    if (undoUrl) {
+                        $element.trigger(EVENT_UNDO, [$actionButton, isUndo, data]);
+                        isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
+                        $actionButton.prop('disabled', false);
+                        return;
+                    }
+
+                    window.location.reload();
+                },
+                error: function(err) {
+                    if (undoUrl) {
+                        $actionButton.prop('disabled', false);
+                    } else if (needDisableButtons) {
+                        _this.switchButtons($element);
+                    }
+
+                    QOR.handleAjaxError(err, $body);
+                }
+            });
         },
 
         switchButtons: function($element, disbale) {
@@ -345,33 +312,21 @@
             this.$element.removeData(NAMESPACE);
         }
     };
-    QorAction.FLASHMESSAGETMPL = `<div class="qor-alert qor-action-alert qor-alert--success [[#error]]qor-alert--error[[/error]]" [[#message]]data-dismissible="true"[[/message]] role="alert">
-                                    <button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
-                                        <i class="material-icons">close</i>
-                                    </button>
-                                    <span class="qor-alert-message">
-                                        [[#message]]
-                                            [[message]]
-                                        [[/message]]
-                                        [[#error]]
-                                            [[error]]
-                                        [[/error]]
-                                    </span>
-                                </div>`;
 
     QorAction.DEFAULTS = {};
 
-    $.fn.qorSliderAfterShow.qorActionInit = function(url, html) {
-        let hasAction = $(html).find('[data-toggle="qor-action-slideout"]').length,
-            $actionForm = $('[data-toggle="qor-action-slideout"]').find('form'),
-            $checkedItem = $('.qor-page__body .mdl-checkbox__input:checked');
+    $.fn.qorSliderAfterShow.qorInsertActionData = function(url, html) {
+        let $action = $(html).find('[data-toggle="qor-action-slideout"]'),
+            $actionForm = $action.find('form'),
+            $checkedItem = $(CLASS_TABLE_BULK).find('.mdl-checkbox__input:checked');
 
-        if (hasAction && $checkedItem.length) {
+        if ($action.length && $checkedItem.length) {
             // insert checked value into sliderout form
-            $checkedItem.each(function(i, e) {
-                let id = $(e)
-                    .parents('tbody tr')
+            $checkedItem.each(function() {
+                let id = $(this)
+                    .closest('tr')
                     .data('primary-key');
+
                 if (id) {
                     $actionForm.prepend('<input class="js-primary-value" type="hidden" name="primary_values[]" value="' + id + '" />');
                 }
@@ -400,8 +355,8 @@
             selector = '[data-toggle="qor.action.bulk"]';
 
         if (!$(selector).length) {
-            $(document).on(EVENT_CLICK, CLASS_MENU_ACTIONS, function() {
-                new QorAction().actionSubmit(this);
+            $(document).on(EVENT_CLICK, CLASS_MENU_ACTIONS, function(e) {
+                new QorAction().actionSubmit($(e.target));
                 return false;
             });
         }
