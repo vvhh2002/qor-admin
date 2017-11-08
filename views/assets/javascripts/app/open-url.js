@@ -79,7 +79,10 @@ $(function() {
 
         if (!openData.method || openData.method.toUpperCase() == 'GET') {
             // Open in BottmSheet: is action button, open type is bottom-sheet
-            if (openType == 'bottomsheet' || isActionButton) {
+            // is action button  but opentype == slideout, should open in slideout\
+            // open type is No.1 priority
+
+            if ((openType == 'bottomsheet' || isActionButton) && openType != 'slideout') {
                 // if is bulk action and no item selected
                 if (isActionButton && !actionData && $this.closest('[data-toggle="qor.action.bulk"]').length) {
                     window.QOR.qorConfirm(openData.errorNoItem);
