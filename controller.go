@@ -230,11 +230,11 @@ func (ac *Controller) Action(context *Context) {
 		if !actionArgument.SkipDefaultResponse {
 			if !context.HasError() {
 				message := string(context.t("qor_admin.actions.executed_successfully", "Action {{.Name}}: Executed successfully", action))
+				context.Flash(message, "success")
 				responder.With("html", func() {
-					context.Flash(message, "success")
 					http.Redirect(context.Writer, context.Request, context.Request.Referer(), http.StatusFound)
-				}).With([]string{"json"}, func() {
-					context.Encode("OK", map[string]string{"message": message, "status": "ok"})
+				}).With([]string{"json", "xml"}, func() {
+					context.Encode("OK", map[string]interface{}{"message": message, "status": "ok"})
 				}).Respond(context.Request)
 			} else {
 				context.Writer.WriteHeader(HTTPUnprocessableEntity)
