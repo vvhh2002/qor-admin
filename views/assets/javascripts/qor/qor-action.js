@@ -227,11 +227,7 @@
                 undoUrl = properties.undoUrl,
                 isUndo = $actionButton.hasClass(CLASS_IS_UNDO),
                 isInSlideout = $actionButton.closest(CLASS_SLIDEOUT).length,
-                needDisableButtons = $element.length && !isInSlideout,
-                $body = $element
-                    .closest('.qor-page__header')
-                    .parent()
-                    .find('.qor-page__body');
+                needDisableButtons = $element.length && !isInSlideout;
 
             if (isUndo) {
                 url = undoUrl; // notification has undo url
@@ -297,7 +293,7 @@
                         _this.switchButtons($element);
                     }
 
-                    QOR.handleAjaxError(err, $body);
+                    QOR.handleAjaxError(err);
                 }
             });
         },

@@ -112,8 +112,7 @@
                         }
                     },
                     error: function(err) {
-                        window.QOR.handleAjaxError(err, $form.parent());
-                        $('.qor-bottomsheets .qor-page__body').scrollTop(0);
+                        window.QOR.handleAjaxError(err);
                     },
                     complete: function() {
                         $submit.prop('disabled', false);

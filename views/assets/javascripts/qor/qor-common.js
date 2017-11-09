@@ -146,37 +146,41 @@ $(function() {
     converVideoLinks();
 
     // ********************************Qor Handle AJAX error********************
-    QOR.handleAjaxError = function(err, $body) {
+    QOR.handleAjaxError = function(err) {
         let $error,
-            $form = $body.find('.qor-form-container:first'),
+            $body = $('body'),
             rJSON = err.responseJSON,
             rText = err.responseText;
 
-        if ($form.length) {
-            $body = $form;
-        }
-
-        $body.find('.qor-error').remove();
+        $body.find('.qor-alert').remove();
 
         if (err.status === 422) {
             if (rJSON) {
                 let errors = rJSON.errors,
                     $errorContent = '';
 
-                $error = $('<ul class="qor-error" id="errors"/>').prependTo($body);
+                $error = $(`<ul class="qor-alert qor-error" data-dismissible="true"><button type="button" class="mdl-button mdl-button--icon" data-dismiss="alert">
+                                <i class="material-icons">close</i>
+                            </button></ul>`);
                 for (let i = 0; i < errors.length; i++) {
                     $errorContent += `<li>
-                                        <label for="">
                                         <i class="material-icons">error</i>
-                                            <span>${errors[i]}</span>
-                                        </label>
+                                        <span>${errors[i]}</span>
                                     </li>`;
                 }
-                $error.html($errorContent);
+                $error.append($errorContent);
             } else {
                 $error = $(rText).find('.qor-error');
-                $body.prepend($error);
             }
+
+            $error.prependTo($body);
+            setTimeout(function() {
+                $error.addClass('qor-alert__active');
+            }, 50);
+
+            setTimeout(function() {
+                $('.qor-alert[data-dismissible="true"]').removeClass('qor-alert__active');
+            }, 5000);
         } else {
             window.alert('Server Error!');
         }

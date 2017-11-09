@@ -353,8 +353,7 @@
         },
 
         submit: function(e) {
-            let $body = this.$body,
-                form = e.target,
+            let form = e.target,
                 $form = $(form),
                 _this = this,
                 url = $form.prop('action'),
@@ -446,8 +445,7 @@
                     $(document).trigger(EVENT_BOTTOMSHEET_SUBMIT);
                 },
                 error: function(err) {
-                    window.QOR.handleAjaxError(err, $body);
-                    $('.qor-bottomsheets .qor-page__body').scrollTop(0);
+                    window.QOR.handleAjaxError(err);
                 },
                 complete: function() {
                     $submit.prop('disabled', false);

@@ -230,7 +230,7 @@
                         $submit.prop('disabled', true);
                         $.fn.qorSlideoutBeforeHide = null;
                     },
-                    success: function(html) {
+                    success: function() {
                         var returnUrl = $form.data('returnUrl');
                         var refreshUrl = $form.data('refreshUrl');
 
@@ -249,35 +249,11 @@
                         if (returnUrl && returnUrl != 'refresh') {
                             _this.load(returnUrl);
                         } else {
-                            var prefix = '/' + location.pathname.split('/')[1];
-                            var flashStructs = [];
-                            $(html)
-                                .find('.qor-alert')
-                                .each(function(i, e) {
-                                    var message = $(e)
-                                        .find('.qor-alert-message')
-                                        .text()
-                                        .trim();
-                                    var type = $(e).data('type');
-                                    if (message !== '') {
-                                        flashStructs.push({
-                                            Type: type,
-                                            Message: message,
-                                            Keep: true
-                                        });
-                                    }
-                                });
-                            if (flashStructs.length > 0) {
-                                document.cookie = 'qor-flashes=' + btoa(unescape(encodeURIComponent(JSON.stringify(flashStructs)))) + '; path=' + prefix;
-                            }
                             _this.refresh();
                         }
                     },
                     error: function(err) {
-                        let $body = $slideout.find('.qor-slideout__body');
-
-                        window.QOR.handleAjaxError(err, $body);
-                        $body.scrollTop(0);
+                        window.QOR.handleAjaxError(err);
                     },
                     complete: function() {
                         $submit.prop('disabled', false);
