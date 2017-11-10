@@ -752,7 +752,7 @@ func (context *Context) getScopes() (menus []*scopeMenu) {
 		return
 	}
 
-	scopes := context.Request.URL.Query()["scopes"]
+	activatedScopeNames := context.Request.URL.Query()["scopes"]
 OUT:
 	for _, s := range context.Resource.scopes {
 		if s.Visible != nil && !s.Visible(context) {
@@ -761,7 +761,7 @@ OUT:
 
 		menu := scope{Scope: s}
 
-		for _, s := range scopes {
+		for _, s := range activatedScopeNames {
 			if s == menu.Name {
 				menu.Active = true
 			}
@@ -777,6 +777,26 @@ OUT:
 			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
 		} else if !menu.Default {
 			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
+		}
+	}
+
+	for _, menu := range menus {
+		hasActivedScope, hasDefaultScope := false, false
+		for _, scope := range menu.Scopes {
+			if scope.Active {
+				hasActivedScope = true
+			}
+			if scope.Default {
+				hasDefaultScope = true
+			}
+		}
+
+		if hasDefaultScope && !hasActivedScope {
+			for _, scope := range menu.Scopes {
+				if scope.Default {
+					scope.Active = true
+				}
+			}
 		}
 	}
 	return menus
