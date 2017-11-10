@@ -743,7 +743,7 @@ type scope struct {
 
 type scopeMenu struct {
 	Group  string
-	Scopes []scope
+	Scopes []*scope
 }
 
 // getScopes get scopes from current context
@@ -759,7 +759,7 @@ OUT:
 			continue
 		}
 
-		menu := scope{Scope: s}
+		menu := &scope{Scope: s}
 
 		for _, s := range activatedScopeNames {
 			if s == menu.Name {
@@ -774,9 +774,9 @@ OUT:
 					continue OUT
 				}
 			}
-			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
+			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []*scope{menu}})
 		} else if !menu.Default {
-			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
+			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []*scope{menu}})
 		}
 	}
 
