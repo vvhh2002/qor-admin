@@ -767,18 +767,16 @@ OUT:
 			}
 		}
 
-		if !menu.Default {
-			if menu.Group != "" {
-				for _, m := range menus {
-					if m.Group == menu.Group {
-						m.Scopes = append(m.Scopes, menu)
-						continue OUT
-					}
+		if menu.Group != "" {
+			for _, m := range menus {
+				if m.Group == menu.Group {
+					m.Scopes = append(m.Scopes, menu)
+					continue OUT
 				}
-				menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
-			} else {
-				menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
 			}
+			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
+		} else if !menu.Default {
+			menus = append(menus, &scopeMenu{Group: menu.Group, Scopes: []scope{menu}})
 		}
 	}
 	return menus
