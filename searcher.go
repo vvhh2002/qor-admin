@@ -116,7 +116,20 @@ func (s *Searcher) filterData(context *qor.Context) *qor.Context {
 	// call default scopes
 	for _, scope := range s.Resource.scopes {
 		if scope.Default {
-			db = scope.Handler(db, context)
+			filterWithThisScope := true
+
+			if scope.Group != "" {
+				for _, s := range s.scopes {
+					if s.Group == scope.Group {
+						filterWithThisScope = false
+						break
+					}
+				}
+			}
+
+			if filterWithThisScope {
+				db = scope.Handler(db, context)
+			}
 		}
 	}
 
