@@ -191,6 +191,11 @@ func (actionArgument *ActionArgument) FindSelectedRecords() []interface{} {
 // IsAllowed check if current user has permission to view the action
 func (action Action) isAllowed(mode roles.PermissionMode, context *Context, records ...interface{}) bool {
 	if action.Visible != nil {
+		if len(records) == 0 {
+			if !action.Visible(nil, context) {
+				return false
+			}
+		}
 		for _, record := range records {
 			if !action.Visible(record, context) {
 				return false

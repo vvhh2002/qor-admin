@@ -480,6 +480,7 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 
 	defer func() {
 		if r := recover(); r != nil {
+			fmt.Println(r)
 			debug.PrintStack()
 			result.WriteString(fmt.Sprintf("Get error when render template for filter %v (%v): %v", filter.Name, filter.Type, r))
 		}
