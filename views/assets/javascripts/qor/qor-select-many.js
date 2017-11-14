@@ -46,12 +46,11 @@
         },
 
         bind: function() {
-            $document
-                .on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this))
-                .on(EVENT_RELOAD, `.${CLASS_MANY}`, this.reloadData.bind(this));
+            $document.on(EVENT_RELOAD, `.${CLASS_MANY}`, this.reloadData.bind(this));
 
             this.$element
                 .on(EVENT_CLICK, CLASS_CLEAR_SELECT, this.clearSelect.bind(this))
+                .on(EVENT_CLICK, '[data-select-modal="many"]', this.openBottomSheets.bind(this))
                 .on(EVENT_CLICK, CLASS_UNDO_DELETE, this.undoDelete.bind(this));
         },
 
@@ -199,7 +198,10 @@
         removeItem: function(data) {
             var primaryKey = data.primaryKey;
 
-            this.$selectFeild.find('[data-primary-key="' + primaryKey + '"]').find(CLASS_CLEAR_SELECT).click();
+            this.$selectFeild
+                .find('[data-primary-key="' + primaryKey + '"]')
+                .find(CLASS_CLEAR_SELECT)
+                .click();
             this.changeIcon(data.$clickElement, this.SELECT_MANY_UNSELECTED_ICON);
         },
 
