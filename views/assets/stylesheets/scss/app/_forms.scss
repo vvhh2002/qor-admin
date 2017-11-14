@@ -262,7 +262,10 @@ button.qor-fieldset__add,
             background-color: unquote('rgb(#{$color-white})');
             overflow: hidden;
             > span {
-                display: block;
+                position: absolute;
+                bottom: 0;
+                width: 100%;
+                box-sizing: border-box;
                 padding: 5px;
                 font-size: 12px;
                 line-height: 20px;
