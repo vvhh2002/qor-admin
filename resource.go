@@ -208,7 +208,11 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 
 		if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
 			parent.FindOneHandler(parentValue, nil, clone)
-			return context.GetDB().Model(parentValue).Related(value).Error
+			if _, ok := context.GetDB().Get("qor:getting_total_count"); ok {
+				*(value.(*int)) = context.GetDB().Model(parentValue).Association(fieldName).Count()
+				return nil
+			}
+			return context.GetDB().Model(parentValue).Association(fieldName).Find(value).Error
 		}
 		return err
 	}
