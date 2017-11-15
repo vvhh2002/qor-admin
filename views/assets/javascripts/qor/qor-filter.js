@@ -55,7 +55,7 @@
         var data = [];
 
         if (search && search.indexOf('?') > -1) {
-            search = search.split('?')[1];
+            search = search.replace(/\+/g, ' ').split('?')[1];
 
             if (search && search.indexOf('#') > -1) {
                 search = search.split('#')[0];
@@ -122,6 +122,7 @@
 
             if ($target.is('select')) {
                 params = decodeSearch(decodeURI(location.search));
+
                 paramName = name = $target.attr('name');
                 value = $target.val();
                 param = [name];
