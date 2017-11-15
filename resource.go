@@ -162,6 +162,17 @@ func (res *Resource) AddSubResource(fieldName string, config ...*Config) (subRes
 		modelType := utils.ModelType(reflect.New(field.Struct.Type).Interface())
 		subRes = admin.NewResource(reflect.New(modelType).Interface(), config...)
 		subRes.setupParentResource(field.StructField.Name, res)
+
+		subRes.Action(&Action{
+			Name:   "Delete",
+			Method: "DELETE",
+			URL: func(record interface{}, context *Context) string {
+				return context.URLFor(record, res)
+			},
+			Permission: subRes.Config.Permission,
+			Modes:      []string{"menu_item"},
+		})
+
 		admin.RegisterResourceRouters(subRes, "create", "update", "read", "delete")
 		return
 	}
