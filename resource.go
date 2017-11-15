@@ -173,6 +173,14 @@ func (res *Resource) AddSubResource(fieldName string, config ...*Config) (subRes
 func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 	res.ParentResource = parent
 
+	var findParent = func(context *qor.Context) (interface{}, error) {
+		clone := context.Clone()
+		clone.ResourceID = parent.GetPrimaryValue(context.Request)
+		parentValue := parent.NewStruct()
+		err := parent.FindOneHandler(parentValue, nil, clone)
+		return parentValue, err
+	}
+
 	findOneHandler := res.FindOneHandler
 	res.FindOneHandler = func(value interface{}, metaValues *resource.MetaValues, context *qor.Context) (err error) {
 		if metaValues != nil {
@@ -180,9 +188,8 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 		}
 
 		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {
-			clone := context.Clone()
 			parentValue := parent.NewStruct()
-			if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
+			if parentValue, err = findParent(context); err == nil {
 				primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
 				result := context.GetDB().Model(parentValue).Where(primaryQuerySQL, primaryParams...).Related(value)
 
@@ -199,15 +206,9 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 		return
 	}
 
-	res.FindManyHandler = func(value interface{}, context *qor.Context) error {
-		var (
-			err         error
-			clone       = context.Clone()
-			parentValue = parent.NewStruct()
-		)
-
-		if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
-			parent.FindOneHandler(parentValue, nil, clone)
+	res.FindManyHandler = func(value interface{}, context *qor.Context) (err error) {
+		parentValue := parent.NewStruct()
+		if parentValue, err = findParent(context); err == nil {
 			if _, ok := context.GetDB().Get("qor:getting_total_count"); ok {
 				*(value.(*int)) = context.GetDB().Model(parentValue).Association(fieldName).Count()
 				return nil
@@ -217,28 +218,20 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 		return err
 	}
 
-	res.SaveHandler = func(value interface{}, context *qor.Context) error {
-		var (
-			err         error
-			clone       = context.Clone()
-			parentValue = parent.NewStruct()
-		)
-
-		if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
-			parent.FindOneHandler(parentValue, nil, clone)
+	res.SaveHandler = func(value interface{}, context *qor.Context) (err error) {
+		parentValue := parent.NewStruct()
+		if parentValue, err = findParent(context); err == nil {
 			return context.GetDB().Model(parentValue).Association(fieldName).Append(value).Error
 		}
 		return err
 	}
 
 	res.DeleteHandler = func(value interface{}, context *qor.Context) (err error) {
-		var clone = context.Clone()
-		var parentValue = parent.NewStruct()
 		if primaryKey := res.GetPrimaryValue(context.Request); primaryKey != "" {
 			primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
 			if err = context.GetDB().Where(primaryQuerySQL, primaryParams...).First(value).Error; err == nil {
-				if err = parent.FindOneHandler(parentValue, nil, clone); err == nil {
-					parent.FindOneHandler(parentValue, nil, clone)
+				parentValue := parent.NewStruct()
+				if parentValue, err = findParent(context); err == nil {
 					return context.GetDB().Model(parentValue).Association(fieldName).Delete(value).Error
 				}
 			}
