@@ -192,12 +192,12 @@ func (res *Resource) setupParentResource(fieldName string, parent *Resource) {
 			if parentValue, err = findParent(context); err == nil {
 				primaryQuerySQL, primaryParams := res.ToPrimaryQueryParams(primaryKey, context)
 				result := context.GetDB().Model(parentValue).Where(primaryQuerySQL, primaryParams...).Related(value)
-
 				if result.Error != nil {
 					err = result.Error
 				}
 
-				if result.RowsAffected == 0 {
+				scope := gorm.Scope{Value: value}
+				if scope.PrimaryKeyZero() && result.RowsAffected == 0 {
 					err = gorm.ErrRecordNotFound
 				}
 			}
