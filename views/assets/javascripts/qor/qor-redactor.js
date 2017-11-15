@@ -94,7 +94,13 @@
     }
 
     function escapeHTML(unsafe_str) {
-        return unsafe_str.replace(/&/g, ' ').replace(/</g, ' ').replace(/>/g, ' ').replace(/\"/g, ' ').replace(/\'/g, ' ').replace(/\`/g, ' ');
+        return unsafe_str
+            .replace(/&/g, ' ')
+            .replace(/</g, ' ')
+            .replace(/>/g, ' ')
+            .replace(/\"/g, ' ')
+            .replace(/\'/g, ' ')
+            .replace(/\`/g, ' ');
     }
 
     function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
@@ -158,13 +164,20 @@
         },
 
         unbind: function() {
-            this.$element.off(EVENT_ADD_CROP).off(EVENT_REMOVE_CROP).off(EVENT_SCROLL);
+            this.$element
+                .off(EVENT_ADD_CROP)
+                .off(EVENT_REMOVE_CROP)
+                .off(EVENT_SCROLL);
         },
 
         addButton: function(e, image) {
             var $image = $(image);
 
-            this.$button.css('left', $(image).width() / 2).prependTo($image.parent()).find(CLASS_CROPPER_TOGGLE).one(EVENT_CLICK, $.proxy(this.crop, this, $image));
+            this.$button
+                .css('left', $(image).width() / 2)
+                .prependTo($image.parent())
+                .find(CLASS_CROPPER_TOGGLE)
+                .one(EVENT_CLICK, $.proxy(this.crop, this, $image));
         },
 
         removeButton: function() {
@@ -213,7 +226,11 @@
 
                                     success: function(response) {
                                         if ($.isPlainObject(response) && response.url) {
-                                            $image.attr('src', response.url).attr('data-crop-options', encodeCropData(cropData)).removeAttr('style').removeAttr('rel');
+                                            $image
+                                                .attr('src', response.url)
+                                                .attr('data-crop-options', encodeCropData(cropData))
+                                                .removeAttr('style')
+                                                .removeAttr('rel');
 
                                             if ($.isFunction(options.complete)) {
                                                 options.complete();
@@ -321,11 +338,15 @@
                             }, this);
 
                             if (isInSlideout) {
-                                toolbarFixedTarget = '.qor-slideout';
+                                toolbarFixedTarget = '.qor-slideout__body';
                                 toolbarFixedTopOffset = $('.qor-slideout__header').height();
                             } else {
                                 toolbarFixedTarget = '.qor-layout main.qor-page';
-                                toolbarFixedTopOffset = toolbarFixedTopOffset + $(toolbarFixedTarget).find('.qor-page__header').height();
+                                toolbarFixedTopOffset =
+                                    toolbarFixedTopOffset +
+                                    $(toolbarFixedTarget)
+                                        .find('.qor-page__header')
+                                        .height();
                             }
 
                             $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
@@ -442,7 +463,9 @@
                         },
 
                         fileUpload: function(link, json) {
-                            $(link).prop('href', json.filelink).html(json.filename);
+                            $(link)
+                                .prop('href', json.filelink)
+                                .html(json.filename);
                         }
                     }
                 };
