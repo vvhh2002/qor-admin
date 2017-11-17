@@ -156,7 +156,7 @@
             this.$slideout
                 .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
                 .on(EVENT_CLICK, '.qor-slideout__fullscreen', this.toggleSlideoutMode.bind(this))
-                .on(EVENT_CLICK, '[data-dismiss="slideout"]', this.closeSlideout.bind(this));
+                .on(EVENT_CLICK, '[data-dismiss="slideout"]', this.hide.bind(this));
 
             $document.on(EVENT_KEYUP, $.proxy(this.keyup, this));
         },
@@ -213,53 +213,72 @@
                 form = e.target,
                 $form = $(form),
                 _this = this,
+                $loading = $('<div id="qor-submit-loading" class="mdl-progress mdl-js-progress"></div><p class="clearfix percent-complete"></p>'),
                 $submit = $form.find(':submit');
 
             $slideout.trigger(EVENT_SLIDEOUT_BEFORESEND);
 
-            if (FormData) {
-                e.preventDefault();
-
-                $.ajax($form.prop('action'), {
-                    method: $form.prop('method'),
-                    data: new FormData(form),
-                    dataType: 'html',
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function() {
-                        $submit.prop('disabled', true);
-                        $.fn.qorSlideoutBeforeHide = null;
-                    },
-                    success: function() {
-                        var returnUrl = $form.data('returnUrl');
-                        var refreshUrl = $form.data('refreshUrl');
-
-                        $slideout.trigger(EVENT_SLIDEOUT_SUBMIT_COMPLEMENT);
-
-                        if (refreshUrl) {
-                            window.location.href = refreshUrl;
-                            return;
-                        }
-
-                        if (returnUrl == 'refresh') {
-                            _this.refresh();
-                            return;
-                        }
-
-                        if (returnUrl && returnUrl != 'refresh') {
-                            _this.load(returnUrl);
-                        } else {
-                            _this.refresh();
-                        }
-                    },
-                    error: function(err) {
-                        window.QOR.handleAjaxError(err);
-                    },
-                    complete: function() {
-                        $submit.prop('disabled', false);
-                    }
-                });
+            if (!FormData) {
+                return;
             }
+            e.preventDefault();
+
+            this.submitXHR = $.ajax($form.prop('action'), {
+                method: $form.prop('method'),
+                data: new FormData(form),
+                dataType: 'html',
+                processData: false,
+                contentType: false,
+                xhr: function() {
+                    let xhr = new window.XMLHttpRequest();
+
+                    xhr.upload.addEventListener(
+                        'progress',
+                        function(evt) {
+                            if (evt.lengthComputable) {
+                                let percentComplete = evt.loaded / evt.total;
+
+                                document.querySelector('#qor-submit-loading').MaterialProgress.setProgress(percentComplete * 100);
+                                $('.percent-complete').html(Math.ceil(percentComplete * 100) + '%');
+                            }
+                        },
+                        false
+                    );
+                    return xhr;
+                },
+                beforeSend: function() {
+                    $loading.prependTo($submit.prop('disabled', true).closest('.qor-form__actions')).trigger('enable');
+                    $.fn.qorSlideoutBeforeHide = null;
+                },
+                success: function() {
+                    let returnUrl = $form.data('returnUrl'),
+                        refreshUrl = $form.data('refreshUrl');
+
+                    $slideout.trigger(EVENT_SLIDEOUT_SUBMIT_COMPLEMENT);
+
+                    if (refreshUrl) {
+                        window.location.href = refreshUrl;
+                        return;
+                    }
+
+                    if (returnUrl == 'refresh') {
+                        _this.refresh();
+                        return;
+                    }
+
+                    if (returnUrl && returnUrl != 'refresh') {
+                        _this.load(returnUrl);
+                    } else {
+                        _this.refresh();
+                    }
+                },
+                error: function(err) {
+                    window.QOR.handleAjaxError(err);
+                },
+                complete: function() {
+                    $submit.prop('disabled', false);
+                }
+            });
         },
 
         load: function(url, data) {
@@ -456,23 +475,20 @@
                 .trigger('afterEnable.qor.slideout');
         },
 
-        closeSlideout: function() {
-            this.hide();
-        },
-
         hide: function(isReload) {
-            let _this = this,
-                message = {
-                    confirm:
-                        'You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?'
-                };
+            let message = {
+                confirm: 'You have unsaved changes on this slideout. If you close this slideout, you will lose all unsaved changes. Are you sure you want to close the slideout?'
+            };
 
             if ($.fn.qorSlideoutBeforeHide) {
-                window.QOR.qorConfirm(message, function(confirm) {
-                    if (confirm) {
-                        _this.hideSlideout(isReload);
-                    }
-                });
+                window.QOR.qorConfirm(
+                    message,
+                    function(confirm) {
+                        if (confirm) {
+                            this.hideSlideout(isReload);
+                        }
+                    }.bind(this)
+                );
             } else {
                 this.hideSlideout(isReload);
             }
@@ -488,6 +504,8 @@
             // remove onbeforeunload event
             window.onbeforeunload = null;
             $.fn.qorSlideoutBeforeHide = null;
+
+            this.submitXHR && this.submitXHR.abort();
 
             if ($datePicker.length) {
                 $datePicker.addClass('hidden');
