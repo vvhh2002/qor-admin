@@ -113,24 +113,22 @@ func (s *Searcher) FindMany() (interface{}, error) {
 func (s *Searcher) filterData(context *Context) *Context {
 	db := context.GetDB()
 
-	// only apply default scopes when listing table
-	if context.Resource != nil && context.Request != nil && context.URLFor(context.Resource) == context.Request.URL.Path {
-		for _, scope := range s.Resource.scopes {
-			if scope.Default {
-				filterWithThisScope := true
+	// call default scopes
+	for _, scope := range s.Resource.scopes {
+		if scope.Default {
+			filterWithThisScope := true
 
-				if scope.Group != "" {
-					for _, s := range s.scopes {
-						if s.Group == scope.Group {
-							filterWithThisScope = false
-							break
-						}
+			if scope.Group != "" {
+				for _, s := range s.scopes {
+					if s.Group == scope.Group {
+						filterWithThisScope = false
+						break
 					}
 				}
+			}
 
-				if filterWithThisScope {
-					db = scope.Handler(db, context.Context)
-				}
+			if filterWithThisScope {
+				db = scope.Handler(db, context.Context)
 			}
 		}
 	}
