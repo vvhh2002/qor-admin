@@ -89,7 +89,7 @@ func (s *Searcher) FindOne() (interface{}, error) {
 		return result, context.Errors
 	}
 
-	err = s.Resource.CallFindOne(result, nil, context)
+	err = s.Resource.CallFindOne(result, nil, context.Context)
 	return result, err
 }
 
@@ -105,12 +105,12 @@ func (s *Searcher) FindMany() (interface{}, error) {
 		return result, context.Errors
 	}
 
-	err = s.Resource.CallFindMany(result, context)
+	err = s.Resource.CallFindMany(result, context.Context)
 	return result, err
 }
 
 // filterData filter data by scopes, filters, order by and keyword
-func (s *Searcher) filterData(context *qor.Context) *qor.Context {
+func (s *Searcher) filterData(context *Context) *Context {
 	db := context.GetDB()
 
 	// call default scopes
@@ -128,14 +128,14 @@ func (s *Searcher) filterData(context *qor.Context) *qor.Context {
 			}
 
 			if filterWithThisScope {
-				db = scope.Handler(db, context)
+				db = scope.Handler(db, context.Context)
 			}
 		}
 	}
 
 	// call scopes
 	for _, scope := range s.scopes {
-		db = scope.Handler(db, context)
+		db = scope.Handler(db, context.Context)
 	}
 
 	// call filters
@@ -144,7 +144,7 @@ func (s *Searcher) filterData(context *qor.Context) *qor.Context {
 			if filter.Handler != nil {
 				filterArgument := &FilterArgument{
 					Value:    value,
-					Context:  context,
+					Context:  context.Context,
 					Resource: s.Resource,
 				}
 				db = filter.Handler(db, filterArgument)
@@ -174,17 +174,17 @@ func (s *Searcher) filterData(context *qor.Context) *qor.Context {
 	}
 
 	if s.Resource.SearchHandler != nil {
-		context.SetDB(s.Resource.SearchHandler(keyword, context))
+		context.SetDB(s.Resource.SearchHandler(keyword, context.Context))
 		return context
 	}
 
 	return context
 }
 
-func (s *Searcher) parseContext() *qor.Context {
+func (s *Searcher) parseContext() *Context {
 	var (
 		searcher = s.clone()
-		context  = searcher.Context.Context.Clone()
+		context  = searcher.Context.clone()
 	)
 
 	if context != nil && context.Request != nil {
@@ -213,7 +213,7 @@ func (s *Searcher) parseContext() *qor.Context {
 
 	// pagination
 	context.SetDB(db.Model(s.Resource.Value).Set("qor:getting_total_count", true))
-	s.Resource.CallFindMany(&s.Pagination.Total, context)
+	s.Resource.CallFindMany(&s.Pagination.Total, context.Context)
 
 	if s.Pagination.CurrentPage == 0 {
 		if s.Context.Request != nil {
