@@ -15,6 +15,7 @@
     let $document = $(document),
         FormData = window.FormData,
         _ = window._,
+        QOR = window.QOR,
         NAMESPACE = 'qor.slideout',
         EVENT_KEYUP = 'keyup.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
@@ -198,7 +199,7 @@
         addLoading: function() {
             $(CLASS_BODY_LOADING).remove();
             var $loading = $(QorSlideout.TEMPLATE_LOADING);
-            $loading.appendTo($('body')).trigger('enable');
+            $loading.appendTo($('body')).trigger('enable.qor.material');
         },
 
         toggleSlideoutMode: function() {
@@ -213,7 +214,7 @@
                 form = e.target,
                 $form = $(form),
                 _this = this,
-                $loading = $('<div id="qor-submit-loading" class="mdl-progress mdl-js-progress"></div><p class="clearfix percent-complete"></p>'),
+                $loading = $(QOR.$formLoading),
                 $submit = $form.find(':submit');
 
             $slideout.trigger(EVENT_SLIDEOUT_BEFORESEND);
@@ -229,25 +230,9 @@
                 dataType: 'html',
                 processData: false,
                 contentType: false,
-                xhr: function() {
-                    let xhr = new window.XMLHttpRequest();
-
-                    xhr.upload.addEventListener(
-                        'progress',
-                        function(evt) {
-                            if (evt.lengthComputable) {
-                                let percentComplete = evt.loaded / evt.total;
-
-                                document.querySelector('#qor-submit-loading').MaterialProgress.setProgress(percentComplete * 100);
-                                $('.percent-complete').html(Math.ceil(percentComplete * 100) + '%');
-                            }
-                        },
-                        false
-                    );
-                    return xhr;
-                },
+                xhr: QOR.xhrLoading,
                 beforeSend: function() {
-                    $loading.prependTo($submit.prop('disabled', true).closest('.qor-form__actions')).trigger('enable');
+                    $loading.appendTo($submit.prop('disabled', true).closest('.qor-form__actions')).trigger('enable.qor.material');
                     $.fn.qorSlideoutBeforeHide = null;
                 },
                 success: function() {
@@ -273,7 +258,7 @@
                     }
                 },
                 error: function(err) {
-                    window.QOR.handleAjaxError(err);
+                    QOR.handleAjaxError(err);
                 },
                 complete: function() {
                     $submit.prop('disabled', false);
@@ -481,7 +466,7 @@
             };
 
             if ($.fn.qorSlideoutBeforeHide) {
-                window.QOR.qorConfirm(
+                QOR.qorConfirm(
                     message,
                     function(confirm) {
                         if (confirm) {

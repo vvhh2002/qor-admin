@@ -20,9 +20,10 @@
         font-weight: 600;
     }
     #qor-submit-loading {
-        clear: both;
-        width: 100%;
-        margin: 24px 0;
+        float: right;
+        .mdl-spinner {
+            margin: 0 24px 24px 0;
+        }
     }
     .mdl-button {
         float: right;
