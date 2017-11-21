@@ -58,6 +58,10 @@ func (meta Meta) HasPermission(mode roles.PermissionMode, context *qor.Context) 
 		return false
 	}
 
+	if meta.Resource != nil {
+		return meta.Resource.HasPermission(mode, context)
+	}
+
 	if meta.baseResource != nil {
 		return meta.baseResource.HasPermission(mode, context)
 	}
