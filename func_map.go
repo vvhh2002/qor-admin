@@ -142,7 +142,6 @@ func (context *Context) FuncMap() template.FuncMap {
 		"has_read_permission":   context.hasReadPermission,
 		"has_update_permission": context.hasUpdatePermission,
 		"has_delete_permission": context.hasDeletePermission,
-
 		"has_change_permission": context.hasChangePermission,
 
 		"qor_theme_class":        context.themesClass,
@@ -834,12 +833,10 @@ func (context *Context) hasDeletePermission(permissioner HasPermissioner) bool {
 }
 
 func (context *Context) hasChangePermission(permissioner HasPermissioner) bool {
-	if context.Action == "edit" {
-		return context.hasUpdatePermission(permissioner)
-	} else if context.Action == "new" {
+	if context.Action == "new" {
 		return context.hasCreatePermission(permissioner)
 	}
-	return false
+	return context.hasUpdatePermission(permissioner)
 }
 
 // PatchCurrentURL is a convinent wrapper for qor/utils.PatchURL
