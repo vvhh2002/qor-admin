@@ -15,6 +15,16 @@
 .qor-form__actions {
     margin-top: 24px;
     @include clearfix();
+    .percent-complete {
+        margin-top: -22px;
+        font-weight: 600;
+    }
+    #qor-submit-loading {
+        float: right;
+        .mdl-spinner {
+            margin: 0 24px 24px 0;
+        }
+    }
     .mdl-button {
         float: right;
         + .mdl-button {
