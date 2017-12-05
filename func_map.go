@@ -84,7 +84,7 @@ func (context *Context) FuncMap() template.FuncMap {
 				typ = t
 			}
 
-			context.renderMeta(meta, value, []string{}, typ, result)
+			context.renderMeta(meta, value, []string{}, typ, result, "")
 			return template.HTML(result.String())
 		},
 		"render_filter": context.renderFilter,
@@ -430,11 +430,11 @@ func (context *Context) valueOf(valuer func(interface{}, *qor.Context) interface
 
 func (context *Context) renderForm(value interface{}, sections []*Section) template.HTML {
 	var result = bytes.NewBufferString("")
-	context.renderSections(value, sections, []string{"QorResource"}, result, "form")
+	context.renderSections(value, sections, []string{"QorResource"}, result, "form", "")
 	return template.HTML(result.String())
 }
 
-func (context *Context) renderSections(value interface{}, sections []*Section, prefix []string, writer *bytes.Buffer, kind string) {
+func (context *Context) renderSections(value interface{}, sections []*Section, prefix []string, writer *bytes.Buffer, kind string, action string) {
 	for _, section := range sections {
 		var rows []struct {
 			Length      int
@@ -446,7 +446,7 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 			for _, col := range column {
 				meta := section.Resource.GetMeta(col)
 				if meta != nil {
-					context.renderMeta(meta, value, prefix, kind, columnsHTML)
+					context.renderMeta(meta, value, prefix, kind, columnsHTML, action)
 				}
 			}
 
@@ -509,17 +509,24 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 	return template.HTML(result.String())
 }
 
-func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []string, metaType string, writer *bytes.Buffer) {
+func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []string, metaType string, writer *bytes.Buffer, action string) {
 	var (
 		err      error
 		funcsMap = context.FuncMap()
 	)
 	prefix = append(prefix, meta.Name)
 
-	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, int) template.HTML {
-		return func(value interface{}, sections []*Section, index int) template.HTML {
-			var result = bytes.NewBufferString("")
-			var newPrefix = append([]string{}, prefix...)
+	var generateNestedRenderSections = func(kind string) func(interface{}, []*Section, int, ...string) template.HTML {
+		return func(value interface{}, sections []*Section, index int, actions ...string) template.HTML {
+			var (
+				result    = bytes.NewBufferString("")
+				newPrefix = append([]string{}, prefix...)
+				action    = "edit"
+			)
+
+			for _, a := range actions {
+				action = a
+			}
 
 			if index >= 0 {
 				last := newPrefix[len(newPrefix)-1]
@@ -529,11 +536,11 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 			if len(sections) > 0 {
 				for _, field := range context.GetDB().NewScope(value).PrimaryFields() {
 					if meta := sections[0].Resource.GetMeta(field.Name); meta != nil {
-						context.renderMeta(meta, value, newPrefix, kind, result)
+						context.renderMeta(meta, value, newPrefix, kind, result, action)
 					}
 				}
 
-				context.renderSections(value, sections, newPrefix, result, kind)
+				context.renderSections(value, sections, newPrefix, result, kind, action)
 			}
 
 			return template.HTML(result.String())
