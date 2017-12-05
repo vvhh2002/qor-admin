@@ -7,7 +7,11 @@
 
     <div class="qor-field__block">
       <fieldset id="{{.InputId}}" class="qor-fieldset">
-        {{render_nested_form $value (edit_sections .Meta.Resource) -1}}
+        {{if is_new_record $value}}
+          {{render_nested_form $value (edit_sections .Meta.Resource) -1 "new"}}
+        {{else}}
+          {{render_nested_form $value (edit_sections .Meta.Resource) -1}}
+        {{end}}
       </fieldset>
     </div>
   </div>

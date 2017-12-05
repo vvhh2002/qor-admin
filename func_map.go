@@ -548,6 +548,12 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 	}
 
 	funcsMap["render_nested_form"] = generateNestedRenderSections("form")
+	funcsMap["has_change_permission"] = func(permissioner HasPermissioner) bool {
+		if action == "new" {
+			return context.hasCreatePermission(permissioner)
+		}
+		return context.hasUpdatePermission(permissioner)
+	}
 
 	defer func() {
 		if r := recover(); r != nil {

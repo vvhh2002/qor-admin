@@ -27,9 +27,9 @@
           <i class="material-icons md-18">delete</i>
         </button>
         {{if $current_values}}
-          {{render_nested_form $meta.Resource.NewStruct (new_sections $meta.Resource) (len $current_values)}}
+          {{render_nested_form $meta.Resource.NewStruct (new_sections $meta.Resource) (len $current_values) "new"}}
         {{else}}
-          {{render_nested_form $meta.Resource.NewStruct (new_sections $meta.Resource) 0}}
+          {{render_nested_form $meta.Resource.NewStruct (new_sections $meta.Resource) 0 "new"}}
         {{end}}
       </fieldset>
 
