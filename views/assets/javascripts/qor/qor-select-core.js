@@ -98,6 +98,7 @@
                         $loading.appendTo($submit.prop('disabled', true).closest('.qor-form__actions')).trigger('enable.qor.material');
                     },
                     success: function(json) {
+                        json.MediaOption && (json.MediaOption = JSON.parse(json.MediaOption));
                         data = json;
                         data.primaryKey = data.ID;
 
