@@ -429,7 +429,6 @@
                 scalable: false,
                 rotatable: false,
                 autoCropArea: 1,
-                checkCrossOrigin: false,
 
                 ready: function() {
                     $modal
