@@ -89,7 +89,7 @@ func getMenu(menus []*Menu, names ...string) *Menu {
 				if menu.Name == name {
 					return menu
 				}
-				if len(menu.subMenus) > 1 {
+				if len(menu.subMenus) > 0 {
 					if m := getMenu(menu.subMenus, name); m != nil {
 						return m
 					}
