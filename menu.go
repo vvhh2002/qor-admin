@@ -15,6 +15,18 @@ func (admin Admin) GetMenus() []*Menu {
 // AddMenu add a menu to admin sidebar
 func (admin *Admin) AddMenu(menu *Menu) *Menu {
 	menu.router = admin.router
+
+	if old := admin.GetMenu(append(menu.Ancestors, menu.Name)...); old != nil {
+		old.Link = menu.Link
+		old.RelativePath = menu.RelativePath
+		old.Priority = menu.Priority
+		old.Permissioner = menu.Permissioner
+		old.Permission = menu.Permission
+		old.RelativePath = menu.RelativePath
+		*menu = *old
+		return old
+	}
+
 	admin.menus = appendMenu(admin.menus, menu.Ancestors, menu)
 	return menu
 }
