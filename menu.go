@@ -16,15 +16,18 @@ func (admin Admin) GetMenus() []*Menu {
 func (admin *Admin) AddMenu(menu *Menu) *Menu {
 	menu.router = admin.router
 
-	if old := admin.GetMenu(append(menu.Ancestors, menu.Name)...); old != nil {
-		old.Link = menu.Link
-		old.RelativePath = menu.RelativePath
-		old.Priority = menu.Priority
-		old.Permissioner = menu.Permissioner
-		old.Permission = menu.Permission
-		old.RelativePath = menu.RelativePath
-		*menu = *old
-		return old
+	names := append(menu.Ancestors, menu.Name)
+	if old := admin.GetMenu(names...); old != nil {
+		if len(names) > 1 || len(old.Ancestors) == 0 {
+			old.Link = menu.Link
+			old.RelativePath = menu.RelativePath
+			old.Priority = menu.Priority
+			old.Permissioner = menu.Permissioner
+			old.Permission = menu.Permission
+			old.RelativePath = menu.RelativePath
+			*menu = *old
+			return old
+		}
 	}
 
 	admin.menus = appendMenu(admin.menus, menu.Ancestors, menu)
