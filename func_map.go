@@ -1115,7 +1115,7 @@ func (context *Context) AllowedActions(actions []*Action, mode string, records .
 	var allowedActions []*Action
 	for _, action := range actions {
 		for _, m := range action.Modes {
-			if m == mode {
+			if m == mode || (m == "index" && mode == "batch") {
 				var permission = roles.Update
 				switch strings.ToUpper(action.Method) {
 				case "POST":
