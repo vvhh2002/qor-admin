@@ -70,6 +70,13 @@ func (context *Context) FuncMap() template.FuncMap {
 			}
 		},
 
+		"to_map": func(values ...interface{}) map[string]interface{} {
+			results := map[string]interface{}{}
+			for i := 0; i < len(values)-1; i += 2 {
+				results[fmt.Sprint(values[i])] = values[i+1]
+			}
+			return results
+		},
 		"render":      context.Render,
 		"render_text": context.renderText,
 		"render_with": context.renderWith,
