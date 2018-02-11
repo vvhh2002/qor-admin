@@ -41,8 +41,6 @@ func TestUpdateRecord(t *testing.T) {
 }
 
 func TestUpdateRecordWithRollback(t *testing.T) {
-	db.Exec("TRUNCATE TABLE users")
-	db.Model(&User{}).AddUniqueIndex("uix_user_name", "name")
 	userR := Admin.GetResource("User")
 	userR.AddProcessor(&resource.Processor{
 		Name: "product-admin-prroduct-res-processor",
@@ -59,7 +57,7 @@ func TestUpdateRecordWithRollback(t *testing.T) {
 	db.Save(&user)
 
 	form := url.Values{
-		"QorResource.Name": {"Katin"},
+		"QorResource.Name": {"very long name very long name very long name very long name very long name very long name very long name very long name very long name"},
 		"QorResource.Role": {"admin"},
 	}
 
