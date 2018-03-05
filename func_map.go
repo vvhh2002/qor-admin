@@ -466,14 +466,16 @@ func (context *Context) renderSections(value interface{}, sections []*Section, p
 			})
 		}
 
-		var data = map[string]interface{}{
-			"Section": section,
-			"Title":   template.HTML(section.Title),
-			"Rows":    rows,
-		}
-		if content, err := context.Asset("metas/section.tmpl"); err == nil {
-			if tmpl, err := template.New("section").Funcs(context.FuncMap()).Parse(string(content)); err == nil {
-				tmpl.Execute(writer, data)
+		if len(rows) > 0 {
+			var data = map[string]interface{}{
+				"Section": section,
+				"Title":   template.HTML(section.Title),
+				"Rows":    rows,
+			}
+			if content, err := context.Asset("metas/section.tmpl"); err == nil {
+				if tmpl, err := template.New("section").Funcs(context.FuncMap()).Parse(string(content)); err == nil {
+					tmpl.Execute(writer, data)
+				}
 			}
 		}
 	}
@@ -617,6 +619,10 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 
 func (context *Context) isEqual(value interface{}, hasValue interface{}) bool {
 	var result string
+
+	if (value == nil || hasValue == nil) && (value != hasValue) {
+		return false
+	}
 
 	if reflect.Indirect(reflect.ValueOf(hasValue)).Kind() == reflect.Struct {
 		scope := &gorm.Scope{Value: hasValue}
