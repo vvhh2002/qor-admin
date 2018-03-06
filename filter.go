@@ -69,6 +69,12 @@ func (res *Resource) Filter(filter *Filter) {
 		}
 	}
 
+	if filter.Type == "" {
+		if meta := res.GetMeta(filter.Name); meta != nil {
+			filter.Type = meta.Type
+		}
+	}
+
 	if filter.Type != "" {
 		res.filters = append(res.filters, filter)
 	} else {
