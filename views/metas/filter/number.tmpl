@@ -6,10 +6,10 @@
 
     <div class="qor-field__show">{{.Value}}</div>
 
-    <select>
-      <option>Equals</option>
-      <option>Greater than</option>
-      <option>Less than</option>
+    <select name="{{.InputNamePrefix}}.Operation">
+      <option value="eq">Equals</option>
+      <option value="gt">Greater than</option>
+      <option value="lt">Less than</option>
     </select>
 
     <div class="qor-field__edit">

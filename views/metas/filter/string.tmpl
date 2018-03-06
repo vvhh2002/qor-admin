@@ -4,10 +4,11 @@
       {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
     </label>
 
-    <select>
-      <option>Contains</option>
-      <option>Start with</option>
-      <option>End with</option>
+    <select name="{{.InputNamePrefix}}.Operation">
+      <option value="conts">Contains</option>
+      <option value="eq">Equals</option>
+      <option value="start_with">Start with</option>
+      <option value="end_with">End with</option>
     </select>
 
     <div class="qor-field__edit">
