@@ -4,14 +4,16 @@
       {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
     </label>
 
+    {{ $opt := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Operation") }}
     <select name="{{.InputNamePrefix}}.Operation">
-      <option value="eq">Equals</option>
-      <option value="gt">Greater than</option>
-      <option value="lt">Less than</option>
+      <option value="eq" {{if (eq $opt "eq")}}selected{{end}}>Equals</option>
+      <option value="gt" {{if (eq $opt "gt")}}selected{{end}}>Greater than</option>
+      <option value="lt" {{if (eq $opt "lt")}}selected{{end}}>Less than</option>
     </select>
 
+    {{ $value := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Value") }}
     <div class="qor-field__edit">
-      <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value">
+      <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value" value={{$value}}>
     </div>
   </div>
 </div>
