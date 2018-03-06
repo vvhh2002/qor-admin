@@ -1,0 +1,39 @@
+<div class="qor-field">
+  <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
+    <label class="qor-field__label mdl-textfield__label">
+      {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
+    </label>
+
+    {{ $start := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Start") }}
+    <div class="qor-field__edit qor-field__datetimepicker" data-picker-type="datetime">
+      <input class="mdl-textfield__input qor-datetimepicker__input" placeholder="{{t (printf "%v.filter.%v.start_placeholder" .Resource.ToParam .Filter.Name) " YYYY-MM-DD HH:MM "}}" type="text" name="{{.InputNamePrefix}}.Start" value="{{$start}}">
+
+      <div>
+        <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+          <i class="material-icons">date_range</i>
+        </button>
+
+        <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+          <i class="material-icons">access_time</i>
+        </button>
+      </div>
+    </div>
+
+    -
+
+    {{ $end := .Context.Request.URL.Query.Get (print .InputNamePrefix ".End") }}
+    <div class="qor-field__edit qor-field__datetimepicker" data-picker-type="datetime">
+      <input class="mdl-textfield__input qor-datetimepicker__input" placeholder="{{t (printf "%v.filter.%v.end_placeholder" .Resource.ToParam .Filter.Name) " YYYY-MM-DD HH:MM "}}" type="text" name="{{.InputNamePrefix}}.End" value="{{$end}}">
+
+      <div>
+        <button data-toggle="qor.datepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__datepicker" type="button">
+          <i class="material-icons">date_range</i>
+        </button>
+
+        <button data-toggle="qor.timepicker" data-target-input=".qor-datetimepicker__input" class="mdl-button mdl-js-button mdl-button--icon qor-action__timepicker" type="button">
+          <i class="material-icons">access_time</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
