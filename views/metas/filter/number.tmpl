@@ -4,8 +4,6 @@
       {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
     </label>
 
-    <div class="qor-field__show">{{.Value}}</div>
-
     <select name="{{.InputNamePrefix}}.Operation">
       <option value="eq">Equals</option>
       <option value="gt">Greater than</option>

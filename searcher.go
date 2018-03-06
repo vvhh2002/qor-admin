@@ -329,9 +329,15 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 
 			appendString := func(field *gorm.Field) {
 				switch filterfield.Operation {
-				case "equal":
+				case "equal", "eq":
 					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) = upper(?)", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, keyword)
+				case "start_with":
+					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, keyword+"%")
+				case "end_with":
+					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, "%"+keyword)
 				default:
 					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, "%"+keyword+"%")
@@ -339,16 +345,30 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 			}
 
 			appendInteger := func(field *gorm.Field) {
-				if _, err := strconv.Atoi(keyword); err == nil {
-					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-					keywords = append(keywords, keyword)
+				if num, err := strconv.Atoi(keyword); err == nil {
+					keywords = append(keywords, num)
+					switch filterfield.Operation {
+					case "gt":
+						conditions = append(conditions, fmt.Sprintf("%v.%v > ?", tableName, scope.Quote(field.DBName)))
+					case "lt":
+						conditions = append(conditions, fmt.Sprintf("%v.%v < ?", tableName, scope.Quote(field.DBName)))
+					default:
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+					}
 				}
 			}
 
 			appendFloat := func(field *gorm.Field) {
-				if _, err := strconv.ParseFloat(keyword, 64); err == nil {
-					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
-					keywords = append(keywords, keyword)
+				if f, err := strconv.ParseFloat(keyword, 64); err == nil {
+					keywords = append(keywords, f)
+					switch filterfield.Operation {
+					case "gt":
+						conditions = append(conditions, fmt.Sprintf("%v.%v > ?", tableName, scope.Quote(field.DBName)))
+					case "lt":
+						conditions = append(conditions, fmt.Sprintf("%v.%v < ?", tableName, scope.Quote(field.DBName)))
+					default:
+						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
+					}
 				}
 			}
 
