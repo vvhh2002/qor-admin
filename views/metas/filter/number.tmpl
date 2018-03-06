@@ -1,7 +1,7 @@
 <div class="qor-field">
   <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-    <label class="qor-field__label mdl-textfield__label" for="{{.InputId}}">
-      {{meta_label .Meta}}
+    <label class="qor-field__label mdl-textfield__label">
+      {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
     </label>
 
     <div class="qor-field__show">{{.Value}}</div>
@@ -13,7 +13,7 @@
     </select>
 
     <div class="qor-field__edit">
-      <input class="mdl-textfield__input" type="text" id="{{.InputId}}" name="{{.InputName}}" value="{{.Value}}" {{if (not (has_change_permission .Meta)) }}disabled{{end}}>
+      <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value">
     </div>
   </div>
 </div>
