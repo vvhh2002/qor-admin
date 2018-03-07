@@ -1,20 +1,25 @@
-<div class="qor-actions">
-  <div class="qor-action-advanced-filter">
+{{$filters := get_filters}}
+{{if $filters}}
+<div class="qor-actions qor-advanced-filter" data-toggle="qor.advancedsearch">
+  <div class="qor-advanced-filter__trigger">
     <label class="mdl-button mdl-button--colored" type="button">
       <span class="qor-notifications__unread">20</span>
       {{t "qor_admin.actions.advanced_filter" "Advanced Filter"}}
     </label>
   </div>
 
-  <div class="qor-filter__block qor-filter__dropdown clearfix" style="display: block;">
-    {{$filters := get_filters}}
-    {{range $filter := $filters}}
-      <div class="qor-actions qor-bottomsheet__filter" data-toggle="qor.filter">
-        {{render_filter $filter}}
-      </div>
-    {{end}}
-
-    <button>{{t "qor_admin.actions.filter.apply" "Apply"}}</button>
-    <button>{{t "qor_admin.actions.filter.save_and_apply" "Save & Apply"}}</button>
+  <div class="qor-advanced-filter__dropdown clearfix" style="display: block;">
+    <h3 class="mdl-layout-title">{{t "qor_admin.actions.advanced_filter" "Advanced Filter"}}</h3>
+    <div>
+      <button>{{t "qor_admin.actions.saved_filter" "Saved Filter"}}</button>
+    </div>
+    <form method="GET">
+      {{range $filter := $filters}}
+          {{render_filter $filter}}
+      {{end}}
+      <button type="submit" class="mdl-button mdl-button--colored mdl-button--raised">{{t "qor_admin.actions.filter.apply" "Apply"}}</button>
+      <button class="mdl-button mdl-button--colored qor-advanced-filter__save">{{t "qor_admin.actions.filter.save_this_filter" "Save This Filter"}}</button>
+    </form>
   </div>
 </div>
+{{end}}

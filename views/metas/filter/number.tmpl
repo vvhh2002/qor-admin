@@ -1,11 +1,11 @@
-<div class="qor-field">
-  <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
-    <label class="qor-field__label mdl-textfield__label">
-      {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
-    </label>
+<advanced-filter-group class="qor-field clearfix" type="filter-number">
+  <label class="qor-field__label">
+    {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
+  </label>
 
+  <div class="qor-field__flexbox">
     {{ $opt := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Operation") }}
-    <select name="{{.InputNamePrefix}}.Operation">
+    <select name="{{.InputNamePrefix}}.Operation" data-toggle="qor.selector" placeholder="{{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}">
       <option value="eq" {{if (eq $opt "eq")}}selected{{end}}>Equals</option>
       <option value="gt" {{if (eq $opt "gt")}}selected{{end}}>Greater than</option>
       <option value="lt" {{if (eq $opt "lt")}}selected{{end}}>Less than</option>
@@ -13,9 +13,12 @@
 
     {{ $value := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Value") }}
     <div class="qor-field__edit">
-      <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value" value={{$value}}>
+      <div class="mdl-textfield mdl-js-textfield">
+        <label class="qor-field__label mdl-textfield__label"></label>
+        <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value" value={{$value}}>
+      </div>
     </div>
   </div>
-</div>
+</advanced-filter-group>
 
 
