@@ -13,11 +13,34 @@
     'use strict';
 
     let NAMESPACE = 'qor.advancedsearch',
-        EVENT_FILTER_CHANGE = 'filterChanged.' + NAMESPACE,
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
-        EVENT_CHANGE = 'change.' + NAMESPACE;
+        EVENT_SUBMIT = 'submit.' + NAMESPACE;
+
+    function getExtraPairs(names) {
+        let pairs = decodeURIComponent(window.location.search.substr(1)).split('&'),
+            pairsObj = {},
+            pair,
+            i;
+
+        if (pairs.length == 1 && pairs[0] == '') {
+            return false;
+        }
+
+        for (i in pairs) {
+            if (pairs[i] === '') continue;
+
+            pair = pairs[i].split('=');
+            pairsObj[pair[0]] = pair[1];
+        }
+
+        names.forEach(function(item) {
+            delete pairsObj[item];
+        });
+
+        return pairsObj;
+    }
 
     function QorAdvancedSearch(element, options) {
         this.$element = $(element);
@@ -33,7 +56,42 @@
         },
 
         bind: function() {
-            // this.$element
+            this.$element.on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+        },
+
+        submit: function(e) {
+            let $form = $(e.target),
+                formArr = $form.find('input[name],select[name]'),
+                names = [],
+                extraPairs;
+
+            formArr.each(function() {
+                names.push($(this).attr('name'));
+            });
+
+            extraPairs = getExtraPairs(names);
+
+            if (!$.isEmptyObject(extraPairs)) {
+                for (let key in extraPairs) {
+                    if (extraPairs.hasOwnProperty(key)) {
+                        $form.prepend(`<input type="hidden" name=${key} value=${extraPairs[key]}  />`);
+                    }
+                }
+            }
+
+            this.$element.find('.qor-advanced-filter__dropdown').hide();
+
+            this.removeEmptyPairs($form);
+        },
+
+        removeEmptyPairs: function($form) {
+            $form.find('advanced-filter-group').each(function() {
+                let $this = $(this),
+                    $input = $this.find('[filter-required]');
+                if ($input.val() == '') {
+                    $this.remove();
+                }
+            });
         },
 
         unbind: function() {},
@@ -48,9 +106,9 @@
 
     QorAdvancedSearch.plugin = function(options) {
         return this.each(function() {
-            var $this = $(this);
-            var data = $this.data(NAMESPACE);
-            var fn;
+            let $this = $(this),
+                data = $this.data(NAMESPACE),
+                fn;
 
             if (!data) {
                 if (/destroy/.test(options)) {
@@ -67,11 +125,8 @@
     };
 
     $(function() {
-        var selector = '[data-toggle="qor.advancedsearch"]';
-        var options = {
-            label: 'a',
-            group: 'select'
-        };
+        let selector = '[data-toggle="qor.advancedsearch"]',
+            options;
 
         $(document)
             .on(EVENT_DISABLE, function(e) {

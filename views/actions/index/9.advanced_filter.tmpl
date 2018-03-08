@@ -12,11 +12,10 @@
     <h3 class="mdl-layout-title">{{t "qor_admin.actions.advanced_filter" "Advanced Filter"}}</h3>
     <div class="qor-advanced-filter__savedfilter">
       <button class="mdl-button">{{t "qor_admin.actions.saved_filter" "Saved Filter"}}</button>
-      <ul>
+      <ul style="display: none;">
         {{range $filter := saved_filters}}
           <li><a href="{{$filter.URL}}">{{$filter.Name}}</a></li>
         {{end}}
-      </ul>
     </div>
     <form method="GET">
       {{range $filter := $filters}}
