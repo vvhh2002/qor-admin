@@ -13,8 +13,9 @@
     <div class="qor-advanced-filter__savedfilter">
       <button class="mdl-button">{{t "qor_admin.actions.saved_filter" "Saved Filter"}}</button>
       <ul>
-        <li><a href="#">filter 1</a></li>
-        <li><a href="#">filter 1</a></li>
+        {{range $filter := saved_filters}}
+          <li><a href="{{$filter.URL}}">{{$filter.Name}}</a></li>
+        {{end}}
       </ul>
     </div>
     <form method="GET">

@@ -19,6 +19,12 @@ type Filter struct {
 	Config     FilterConfigInterface
 }
 
+// SavedFilter saved filter settings
+type SavedFilter struct {
+	Name string
+	URL  string
+}
+
 // FilterConfigInterface filter config interface
 type FilterConfigInterface interface {
 	ConfigureQORAdminFilter(*Filter)

@@ -95,6 +95,7 @@ func (context *Context) FuncMap() template.FuncMap {
 			return template.HTML(result.String())
 		},
 		"render_filter": context.renderFilter,
+		"saved_filters": context.savedFilters,
 		"page_title":    context.pageTitle,
 		"meta_label": func(meta *Meta) template.HTML {
 			key := fmt.Sprintf("%v.attributes.%v", meta.baseResource.ToParam(), meta.Label)
@@ -516,6 +517,11 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 	}
 
 	return template.HTML(result.String())
+}
+
+func (context *Context) savedFilters() (filters []SavedFilter) {
+	LoadAdminSettings("saved_filters", &filters, context)
+	return
 }
 
 func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []string, metaType string, writer *bytes.Buffer) {
