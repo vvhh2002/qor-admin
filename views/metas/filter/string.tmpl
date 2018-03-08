@@ -16,8 +16,8 @@
     {{ $value := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Value") }}
     <div class="qor-field__edit">
       <div class="mdl-textfield mdl-js-textfield">
-          <label class="qor-field__label mdl-textfield__label"></label>
-          <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value" value="{{$value}}" filter-required>
+        <label class="qor-field__label mdl-textfield__label"></label>
+        <input class="mdl-textfield__input" type="text" name="{{.InputNamePrefix}}.Value" value="{{$value}}" filter-required>
       </div>
     </div>
   </div>
