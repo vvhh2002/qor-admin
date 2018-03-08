@@ -7,6 +7,19 @@ import (
 	"github.com/qor/qor"
 )
 
+// SettingsStorageInterface settings storage interface
+type SettingsStorageInterface interface {
+	Get(key string, value interface{}, context *Context) error
+	Save(key string, value interface{}, res *Resource, user qor.CurrentUser, context *Context) error
+}
+
+func newSettings(db *gorm.DB) SettingsStorageInterface {
+	if db != nil {
+		db.AutoMigrate(&QorAdminSetting{})
+	}
+	return settings{}
+}
+
 // QorAdminSetting admin settings
 type QorAdminSetting struct {
 	gorm.Model
@@ -16,8 +29,10 @@ type QorAdminSetting struct {
 	Value    string `gorm:"size:65532"`
 }
 
-// LoadAdminSettings load admin settings
-func LoadAdminSettings(key string, value interface{}, context *Context) error {
+type settings struct{}
+
+// Get load admin settings
+func (settings) Get(key string, value interface{}, context *Context) error {
 	var (
 		settings     = []QorAdminSetting{}
 		sqlCondition = "key = ? AND (resource = ? OR resource = ?) AND (user_id = ? OR user_id = ?)"
@@ -44,8 +59,8 @@ func LoadAdminSettings(key string, value interface{}, context *Context) error {
 	return nil
 }
 
-// SaveAdminSettings save admin settings
-func SaveAdminSettings(key string, value interface{}, res *Resource, user qor.CurrentUser, context *Context) error {
+// Save save admin settings
+func (settings) Save(key string, value interface{}, res *Resource, user qor.CurrentUser, context *Context) error {
 	var (
 		tx          = context.GetDB()
 		result, err = json.Marshal(value)

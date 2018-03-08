@@ -520,7 +520,7 @@ func (context *Context) renderFilter(filter *Filter) template.HTML {
 }
 
 func (context *Context) savedFilters() (filters []SavedFilter) {
-	LoadAdminSettings("saved_filters", &filters, context)
+	context.Admin.SettingsStorage.Get("saved_filters", &filters, context)
 	return
 }
 
