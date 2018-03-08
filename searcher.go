@@ -210,8 +210,21 @@ func (s *Searcher) parseContext(withDefaultScope bool) *qor.Context {
 
 		if savingName := context.Request.Form.Get("filter_saving_name"); savingName != "" {
 			var filters []SavedFilter
+			newFilters := []SavedFilter{{Name: savingName, URL: context.Request.URL.String()}}
 			if context.AddError(LoadAdminSettings("saved_filters", &filters, searcher.Context)); !context.HasError() {
-				newFilters := []SavedFilter{{Name: savingName, URL: context.Request.URL.String()}}
+				for _, filter := range filters {
+					if filter.Name != savingName {
+						newFilters = append(newFilters, filter)
+					}
+				}
+
+				context.AddError(SaveAdminSettings("saved_filters", newFilters, searcher.Resource, context.CurrentUser, searcher.Context))
+			}
+		}
+
+		if savingName := context.Request.Form.Get("delete_saved_filter"); savingName != "" {
+			var filters, newFilters []SavedFilter
+			if context.AddError(LoadAdminSettings("saved_filters", &filters, searcher.Context)); !context.HasError() {
 				for _, filter := range filters {
 					if filter.Name != savingName {
 						newFilters = append(newFilters, filter)
