@@ -403,6 +403,13 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 				if value, err := strconv.ParseBool(keyword); err == nil {
 					conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, value)
+				} else {
+					switch keyword {
+					case "present":
+						conditions = append(conditions, fmt.Sprintf("%v.%v IS NOT NULL", tableName, scope.Quote(field.DBName)))
+					case "blank":
+						conditions = append(conditions, fmt.Sprintf("%v.%v IS NULL", tableName, scope.Quote(field.DBName)))
+					}
 				}
 			}
 
