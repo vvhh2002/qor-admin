@@ -10,8 +10,12 @@
 
   <div class="qor-advanced-filter__dropdown clearfix" style="display: block;">
     <h3 class="mdl-layout-title">{{t "qor_admin.actions.advanced_filter" "Advanced Filter"}}</h3>
-    <div>
-      <button>{{t "qor_admin.actions.saved_filter" "Saved Filter"}}</button>
+    <div class="qor-advanced-filter__savedfilter">
+      <button class="mdl-button">{{t "qor_admin.actions.saved_filter" "Saved Filter"}}</button>
+      <ul>
+        <li><a href="#">filter 1</a></li>
+        <li><a href="#">filter 1</a></li>
+      </ul>
     </div>
     <form method="GET">
       {{range $filter := $filters}}

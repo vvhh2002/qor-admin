@@ -119,6 +119,22 @@
         .qor-selector {
             margin-right: 1%;
             margin-top: 15px;
+            min-width: 100px;
+        }
+    }
+    .qor-advanced-filter__savedfilter {
+        button {
+            float: right;
+            margin-top: -48px;
+        }
+        ul {
+            background-color: rgba(0, 0, 0, 0.05);
+            margin: 0;
+            list-style: none;
+            padding: 12px 24px;
+            li {
+                margin: 4px 0;
+            }
         }
     }
 }
