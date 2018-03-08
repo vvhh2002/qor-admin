@@ -1,13 +1,13 @@
 <advanced-filter-group class="qor-field clearfix" type="filter-string">
   {{ $opt := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Operation") }}
-  
+
   <label class="qor-field__label">
     {{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}
   </label>
 
   <div class="qor-field__flexbox">
     <select name="{{.InputNamePrefix}}.Operation" data-toggle="qor.selector" placeholder="{{t (printf "%v.filter.%v" .Resource.ToParam .Filter.Label) .Filter.Label}}">
-      <option value="conts" {{if (eq $opt "conts")}}selected{{end}}>Contains</option>
+      <option value="conts" {{if (or (eq $opt "conts") (eq $opt ""))}}selected{{end}}>Contains</option>
       <option value="eq" {{if (eq $opt "eq")}}selected{{end}}>Equals</option>
       <option value="start_with" {{if (eq $opt "start_with")}}selected{{end}}>Start with</option>
       <option value="end_with" {{if (eq $opt "end_with")}}selected{{end}}>End with</option>
