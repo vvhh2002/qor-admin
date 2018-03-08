@@ -45,6 +45,18 @@ func (res *Resource) Filter(filter *Filter) {
 		filter.Label = utils.HumanizeString(filter.Name)
 	}
 
+	if meta := res.GetMeta(filter.Name); meta != nil {
+		if filter.Type == "" {
+			filter.Type = meta.Type
+		}
+
+		if filter.Config == nil {
+			if filterConfig, ok := meta.Config.(FilterConfigInterface); ok {
+				filter.Config = filterConfig
+			}
+		}
+	}
+
 	if filter.Config != nil {
 		filter.Config.ConfigureQORAdminFilter(filter)
 	}
@@ -72,12 +84,6 @@ func (res *Resource) Filter(filter *Filter) {
 				}
 			}
 			return db
-		}
-	}
-
-	if filter.Type == "" {
-		if meta := res.GetMeta(filter.Name); meta != nil {
-			filter.Type = meta.Type
 		}
 	}
 
