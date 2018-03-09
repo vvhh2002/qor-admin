@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
 	"github.com/qor/qor"
@@ -34,11 +35,12 @@ type settings struct{}
 // Get load admin settings
 func (settings) Get(key string, value interface{}, context *Context) error {
 	var (
-		settings     = []QorAdminSetting{}
-		sqlCondition = "key = ? AND (resource = ? OR resource = ?) AND (user_id = ? OR user_id = ?)"
-		resParams    = ""
-		userID       = ""
+		settings  = []QorAdminSetting{}
+		tx        = context.GetDB().New()
+		resParams = ""
+		userID    = ""
 	)
+	sqlCondition := fmt.Sprintf("%v = ? AND (resource = ? OR resource = ?) AND (user_id = ? OR user_id = ?)", tx.NewScope(nil).Quote("key"))
 
 	if context.Resource != nil {
 		resParams = context.Resource.ToParam()
@@ -48,7 +50,7 @@ func (settings) Get(key string, value interface{}, context *Context) error {
 		userID = ""
 	}
 
-	context.GetDB().New().Where(sqlCondition, key, resParams, "", userID, "").Order("user_id DESC, resource DESC, id DESC").Find(&settings)
+	tx.Where(sqlCondition, key, resParams, "", userID, "").Order("user_id DESC, resource DESC, id DESC").Find(&settings)
 
 	for _, setting := range settings {
 		if err := json.Unmarshal([]byte(setting.Value), value); err != nil {
