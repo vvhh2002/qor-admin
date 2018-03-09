@@ -48,7 +48,7 @@ func (settings) Get(key string, value interface{}, context *Context) error {
 		userID = ""
 	}
 
-	context.GetDB().Where(sqlCondition, key, resParams, "", userID, "").Order("user_id DESC, resource DESC, id DESC").Find(&settings)
+	context.GetDB().New().Where(sqlCondition, key, resParams, "", userID, "").Order("user_id DESC, resource DESC, id DESC").Find(&settings)
 
 	for _, setting := range settings {
 		if err := json.Unmarshal([]byte(setting.Value), value); err != nil {
@@ -62,7 +62,7 @@ func (settings) Get(key string, value interface{}, context *Context) error {
 // Save save admin settings
 func (settings) Save(key string, value interface{}, res *Resource, user qor.CurrentUser, context *Context) error {
 	var (
-		tx          = context.GetDB()
+		tx          = context.GetDB().New()
 		result, err = json.Marshal(value)
 		resParams   = ""
 		userID      = ""
