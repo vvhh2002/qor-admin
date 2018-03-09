@@ -16,6 +16,7 @@
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
+        EVENT_SHOWN = 'shown.qor.modal',
         EVENT_SUBMIT = 'submit.' + NAMESPACE;
 
     function getExtraPairs(names) {
@@ -52,15 +53,36 @@
         constructor: QorAdvancedSearch,
 
         init: function() {
+            this.$form = this.$element.find('form');
+            this.$modal = $(QorAdvancedSearch.MODAL).appendTo('body');
             this.bind();
         },
 
         bind: function() {
-            this.$element.on(EVENT_SUBMIT, 'form', this.submit.bind(this));
+            this.$element.on(EVENT_SUBMIT, 'form', this.submit.bind(this)).on(EVENT_CLICK, '.qor-advanced-filter__save', this.showSaveFilter.bind(this));
+            this.$modal.on(EVENT_SHOWN, this.start.bind(this));
         },
 
-        submit: function(e) {
-            let $form = $(e.target),
+        showSaveFilter: function() {
+            this.$modal.qorModal('show');
+        },
+
+        start: function() {
+            this.$modal.trigger('enable.qor.material').on(EVENT_CLICK, '.qor-advanced-filter__savefilter', this.saveFilter.bind(this));
+        },
+
+        saveFilter: function() {
+            let name = this.$modal.find('#qor-advanced-filter__savename').val();
+
+            if (!name) {
+                return;
+            }
+
+            this.$form.prepend(`<input type="hidden" name="filter_saving_name" value=${name}  />`).submit();
+        },
+
+        submit: function() {
+            let $form = this.$form,
                 formArr = $form.find('input[name],select[name]'),
                 names = [],
                 extraPairs;
@@ -103,6 +125,31 @@
     };
 
     QorAdvancedSearch.DEFAULTS = {};
+
+    QorAdvancedSearch.MODAL = `<div class="qor-modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="mdl-card mdl-shadow--2dp" role="document">
+                <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text">Save advanced filter</h2>
+                </div>
+                <div class="mdl-card__supporting-text">
+                        
+                    <div class="mdl-textfield mdl-textfield--full-width mdl-js-textfield">
+                        <input class="mdl-textfield__input" type="text" id="qor-advanced-filter__savename">
+                        <label class="mdl-textfield__label" for="qor-advanced-filter__savename">Please enter name for this filter</label>
+                    </div>
+
+                </div>
+                <div class="mdl-card__actions">
+                    <a class="mdl-button mdl-button--colored mdl-button--raised qor-advanced-filter__savefilter">Save This Filter</a>
+                    <a class="mdl-button mdl-button--colored" data-dismiss="modal">Cancel</a>
+                </div>
+                <div class="mdl-card__menu">
+                    <button class="mdl-button mdl-button--icon" data-dismiss="modal" aria-label="close">
+                        <i class="material-icons">close</i>
+                    </button>
+                </div>
+            </div>
+        </div>`;
 
     QorAdvancedSearch.plugin = function(options) {
         return this.each(function() {
