@@ -9,6 +9,9 @@
       <option value="eq" {{if (or (eq $opt "eq") (eq $opt ""))}}selected{{end}}>{{t "qor_admin.filter.number.eq" "Equals"}}</option>
       <option value="gt" {{if (eq $opt "gt")}}selected{{end}}>{{t "qor_admin.filter.number.gt" "Greater than"}}</option>
       <option value="lt" {{if (eq $opt "lt")}}selected{{end}}>{{t "qor_admin.filter.number.lt" "Less than"}}</option>
+      <option disabled>---</option>
+      <option value="present" {{if (eq $opt "present")}}selected{{end}}>{{t "qor_admin.filter.string.is_present" "Is Present"}}</option>
+      <option value="blank" {{if (eq $opt "blank")}}selected{{end}}>{{t "qor_admin.filter.string.is_null" "Is Null"}}</option>
     </select>
 
     {{ $value := .Context.Request.URL.Query.Get (print .InputNamePrefix ".Value") }}
