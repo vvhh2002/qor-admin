@@ -12,7 +12,9 @@
 })(function($) {
     'use strict';
 
-    let NAMESPACE = 'qor.advancedsearch',
+    let location = window.location,
+        QOR = window.QOR,
+        NAMESPACE = 'qor.advancedsearch',
         EVENT_ENABLE = 'enable.' + NAMESPACE,
         EVENT_DISABLE = 'disable.' + NAMESPACE,
         EVENT_CLICK = 'click.' + NAMESPACE,
@@ -20,7 +22,7 @@
         EVENT_SUBMIT = 'submit.' + NAMESPACE;
 
     function getExtraPairs(names) {
-        let pairs = decodeURIComponent(window.location.search.substr(1)).split('&'),
+        let pairs = decodeURIComponent(location.search.substr(1)).split('&'),
             pairsObj = {},
             pair,
             i;
@@ -59,12 +61,45 @@
         },
 
         bind: function() {
-            this.$element.on(EVENT_SUBMIT, 'form', this.submit.bind(this)).on(EVENT_CLICK, '.qor-advanced-filter__save', this.showSaveFilter.bind(this));
+            this.$element
+                .on(EVENT_SUBMIT, 'form', this.submit.bind(this))
+                .on(EVENT_CLICK, '.qor-advanced-filter__save', this.showSaveFilter.bind(this))
+                .on(EVENT_CLICK, '.qor-advanced-filter__toggle', this.toggleFilterContent)
+                .on(EVENT_CLICK, '.qor-advanced-filter__close', this.closeFilter)
+                .on(EVENT_CLICK, '.qor-advanced-filter__delete', this.deleteSavedFilter);
+
             this.$modal.on(EVENT_SHOWN, this.start.bind(this));
+        },
+
+        closeFilter: function() {
+            $('.qor-advanced-filter__dropdown').hide();
+        },
+
+        toggleFilterContent: function(e) {
+            $(e.target)
+                .parent()
+                .find('>[advanced-search-toggle]')
+                .toggle();
         },
 
         showSaveFilter: function() {
             this.$modal.qorModal('show');
+        },
+
+        deleteSavedFilter: function(e) {
+            let name = $(e.target).data('filter-name'),
+                url = location.pathname,
+                message = {
+                    confirm: 'Are you sure you want to delete this saved filter?'
+                };
+
+            QOR.qorConfirm(message, function(confirm) {
+                if (confirm) {
+                    $.get(url, {delete_saved_filter: name}, function(data) {
+                        console.log(data);
+                    });
+                }
+            });
         },
 
         start: function() {

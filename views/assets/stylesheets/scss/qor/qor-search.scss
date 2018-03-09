@@ -60,6 +60,7 @@
     margin-right: 16px !important;
     h3 {
         margin-top: 0;
+        display: inline-block;
     }
     button[type='submit'] {
         margin-top: 32px;
@@ -73,6 +74,10 @@
         background-color: #fff;
         padding: 24px;
         @include shadow-2dp();
+    }
+    .qor-advanced-filter__close {
+        float: right;
+        margin-top: -4px;
     }
     advanced-filter-group {
         margin: 12px 0;
@@ -123,18 +128,39 @@
         }
     }
     .qor-advanced-filter__savedfilter {
-        button {
+        > button {
             float: right;
             margin-top: -48px;
+            margin-right: 40px;
             font-size: 11px;
         }
         ul {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: rgba(0, 0, 0, 0.03);
             margin: 0;
             list-style: none;
             padding: 12px 24px;
             li {
-                margin: 4px 0;
+                margin: 8px 0;
+                .qor-advanced-filter__delete {
+                    height: 24px;
+                    width: 24px;
+                    min-width: 24px;
+                    line-height: 24px;
+                    .material-icons {
+                        font-size: 20px;
+                    }
+                }
+                &:hover {
+                    .qor-advanced-filter__delete {
+                        display: inline-block !important;
+                    }
+                }
+                > a,
+                > button {
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin-right: 12px;
+                }
             }
         }
     }
