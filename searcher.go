@@ -365,6 +365,12 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 				case "end_with":
 					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, "%"+keyword)
+				case "present":
+					conditions = append(conditions, fmt.Sprintf("%v.%v <> ?", tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, "")
+				case "blank":
+					conditions = append(conditions, fmt.Sprintf("%v.%v = ? OR %v.%v IS NULL", tableName, scope.Quote(field.DBName), tableName, scope.Quote(field.DBName)))
+					keywords = append(keywords, "")
 				default:
 					conditions = append(conditions, fmt.Sprintf("upper(%v.%v) like upper(?)", tableName, scope.Quote(field.DBName)))
 					keywords = append(keywords, "%"+keyword+"%")
@@ -379,6 +385,10 @@ func filterResourceByFields(res *Resource, filterFields []filterField, keyword s
 						conditions = append(conditions, fmt.Sprintf("%v.%v > ?", tableName, scope.Quote(field.DBName)))
 					case "lt":
 						conditions = append(conditions, fmt.Sprintf("%v.%v < ?", tableName, scope.Quote(field.DBName)))
+					case "present":
+						conditions = append(conditions, fmt.Sprintf("%v.%v IS NOT NULL", tableName, scope.Quote(field.DBName)))
+					case "blank":
+						conditions = append(conditions, fmt.Sprintf("%v.%v IS NULL", tableName, scope.Quote(field.DBName), tableName, scope.Quote(field.DBName)))
 					default:
 						conditions = append(conditions, fmt.Sprintf("%v.%v = ?", tableName, scope.Quote(field.DBName)))
 					}
