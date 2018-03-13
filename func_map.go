@@ -549,6 +549,12 @@ func (context *Context) renderMeta(meta *Meta, value interface{}, prefix []strin
 		}
 	}
 
+	funcsMap["has_change_permission"] = func(permissioner HasPermissioner) bool {
+		if context.GetDB().NewScope(value).PrimaryKeyZero() {
+			return context.hasCreatePermission(permissioner)
+		}
+		return context.hasUpdatePermission(permissioner)
+	}
 	funcsMap["render_nested_form"] = generateNestedRenderSections("form")
 
 	defer func() {
