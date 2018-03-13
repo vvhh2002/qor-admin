@@ -95,8 +95,8 @@
 
             QOR.qorConfirm(message, function(confirm) {
                 if (confirm) {
-                    $.get(url, {delete_saved_filter: name}, function(data) {
-                        console.log(data);
+                    $.post(url, {delete_saved_filter: name}, function(data) {
+                        // console.log(data);
                     });
                 }
             });
