@@ -321,7 +321,6 @@
                     imageUpload: $this.data('uploadUrl'),
                     fileUpload: $this.data('uploadUrl'),
                     imageResizable: true,
-                    imagePosition: true,
                     toolbarFixed: false,
                     buttons: editorButtons,
 
