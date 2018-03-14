@@ -210,7 +210,11 @@ func (s *Searcher) parseContext(withDefaultScope bool) *qor.Context {
 
 		if savingName := context.Request.Form.Get("filter_saving_name"); savingName != "" {
 			var filters []SavedFilter
-			newFilters := []SavedFilter{{Name: savingName, URL: context.Request.URL.String()}}
+			requestURL := context.Request.URL
+			requestURLQuery := context.Request.URL.Query()
+			requestURLQuery.Del("filter_saving_name")
+			requestURL.RawQuery = requestURLQuery.Encode()
+			newFilters := []SavedFilter{{Name: savingName, URL: requestURL.String()}}
 			if context.AddError(searcher.Admin.SettingsStorage.Get("saved_filters", &filters, searcher.Context)); !context.HasError() {
 				for _, filter := range filters {
 					if filter.Name != savingName {
