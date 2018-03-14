@@ -10,6 +10,7 @@
       <i class="material-icons">close</i>
     </button>
     <h3 class="mdl-layout-title">{{t "qor_admin.actions.advanced_filter" "Advanced Filter"}}</h3>
+    {{if len saved_filters}}
     <div class="qor-advanced-filter__savedfilter">
       <button class="mdl-button qor-advanced-filter__toggle">{{t "qor_admin.filter.saved_filter" "Saved Filter"}}</button>
       <ul style="display:none;" advanced-search-toggle>
@@ -23,6 +24,7 @@
         {{end}}
       </ul>
     </div>
+    {{end}}
 
     <form method="GET">
       {{range $filter := $filters}}

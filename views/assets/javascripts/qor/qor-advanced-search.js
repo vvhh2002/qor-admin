@@ -88,6 +88,7 @@
 
         deleteSavedFilter: function(e) {
             let $target = $(e.target).closest('.qor-advanced-filter__delete'),
+                $savedFilter = $target.closest('.qor-advanced-filter__savedfilter'),
                 name = $target.data('filter-name'),
                 url = location.pathname,
                 message = {
@@ -99,6 +100,9 @@
                     $.get(url, $.param({delete_saved_filter: name}))
                         .done(function() {
                             $target.closest('li').remove();
+                            if ($savedFilter.find('li').length === 0) {
+                                $savedFilter.remove();
+                            }
                         })
                         .fail(function() {
                             QOR.qorConfirm('Server error, please try again!');
