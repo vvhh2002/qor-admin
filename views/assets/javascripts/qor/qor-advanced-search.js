@@ -87,7 +87,8 @@
         },
 
         deleteSavedFilter: function(e) {
-            let name = $(e.target).data('filter-name'),
+            let $target = $(e.target).closest('.qor-advanced-filter__delete'),
+                name = $target.data('filter-name'),
                 url = location.pathname,
                 message = {
                     confirm: 'Are you sure you want to delete this saved filter?'
@@ -95,11 +96,16 @@
 
             QOR.qorConfirm(message, function(confirm) {
                 if (confirm) {
-                    $.post(url, {delete_saved_filter: name}, function(data) {
-                        // console.log(data);
-                    });
+                    $.get(url, $.param({delete_saved_filter: name}))
+                        .done(function() {
+                            $target.closest('li').remove();
+                        })
+                        .fail(function() {
+                            QOR.qorConfirm('Server error, please try again!');
+                        });
                 }
             });
+            return false;
         },
 
         start: function() {
