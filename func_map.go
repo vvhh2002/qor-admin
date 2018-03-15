@@ -96,7 +96,16 @@ func (context *Context) FuncMap() template.FuncMap {
 		},
 		"render_filter": context.renderFilter,
 		"saved_filters": context.savedFilters,
-		"page_title":    context.pageTitle,
+		"has_filter": func() bool {
+			query := context.Request.URL.Query()
+			for key := range query {
+				if regexp.MustCompile("filter[(\\w+)]").MatchString(key) && query.Get(key) != "" {
+					return true
+				}
+			}
+			return false
+		},
+		"page_title": context.pageTitle,
 		"meta_label": func(meta *Meta) template.HTML {
 			key := fmt.Sprintf("%v.attributes.%v", meta.baseResource.ToParam(), meta.Label)
 			return context.Admin.T(context.Context, key, meta.Label)
