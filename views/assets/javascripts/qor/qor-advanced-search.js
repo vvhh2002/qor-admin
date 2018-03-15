@@ -77,6 +77,7 @@
 
         toggleFilterContent: function(e) {
             $(e.target)
+                .closest('.qor-advanced-filter__toggle')
                 .parent()
                 .find('>[advanced-search-toggle]')
                 .toggle();

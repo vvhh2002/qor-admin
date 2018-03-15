@@ -73,10 +73,16 @@
         width: 420px;
         background-color: #fff;
         padding: 24px;
-        height: 600px;
+        height: 550px;
         overflow-y: auto;
         overflow-x: hidden;
         @include shadow-2dp();
+    }
+    .qor-advanced-filter__btns {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
     }
     .qor-advanced-filter__close {
         float: right;
