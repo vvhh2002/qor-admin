@@ -259,8 +259,6 @@
 
             $list.show();
 
-            delete this.data.Delete;
-
             if ($alert.length) {
                 $alert.remove();
             }
@@ -353,19 +351,25 @@
                                 data[options.key] = {};
                             }
 
-                            data[options.key][sizeName] = emulateCropData;
+                            if (sizeName != 'original') {
+                                data[options.key][sizeName] = emulateCropData;
+                            }
                         }
                     } else {
                         _this.center($this);
                     }
 
                     // Crop, CropOptions and Delete should be BOOL type, if empty should delete,
-                    if (data.Crop === '') {
+                    if (data.Crop === '' || !fromExternal) {
                         delete data.Crop;
                     }
 
-                    if (data.CropOptions === '') {
+                    if (data.CropOptions === '' || !fromExternal) {
                         delete data.CropOptions;
+                    }
+
+                    if (!fromExternal) {
+                        delete data.Sizes;
                     }
 
                     delete data.Delete;
