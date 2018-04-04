@@ -365,7 +365,7 @@
                     }
 
                     if (!fromExternal) {
-                        data.CropOptions = '{}';
+                        data.CropOptions = null;
                         delete data.Sizes;
                     }
 
