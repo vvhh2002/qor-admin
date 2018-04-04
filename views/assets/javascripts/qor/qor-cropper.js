@@ -364,11 +364,8 @@
                         delete data.Crop;
                     }
 
-                    if (data.CropOptions === '' || !fromExternal) {
-                        delete data.CropOptions;
-                    }
-
                     if (!fromExternal) {
+                        data.CropOptions = '{}';
                         delete data.Sizes;
                     }
 
