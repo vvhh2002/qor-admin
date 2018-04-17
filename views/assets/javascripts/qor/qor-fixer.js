@@ -36,8 +36,8 @@
             if (this.isNeedBuild()) {
                 return;
             }
-            this.$thead = $this.find('thead');
-            this.$tbody = $this.find('tbody');
+            this.$thead = $this.find('> thead');
+            this.$tbody = $this.find('> tbody');
 
             this.$header = $(options.header);
             this.$subHeader = $(options.subHeader);
