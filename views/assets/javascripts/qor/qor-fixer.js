@@ -78,7 +78,9 @@
                 $items = this.$tbody.find('> tr:first').children();
 
             $items.each(function() {
-                headerWidth.push($(this).outerWidth());
+                let tdWidth = $(this).outerWidth();
+                $(this).outerWidth(tdWidth);
+                headerWidth.push(tdWidth);
             });
 
             this.$thead
