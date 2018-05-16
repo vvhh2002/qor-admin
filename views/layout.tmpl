@@ -26,23 +26,31 @@
     <!--[if lt IE 10]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-    <a class="visuallyhidden" href="#content" tabindex="1">{{t "qor_admin.layout.skip_to_content" "Skip to content"}}</a>
 
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header qor-layout">
-      <header class="mdl-layout__header">
-        <div class="mdl-layout__header-row">
+    <div class="mdc-typography qor-layout">
+      
+      <header class="mdc-top-app-bar mdc-top-app-bar--short">
+        <div class="mdc-top-app-bar__row">
           {{$actions := load_actions "header" }}
           {{if $actions}}
-            {{$actions}}
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
+              {{$actions}}
+            </section>
           {{end}}
         </div>
       </header>
 
-      <div class="mdl-layout__drawer">
-        {{render "shared/sidebar"}}
-      </div>
+      <aside class="mdc-drawer mdc-drawer--permanent">
+        <nav class="mdc-drawer__drawer">
+          <div class="mdc-drawer__content">
+            {{render "shared/sidebar"}}
+          </div>
+        </nav>
+      </aside>
 
-      <main class="mdl-layout__content qor-page" id="content">
+      
+
+      <main class="mdl-layout__content qor-page" id="content" style="display: none;">
         {{.Content}}
       </main>
     </div>
