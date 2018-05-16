@@ -1,11 +1,18 @@
+html,
 body {
     margin: 0;
+    width: 100%;
+    height: 100%;
 }
 .qor-layout {
     width: 100%;
-    .mdl-layout__content {
-        overflow: auto;
+    height: 100%;
+    position: absolute;
+    .mdc-layout__content {
         padding-top: 8px;
+        margin-left: 240px;
+        overflow: auto;
+        height: calc(100% - 48px);
         &.has-subnav {
             padding-top: 56px;
         }
@@ -13,39 +20,6 @@ body {
             > .qor-table-container {
                 margin-top: 0;
             }
-        }
-        &::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        &::-webkit-scrollbar-button {
-            width: 0;
-            height: 0;
-        }
-        &::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border: 0 none #ffffff;
-            border-radius: 50px;
-        }
-        &::-webkit-scrollbar-thumb:hover {
-            background: unquote('rgb(#{$color-primary})');
-        }
-        &::-webkit-scrollbar-thumb:active {
-            background: unquote('rgb(#{$color-primary})');
-        }
-        &::-webkit-scrollbar-track {
-            background: transparent;
-            border: 0 none #ffffff;
-            border-radius: 50px;
-        }
-        &::-webkit-scrollbar-track:hover {
-            background: transparent;
-        }
-        &::-webkit-scrollbar-track:active {
-            background: transparent;
-        }
-        &::-webkit-scrollbar-corner {
-            background: transparent;
         }
     }
     .mdl-layout__header,
@@ -96,11 +70,14 @@ body {
         background-color: #fff;
     }
 }
-
+.qor-layout__aside {
+    position: absolute;
+    height: 100%;
+}
 .qor-layout__sidebar {
     height: 100%;
     > .sidebar-header {
-        // position: absolute;
+        position: absolute;
         top: 0;
         left: 0;
         right: 0;
@@ -136,7 +113,7 @@ body {
     }
     > .sidebar-userinfo {
         height: 48px;
-        // position: absolute;
+        position: absolute;
         top: 64px;
         left: 0;
         right: 0;
@@ -158,7 +135,7 @@ body {
         }
     }
     > .sidebar-body {
-        // position: absolute;
+        position: absolute;
         top: 112px;
         right: 0;
         bottom: 40px;
@@ -167,7 +144,7 @@ body {
         overflow-y: auto;
     }
     > .sidebar-footer {
-        // position: absolute;
+        position: absolute;
         left: 0;
         right: 0;
         bottom: 0;

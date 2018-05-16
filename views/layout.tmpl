@@ -28,8 +28,16 @@
     <![endif]-->
 
     <div class="mdc-typography qor-layout">
+
+    <aside class="mdc-drawer mdc-drawer--permanent qor-layout__aside">
+        <nav class="mdc-drawer__drawer">
+          <div class="mdc-drawer__content">
+            {{render "shared/sidebar"}}
+          </div>
+        </nav>
+      </aside>
       
-      <header class="mdc-top-app-bar mdc-top-app-bar--short">
+      <header class="mdc-top-app-bar">
         <div class="mdc-top-app-bar__row">
           {{$actions := load_actions "header" }}
           {{if $actions}}
@@ -40,19 +48,10 @@
         </div>
       </header>
 
-      <aside class="mdc-drawer mdc-drawer--permanent">
-        <nav class="mdc-drawer__drawer">
-          <div class="mdc-drawer__content">
-            {{render "shared/sidebar"}}
-          </div>
-        </nav>
-      </aside>
-
-      
-
-      <main class="mdl-layout__content qor-page" id="content" style="display: none;">
+      <main class="mdc-layout__content qor-page" id="content">
         {{.Content}}
       </main>
+
     </div>
 
     <!-- JavaScripts -->
