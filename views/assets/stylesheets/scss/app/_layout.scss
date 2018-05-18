@@ -12,7 +12,8 @@ body {
         padding-top: 8px;
         margin-left: 240px;
         overflow: auto;
-        height: calc(100% - 48px);
+        height: calc(100% - 64px);
+        box-sizing: border-box;
         &.has-subnav {
             padding-top: 56px;
         }
