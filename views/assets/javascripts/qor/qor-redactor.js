@@ -24,10 +24,7 @@
     EVENT_SCROLL = "scroll." + NAMESPACE,
     CLASS_WRAPPER = ".qor-cropper__wrapper",
     CLASS_SAVE = ".qor-cropper__save",
-    CLASS_CROPPER_TOGGLE = ".qor-cropper__toggle--redactor",
-    ID_REDACTOR_LINK_TITLE = "#redactor-link-title",
-    ID_REDACTOR_LINK_TEXT = "#redactor-link-url-text",
-    ID_REDACTOR_MODAL_BUTTON_CANCEL = "#redactor-modal-button-cancel";
+    CLASS_CROPPER_TOGGLE = ".qor-cropper__toggle--redactor";
 
   function encodeCropData(data) {
     var nums = [];
@@ -343,6 +340,8 @@
           imageResizable: true,
           toolbarFixed: false,
           buttons: editorButtons,
+          linkNewTab: true,
+          linkTitle: true,
 
           callbacks: {
             init: function() {
@@ -400,94 +399,6 @@
             imageUpload: function(image, json) {
               var $image = $(image);
               json.filelink && $image.prop("src", json.filelink);
-            },
-
-            click: function(e) {
-              var $currentTag = $(this.selection.getParent());
-
-              if ($currentTag.is(".redactor-layer")) {
-                $currentTag = $(this.selection.current());
-              }
-              this.selection.$currentTag = $currentTag;
-              this.instances.link.linkDescription = "";
-              this.instances.link.insertedTriggered = false;
-              this.instances.link.valueChanged = false;
-
-              if (this.instances.link.inspector.parse($currentTag).isLink()) {
-                this.instances.link.linkDescription = $currentTag.prop("title");
-                this.instances.link.$linkHtml = $(e.target);
-              }
-            },
-
-            modal: {
-              opened: function(modal, form) {
-                var _this = this;
-                let name = form;
-                console.log(form);
-                if (name == "link") {
-                  $(modal)
-                    .find("#redactor-link-url-text")
-                    .closest("section")
-                    .after(
-                      '<section><label>Description for Accessibility</label><input value="' +
-                        this.link.linkDescription +
-                        '" type="text" id="redactor-link-title" placeholder="If blank, will use Text value above" /></section>'
-                    );
-
-                  this.link.linkUrlText = $(ID_REDACTOR_LINK_TEXT).val();
-                  this.link.description = $(ID_REDACTOR_LINK_TITLE).val();
-
-                  $(ID_REDACTOR_MODAL_BUTTON_CANCEL)
-                    .off(EVENT_CLICK)
-                    .on(EVENT_CLICK, function() {
-                      _this.link.clickCancel = true;
-                    });
-
-                  $(ID_REDACTOR_LINK_TITLE)
-                    .off(EVENT_KEYUP)
-                    .on(EVENT_KEYUP, function() {
-                      _this.link.valueChanged = true;
-                      _this.link.description = escapeHTML($(this).val());
-                    });
-
-                  $(ID_REDACTOR_LINK_TEXT)
-                    .off(EVENT_KEYUP)
-                    .on(EVENT_KEYUP, function() {
-                      _this.link.valueChanged = true;
-                      _this.link.linkUrlText = escapeHTML($(this).val());
-                    });
-                }
-              },
-
-              closed: function(modal, form) {
-                var $linkHtml = this.link.$linkHtml,
-                  description = this.link.description;
-
-                var name = form;
-
-                if (
-                  name == "link" &&
-                  !this.link.insertedTriggered &&
-                  $linkHtml &&
-                  $linkHtml.length &&
-                  this.link.valueChanged &&
-                  !this.link.clickCancel
-                ) {
-                  if (description) {
-                    $linkHtml.prop("title", description);
-                  } else {
-                    $linkHtml.prop("title", this.link.linkUrlText);
-                  }
-                }
-
-                $("#redactor-image-displaymode").remove();
-
-                this.link.description = "";
-                this.link.linkUrlText = "";
-                this.link.insertedTriggered = false;
-                this.link.valueChanged = false;
-                this.link.clickCancel = false;
-              }
             },
 
             insertedLink: function(link) {
