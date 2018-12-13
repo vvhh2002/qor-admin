@@ -16,7 +16,6 @@
     EVENT_ENABLE = "enable." + NAMESPACE,
     EVENT_DISABLE = "disable." + NAMESPACE,
     EVENT_CLICK = "click." + NAMESPACE,
-    EVENT_KEYUP = "keyup." + NAMESPACE,
     EVENT_ADD_CROP = "addCrop." + NAMESPACE,
     EVENT_REMOVE_CROP = "removeCrop." + NAMESPACE,
     EVENT_SHOWN = "shown.qor.modal",
@@ -88,16 +87,6 @@
     }
 
     return str;
-  }
-
-  function escapeHTML(unsafe_str) {
-    return unsafe_str
-      .replace(/&/g, " ")
-      .replace(/</g, " ")
-      .replace(/>/g, " ")
-      .replace(/\"/g, " ")
-      .replace(/\'/g, " ")
-      .replace(/\`/g, " ");
   }
 
   function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
@@ -178,6 +167,8 @@
 
     addButton: function(e, image) {
       var $image = $(image);
+
+      console.log($image);
 
       this.$button
         .css("left", $(image).width() / 2)
@@ -331,7 +322,8 @@
           "image",
           "file",
           "link",
-          "table"
+          "table",
+          "medialibrary"
         ];
 
         config = {
