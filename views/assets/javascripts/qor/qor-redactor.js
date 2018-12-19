@@ -89,35 +89,26 @@
     return str;
   }
 
-  function redactorToolbarSrcoll($editor, toolbarFixedTopOffset) {
-    let $toolbar = $editor.find(".redactor-toolbar"),
-      offsetTop = $editor.offset().top,
-      editorHeight = $editor.height(),
+  function redactorToolbarSrcoll($toolbar, $container, toolbarFixedTopOffset) {
+    let offsetTop = $container.offset().top,
       normallCSS = {
         position: "relative",
         top: "auto",
-        width: "auto",
-        boxShadow: "none"
+        width: "auto"
       },
       fixedCSS = {
         position: "fixed",
-        boxShadow: "0 2px 4px rgba(0,0,0,.1)",
         top: toolbarFixedTopOffset,
-        width: $editor.width()
+        width: $container.width(),
+        boxShadow: "none"
       };
 
-    if ($toolbar.css("position") === "relative") {
-      editorHeight = $editor.height() - 50;
-    }
-
     if (offsetTop < toolbarFixedTopOffset) {
-      if (editorHeight - 50 - toolbarFixedTopOffset < Math.abs(offsetTop)) {
-        $toolbar.css(normallCSS);
-      } else {
-        $toolbar.css(fixedCSS);
-      }
+      $toolbar.css(fixedCSS);
+      $container.css("padding-top", $toolbar.outerHeight());
     } else {
       $toolbar.css(normallCSS);
+      $container.css("padding-top", 0);
     }
   }
 
@@ -167,8 +158,6 @@
 
     addButton: function(e, image) {
       var $image = $(image);
-
-      console.log($image);
 
       this.$button
         .css("left", $(image).width() / 2)
@@ -321,35 +310,33 @@
           "lists",
           "image",
           "file",
-          "link",
-          "table",
-          "medialibrary"
+          "link"
         ];
 
         config = {
+          toolbarFixed: true,
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
-          imageResizable: true,
-          toolbarFixed: false,
           buttons: editorButtons,
           linkNewTab: true,
           linkTitle: true,
 
           callbacks: {
-            init: function() {
+            started: function() {
               let button,
-                $editor = this.core.box(),
+                $container = $(this.container.$container.nodes[0]),
+                $toolbar = $(this.toolbar.$toolbar.nodes[0]),
                 isInSlideout = $(".qor-slideout").is(":visible"),
                 toolbarFixedTarget,
                 toolbarFixedTopOffset = 64;
 
-              editorButtons.forEach(function(item) {
-                button = this.button.get(item);
-                this.button.setIcon(
-                  button,
-                  '<i class="material-icons ' + item + '"></i>'
-                );
-              }, this);
+              // editorButtons.forEach(function(item) {
+              //   button = this.button.get(item);
+              //   this.button.setIcon(
+              //     button,
+              //     '<i class="material-icons ' + item + '"></i>'
+              //   );
+              // }, this);
 
               if (isInSlideout) {
                 toolbarFixedTarget = ".qor-slideout__body";
@@ -362,7 +349,11 @@
               }
 
               $(toolbarFixedTarget).on(EVENT_SCROLL, function() {
-                redactorToolbarSrcoll($editor, toolbarFixedTopOffset);
+                redactorToolbarSrcoll(
+                  $toolbar,
+                  $container,
+                  toolbarFixedTopOffset
+                );
               });
 
               if (!$this.data("cropUrl")) {
