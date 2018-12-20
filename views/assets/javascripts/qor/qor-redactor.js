@@ -91,6 +91,7 @@
 
   function redactorToolbarSrcoll($toolbar, $container, toolbarFixedTopOffset) {
     let offsetTop = $container.offset().top,
+      containerHeight = $container.outerHeight(),
       normallCSS = {
         position: "relative",
         top: "auto",
@@ -104,8 +105,13 @@
       };
 
     if (offsetTop < toolbarFixedTopOffset) {
-      $toolbar.css(fixedCSS);
-      $container.css("padding-top", $toolbar.outerHeight());
+      if (Math.abs(offsetTop) < containerHeight - 50 - toolbarFixedTopOffset) {
+        $toolbar.css(fixedCSS);
+        $container.css("padding-top", $toolbar.outerHeight());
+      } else {
+        $toolbar.css(normallCSS);
+        $container.css("padding-top", 0);
+      }
     } else {
       $toolbar.css(normallCSS);
       $container.css("padding-top", 0);
