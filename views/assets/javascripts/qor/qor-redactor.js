@@ -320,12 +320,12 @@
         ];
 
         config = {
-          toolbarFixed: true,
           imageUpload: $this.data("uploadUrl"),
           fileUpload: $this.data("uploadUrl"),
           buttons: editorButtons,
           linkNewTab: true,
           linkTitle: true,
+          toolbarFixedTarget: "main",
 
           callbacks: {
             started: function() {
@@ -335,14 +335,6 @@
                 isInSlideout = $(".qor-slideout").is(":visible"),
                 toolbarFixedTarget,
                 toolbarFixedTopOffset = 64;
-
-              // editorButtons.forEach(function(item) {
-              //   button = this.button.get(item);
-              //   this.button.setIcon(
-              //     button,
-              //     '<i class="material-icons ' + item + '"></i>'
-              //   );
-              // }, this);
 
               if (isInSlideout) {
                 toolbarFixedTarget = ".qor-slideout__body";
