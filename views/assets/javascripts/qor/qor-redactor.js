@@ -325,7 +325,10 @@
           buttons: editorButtons,
           linkNewTab: true,
           linkTitle: true,
-          toolbarFixedTarget: "main",
+          toolbarFixedTarget:
+            $("main.mdl-layout__content .qor-table-container").length === 0
+              ? "main.mdl-layout__content"
+              : document,
 
           callbacks: {
             started: function() {
@@ -399,6 +402,9 @@
         };
 
         $.extend(config, $this.data("redactorSettings"));
+        window.$R.prototype.constructor.services.editor.prototype.focus = function() {
+          return false;
+        };
         window.$R(this, config);
       } else {
         if (/destroy/.test(option)) {
