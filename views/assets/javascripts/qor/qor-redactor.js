@@ -326,14 +326,14 @@
           linkNewTab: true,
           linkTitle: true,
           toolbarFixedTarget:
-            $("main.mdl-layout__content .qor-table-container").length === 0
+            $(".qor-slideout.is-shown.is-slided").length === 0 &&
+            $("main.mdl-layout__content").length != 0
               ? "main.mdl-layout__content"
               : document,
 
           callbacks: {
             started: function() {
-              let button,
-                $container = $(this.container.$container.nodes[0]),
+              let $container = $(this.container.$container.nodes[0]),
                 $toolbar = $(this.toolbar.$toolbar.nodes[0]),
                 isInSlideout = $(".qor-slideout").is(":visible"),
                 toolbarFixedTarget,
