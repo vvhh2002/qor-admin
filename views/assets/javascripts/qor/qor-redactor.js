@@ -103,9 +103,10 @@
         width: $container.width(),
         boxShadow: "none"
       };
-
     if (offsetTop < toolbarFixedTopOffset) {
-      if (Math.abs(offsetTop) < containerHeight - 50 - toolbarFixedTopOffset) {
+      if (
+        Math.abs(offsetTop) < Math.abs(containerHeight - toolbarFixedTopOffset)
+      ) {
         $toolbar.css(fixedCSS);
         $container.css("padding-top", $toolbar.outerHeight());
       } else {
@@ -340,8 +341,15 @@
                 toolbarFixedTopOffset = 64;
 
               if (isInSlideout) {
-                toolbarFixedTarget = ".qor-slideout__body";
-                toolbarFixedTopOffset = $(".qor-slideout__header").height();
+                if ($this.closest(".qor-bottomsheets").length != 0) {
+                  toolbarFixedTarget = $this.closest(".qor-page__body");
+                  toolbarFixedTopOffset = $this
+                    .closest(".qor-page__body")
+                    .offset().top;
+                } else {
+                  toolbarFixedTarget = ".qor-slideout__body";
+                  toolbarFixedTopOffset = $(".qor-slideout__header").height();
+                }
               } else {
                 toolbarFixedTarget = ".qor-layout main.qor-page";
                 toolbarFixedTopOffset =
