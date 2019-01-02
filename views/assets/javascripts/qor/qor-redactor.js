@@ -326,7 +326,10 @@
           linkNewTab: true,
           linkTitle: true,
           toolbarFixedTarget:
-            !$this.closest(".qor-slideout").length ? "main.mdl-layout__content": document,
+            !$this.closest(".qor-slideout").length &&
+            !$this.closest(".qor-bottomsheets").length
+              ? "main.mdl-layout__content"
+              : document,
 
           callbacks: {
             started: function() {
