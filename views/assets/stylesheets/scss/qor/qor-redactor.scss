@@ -52,6 +52,11 @@
   }
 }
 
+.redactor-styles h6,
+.redactor-dropdown-format .redactor-dropdown-item-h6 {
+  text-transform: none;
+}
+
 .redactor-toolbar {
   box-shadow: none;
   li a {
