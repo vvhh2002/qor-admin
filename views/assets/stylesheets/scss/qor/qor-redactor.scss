@@ -10,12 +10,25 @@
   position: static;
   font-family: 'Roboto', Helvetica, Arial, sans-serif !important;
   border: 0;
+
   iframe.qor-video-container {
     height: 380px;
     margin-bottom: 16px;
   }
   pre {
     white-space: normal;
+    background-color: transparent;
+    font-family: monospace, Helvetica Neue, Helvetica, Arial, "sans-serif";
+  }
+
+  blockquote {
+    font-style: inherit;
+    color: inherit;
+
+    &::before,
+    &::after {
+      display: none;
+    }
   }
 
   figure,
@@ -25,9 +38,7 @@
   h4,
   h5,
   h6,
-  p,
-  code,
-  pre {
+  p {
     font-family: 'Roboto', Helvetica, Arial, sans-serif !important;
   }
 
@@ -40,6 +51,10 @@
   pre,
   table {
     margin: inherit;
+  }
+
+  p {
+    margin-bottom: 10px;
   }
 
   // redactor display mode plugin style
