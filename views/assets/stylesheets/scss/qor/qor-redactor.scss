@@ -31,6 +31,17 @@
     font-family: 'Roboto', Helvetica, Arial, sans-serif !important;
   }
 
+  address,
+  blockquote,
+  dl,
+  figure,
+  hr,
+  p,
+  pre,
+  table {
+    margin: inherit;
+  }
+
   // redactor display mode plugin style
   #redactor-image-displaymode {
     position: absolute;
@@ -55,6 +66,19 @@
 .redactor-styles h6,
 .redactor-dropdown-format .redactor-dropdown-item-h6 {
   text-transform: none;
+}
+
+.redactor-in {
+  blockquote:empty,
+  h1:empty,
+  h2:empty,
+  h3:empty,
+  h4:empty,
+  h5:empty,
+  h6:empty,
+  p:empty {
+    min-height: 0;
+  }
 }
 
 .redactor-toolbar {
