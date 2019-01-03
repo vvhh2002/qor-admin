@@ -16,14 +16,18 @@
     margin-bottom: 16px;
   }
   pre {
-    white-space: normal;
     background-color: transparent;
     font-family: monospace, Helvetica Neue, Helvetica, Arial, "sans-serif";
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 0;
   }
 
   blockquote {
     font-style: inherit;
     color: inherit;
+    font-family: inherit;
+    font-size: inherit;
 
     &::before,
     &::after {
