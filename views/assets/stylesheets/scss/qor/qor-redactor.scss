@@ -61,6 +61,34 @@
     margin-bottom: 10px;
   }
 
+  .rd-text-justify {
+    text-align: justify;
+  }
+  .rd-text-right {
+    text-align: right;
+  }
+  .rd-text-center {
+    text-align: center;
+  }
+
+  li {
+    &.rd-text-justify {
+      text-align: justify !important;
+    }
+
+    &.rd-text-left {
+      text-align: left !important;
+    }
+
+    &.rd-text-right {
+      text-align: right !important;
+    }
+
+    &.rd-text-center {
+      text-align: center !important;
+    }
+  }
+
   // redactor display mode plugin style
   #redactor-image-displaymode {
     position: absolute;
@@ -142,16 +170,6 @@
 
 .redactor-link-tooltip {
   z-index: 1000;
-}
-
-.rd-text-justify {
-  text-align: justify;
-}
-.rd-text-right {
-  text-align: right;
-}
-.rd-text-center {
-  text-align: center;
 }
 
 #redactor-modal-box {
