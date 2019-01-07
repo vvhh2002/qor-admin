@@ -329,7 +329,9 @@
           toolbarFixedTarget:
             !$this.closest(".qor-slideout").length &&
             !$this.closest(".qor-bottomsheets").length
-              ? "main.mdl-layout__content"
+              ? $("main.mdl-layout__content").length
+                ? "main.mdl-layout__content"
+                : document
               : document,
 
           callbacks: {
