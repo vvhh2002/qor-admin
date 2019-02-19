@@ -17,7 +17,6 @@
   background-color: rgba(44, 165, 242, 0.5);
   position: absolute;
   top: 0;
-  z-index: 2;
 }
 
 .redactor-styles {
@@ -27,8 +26,6 @@
   min-height: 200px;
 
   table {
-    position: relative;
-    z-index: 1;
 
     td,
     th {
