@@ -8,7 +8,7 @@
 
 .redactor-component[data-redactor-type="table"] td[data-active],
 .redactor-component[data-redactor-type="table"] th[data-active] {
-  background-color: rgba(44, 165, 242, 0.05);
+  background-color: rgba(14, 101, 235, 0.1);
 }
 
 .redactor-component-table-line {
@@ -94,6 +94,7 @@
     margin-bottom: 10px;
   }
 
+  // for text alignment
   .rd-text-justify {
     text-align: justify;
   }
