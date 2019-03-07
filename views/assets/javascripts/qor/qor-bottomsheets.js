@@ -14,6 +14,7 @@
 
   let _ = window._,
     FormData = window.FormData,
+    QOR_Translations = window.QOR_Translations,
     NAMESPACE = "qor.bottomsheets",
     EVENT_CLICK = "click." + NAMESPACE,
     EVENT_SUBMIT = "submit." + NAMESPACE,
@@ -643,7 +644,7 @@
                 .get()
                 .join(", ");
             } else {
-              errors = "Server error, please try again later!";
+              errors = QOR_Translations.serverError;
             }
             window.alert(errors);
           }, this)
