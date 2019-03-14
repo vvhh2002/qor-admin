@@ -8,7 +8,8 @@
 
 .redactor-component[data-redactor-type="table"] td[data-active],
 .redactor-component[data-redactor-type="table"] th[data-active] {
-  background-color: rgba(14, 101, 235, 0.1);
+  opacity: 0.5;
+  box-shadow: 0 0 10px rgb(14, 101, 235);
 }
 
 .redactor-component-table-line {
@@ -26,7 +27,6 @@
   min-height: 200px;
 
   table {
-
     td,
     th {
       box-sizing: border-box;
