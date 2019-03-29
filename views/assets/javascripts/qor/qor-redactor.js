@@ -325,7 +325,7 @@
           fileUpload: $this.data("uploadUrl"),
           buttons: editorButtons,
           linkNewTab: true,
-          linkTitle: true,
+          linkTitle: false,
           autoparsePaste: false,
           autoparseLinks: false,
           multipleUpload: false,
