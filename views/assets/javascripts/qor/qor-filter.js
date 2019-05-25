@@ -62,7 +62,7 @@
                     var value;
 
                     n = n.split('=');
-                    if (/page/.test(n[0])) {
+                    if (/per_page/.test(n[0])) {
                         return;
                     }
                     value = n[1];
