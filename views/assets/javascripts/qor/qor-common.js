@@ -67,6 +67,10 @@ $(function() {
         cancelBtn.text(QOR_Translations.cancelButton);
       }
 
+      if(data.icon){
+        $dialog.find('i.material-icons').addClass(data.icon).html(data.icon);
+      }
+
       $dialog.find(".dialog-message").text(data.confirm);
     }
 
