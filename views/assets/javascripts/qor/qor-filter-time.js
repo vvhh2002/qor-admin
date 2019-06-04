@@ -71,9 +71,13 @@
         },
 
         initActionTemplate: function() {
-            var scheduleStartAt = this.getUrlParameter('schedule_start_at'),
-                scheduleEndAt = this.getUrlParameter('schedule_end_at'),
-                $filterToggle = $(this.options.trigger);
+            let paramFrom = this.$element.data('schedule-from');
+            let paramTo = this.$element.data('schedule-to');
+
+            
+            let scheduleStartAt = this.getUrlParameter(paramFrom || 'schedule_start_at');
+            let scheduleEndAt = this.getUrlParameter(paramTo || 'schedule_end_at');
+            let $filterToggle = $(this.options.trigger);
 
             if (scheduleStartAt || scheduleEndAt) {
                 this.$timeStart.val(scheduleStartAt);
