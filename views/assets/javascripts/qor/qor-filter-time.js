@@ -184,12 +184,12 @@
         },
 
         getUrlParameter: function(name) {
-            let search = location.search,
+            let search = decodeURIComponent(location.search),
                 parameterName = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]'),
                 regex = new RegExp('[\\?&]' + parameterName + '=([^&#]*)'),
                 results = regex.exec(search);
 
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            return results === null ? '' : results[1].replace(/\+/g, ' ');
         },
 
         updateQueryStringParameter: function(key, value, url) {

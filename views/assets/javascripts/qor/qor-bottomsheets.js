@@ -41,10 +41,10 @@
   function getUrlParameter(name, search) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-    var results = regex.exec(search);
+    var results = regex.exec(decodeURIComponent(search));
     return results === null
       ? ""
-      : decodeURIComponent(results[1].replace(/\+/g, " "));
+      : results[1].replace(/\+/g, " ");
   }
 
   function updateQueryStringParameter(key, value, uri) {
