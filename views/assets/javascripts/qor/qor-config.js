@@ -24,6 +24,7 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
 
     return {
         dataType: 'json',
+        headers: getSelect2Header(),
         cache: true,
         delay: 250,
         data: function(params) {
@@ -71,3 +72,17 @@ $.fn.select2.ajaxFormatResult = function(data, tmpl) {
     }
     return result;
 };
+
+function getSelect2Header(){
+    let data = $("body").data();
+    let selectAjaxHeader = data.selectAjaxHeader;
+    let getSelect2HeaderFunction = window.getSelect2HeaderFunction;
+    let headers = {};
+
+    if(selectAjaxHeader && getSelect2HeaderFunction && $.isFunction(getSelect2HeaderFunction)){
+        headers[selectAjaxHeader] = getSelect2HeaderFunction();
+        return headers;
+    } else {
+        return {};
+    }
+}
