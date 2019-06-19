@@ -25,7 +25,7 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
 
     let ajaxData = {
         dataType: 'json',
-        headers: getSelect2Header(),
+        headers: getSelect2Header(select2Data),
         cache: true,
         delay: 250,
         data: function(params) {
