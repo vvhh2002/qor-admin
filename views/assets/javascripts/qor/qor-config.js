@@ -57,7 +57,7 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
     };
 
     if(getSelect2AjaxDynamicURL){
-        ajaxData.url = getSelect2AjaxDynamicURL;
+        ajaxData.url = getSelect2AjaxDynamicURL.bind(select2Data);
     }
 
     return ajaxData;
