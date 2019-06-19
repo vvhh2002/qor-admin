@@ -39,7 +39,9 @@
             if (select2Data.remoteData) {
                 option.ajax = $.fn.select2.ajaxCommonOptions(select2Data);                    
                     if(getSelect2AjaxDynamicURL && $.isFunction(getSelect2AjaxDynamicURL)){
-                        option.ajax.url = getSelect2AjaxDynamicURL(select2Data);
+                        option.ajax.url = function(){
+                            return getSelect2AjaxDynamicURL(select2Data);
+                        };
                     } else {
                         option.ajax.url = select2Data.remoteUrl;
                     }
