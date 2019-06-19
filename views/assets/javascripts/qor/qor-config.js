@@ -21,8 +21,9 @@ $(document).ajaxComplete(function(event, xhr, settings) {
 // $.fn.select2 = $.fn.select2 || function(){};
 $.fn.select2.ajaxCommonOptions = function(select2Data) {
     let remoteDataPrimaryKey = select2Data.remoteDataPrimaryKey;
+    let getSelect2AjaxDynamicURL = window.getSelect2AjaxDynamicURL;
 
-    return {
+    let ajaxData = {
         dataType: 'json',
         headers: getSelect2Header(),
         cache: true,
@@ -54,6 +55,12 @@ $.fn.select2.ajaxCommonOptions = function(select2Data) {
             };
         }
     };
+
+    if(getSelect2AjaxDynamicURL){
+        ajaxData.url = getSelect2AjaxDynamicURL;
+    }
+
+    return ajaxData;
 };
 
 // select2 ajax common options
