@@ -181,11 +181,18 @@ $(function() {
         let errors = rJSON.errors,
           $errorContent = "";
 
-        for (let i = 0; i < errors.length; i++) {
-          $errorContent += `<li>
-                                        <i class="material-icons">error</i>
-                                        <span>${errors[i]}</span>
-                                    </li>`;
+        if ($.isArray(errors)) {
+          for (let i = 0; i < errors.length; i++) {
+            $errorContent += `<li>
+                                          <i class="material-icons">error</i>
+                                          <span>${errors[i]}</span>
+                                      </li>`;
+          }
+        } else {
+            $errorContent = `<li>
+                              <i class="material-icons">error</i>
+                              <span>${errors}</span>
+                          </li>`;
         }
         $error.append($errorContent);
       } else {
