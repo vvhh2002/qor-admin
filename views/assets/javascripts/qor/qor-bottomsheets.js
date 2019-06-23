@@ -84,7 +84,8 @@
     for (var name in qorSliderAfterShow) {
       if (
         qorSliderAfterShow.hasOwnProperty(name) &&
-        !qorSliderAfterShow[name]["isLoadedInBottomSheet"]
+        !qorSliderAfterShow[name]["isLoadedInBottomSheet"] &&
+        name != "initPublishForm"
       ) {
         qorSliderAfterShow[name]["isLoadedInBottomSheet"] = true;
         qorSliderAfterShow[name].call(this, url, response);
