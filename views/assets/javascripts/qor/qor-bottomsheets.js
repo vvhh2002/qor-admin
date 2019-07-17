@@ -85,7 +85,8 @@
       if (
         qorSliderAfterShow.hasOwnProperty(name) &&
         !qorSliderAfterShow[name]["isLoadedInBottomSheet"] &&
-        name != "initPublishForm"
+        name != "initPublishForm" &&
+        name != "qorActivityinit"
       ) {
         qorSliderAfterShow[name]["isLoadedInBottomSheet"] = true;
         qorSliderAfterShow[name].call(this, url, response);

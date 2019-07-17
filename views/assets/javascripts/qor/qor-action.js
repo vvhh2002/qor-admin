@@ -271,7 +271,7 @@
                     if (undoUrl) {
                         $element.trigger(EVENT_UNDO, [$actionButton, isUndo, data]);
                         isUndo ? $actionButton.removeClass(CLASS_IS_UNDO) : $actionButton.addClass(CLASS_IS_UNDO);
-                        $actionButton.prop('disabled', false)
+                        $actionButton.prop('disabled', false);
                         return;
                     }
 
