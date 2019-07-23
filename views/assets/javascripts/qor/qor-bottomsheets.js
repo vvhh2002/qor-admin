@@ -188,7 +188,7 @@
       this.$bottomsheets
         .on(EVENT_SUBMIT, "form", this.submit.bind(this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
-        .on(EVENT_CLICK, ".qor-pagination a", this.pagination.bind(this))
+        .on(EVENT_CLICK, ".qor-pagination-container a", this.pagination.bind(this))
         .on(EVENT_CLICK, CLASS_BOTTOMSHEETS_BUTTON, this.search.bind(this))
         .on(EVENT_KEYUP, this.keyup.bind(this))
         .on("selectorChanged.qor.selector", this.selectorChanged.bind(this))
@@ -262,7 +262,7 @@
     },
 
     pagination: function(e) {
-      var $ele = $(e.target),
+      var $ele = $(e.target).closest("a"),
         url = $ele.prop("href");
       if (url) {
         this.reload(url);
