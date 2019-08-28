@@ -164,7 +164,7 @@
             var month = dateNow.getMonth() + 1,
                 date = dateNow.getDate();
 
-            month = month < 8 ? '0' + month : month;
+            month = month < 10 ? '0' + month : month;
             date = date < 10 ? '0' + date : date;
 
             return dateNow.getFullYear() + '-' + month + '-' + date;
