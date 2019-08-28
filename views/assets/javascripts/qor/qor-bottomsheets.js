@@ -258,6 +258,10 @@
         ),
         url = baseUrl + param + searchValue;
 
+        if(/\?/g.test(baseUrl)){
+          url = baseUrl + "&keyword=" + searchValue;
+        }
+
       this.reload(url);
     },
 
