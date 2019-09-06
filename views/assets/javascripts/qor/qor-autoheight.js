@@ -48,11 +48,6 @@
 
     resize: function () {
       var $this = this.$element;
-
-      if ($this.is(':hidden')) {
-        return;
-      }
-
       $this.height('auto').height($this.prop('scrollHeight') - this.paddingTop - this.paddingBottom);
     },
 
