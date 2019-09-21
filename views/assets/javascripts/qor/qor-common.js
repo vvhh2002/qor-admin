@@ -67,6 +67,10 @@ $(function() {
         cancelBtn.text(QOR_Translations.cancelButton);
       }
 
+      if(data.icon){
+        $dialog.find('i.material-icons').addClass(data.icon).html(data.icon);
+      }
+
       $dialog.find(".dialog-message").text(data.confirm);
     }
 
@@ -177,11 +181,18 @@ $(function() {
         let errors = rJSON.errors,
           $errorContent = "";
 
-        for (let i = 0; i < errors.length; i++) {
-          $errorContent += `<li>
-                                        <i class="material-icons">error</i>
-                                        <span>${errors[i]}</span>
-                                    </li>`;
+        if ($.isArray(errors)) {
+          for (let i = 0; i < errors.length; i++) {
+            $errorContent += `<li>
+                                          <i class="material-icons">error</i>
+                                          <span>${errors[i]}</span>
+                                      </li>`;
+          }
+        } else {
+            $errorContent = `<li>
+                              <i class="material-icons">error</i>
+                              <span>${errors}</span>
+                          </li>`;
         }
         $error.append($errorContent);
       } else {

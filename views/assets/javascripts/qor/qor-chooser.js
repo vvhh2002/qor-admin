@@ -34,9 +34,17 @@
                     minimumResultsForSearch: 8,
                     dropdownParent: $this.parent()
                 };
+            let getSelect2AjaxDynamicURL = window.getSelect2AjaxDynamicURL;
 
             if (select2Data.remoteData) {
-                option.ajax = $.fn.select2.ajaxCommonOptions(select2Data);
+                option.ajax = $.fn.select2.ajaxCommonOptions(select2Data);                    
+                    if(getSelect2AjaxDynamicURL && $.isFunction(getSelect2AjaxDynamicURL)){
+                        option.ajax.url = function(){
+                            return getSelect2AjaxDynamicURL(select2Data);
+                        };
+                    } else {
+                        option.ajax.url = select2Data.remoteUrl;
+                    }
 
                 option.templateResult = function(data) {
                     let tmpl = $this.parents('.qor-field').find('[name="select2-result-template"]');

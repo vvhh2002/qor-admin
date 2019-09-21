@@ -41,10 +41,10 @@
   function getUrlParameter(name, search) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-    var results = regex.exec(search);
+    var results = regex.exec(decodeURIComponent(search));
     return results === null
       ? ""
-      : decodeURIComponent(results[1].replace(/\+/g, " "));
+      : results[1].replace(/\+/g, " ");
   }
 
   function updateQueryStringParameter(key, value, uri) {
@@ -84,7 +84,9 @@
     for (var name in qorSliderAfterShow) {
       if (
         qorSliderAfterShow.hasOwnProperty(name) &&
-        !qorSliderAfterShow[name]["isLoadedInBottomSheet"]
+        !qorSliderAfterShow[name]["isLoadedInBottomSheet"] &&
+        name != "initPublishForm" &&
+        name != "qorActivityinit"
       ) {
         qorSliderAfterShow[name]["isLoadedInBottomSheet"] = true;
         qorSliderAfterShow[name].call(this, url, response);
@@ -186,7 +188,7 @@
       this.$bottomsheets
         .on(EVENT_SUBMIT, "form", this.submit.bind(this))
         .on(EVENT_CLICK, '[data-dismiss="bottomsheets"]', this.hide.bind(this))
-        .on(EVENT_CLICK, ".qor-pagination a", this.pagination.bind(this))
+        .on(EVENT_CLICK, ".qor-pagination-container a", this.pagination.bind(this))
         .on(EVENT_CLICK, CLASS_BOTTOMSHEETS_BUTTON, this.search.bind(this))
         .on(EVENT_KEYUP, this.keyup.bind(this))
         .on("selectorChanged.qor.selector", this.selectorChanged.bind(this))
@@ -256,11 +258,15 @@
         ),
         url = baseUrl + param + searchValue;
 
+        if(/\?/g.test(baseUrl)){
+          url = baseUrl + "&keyword=" + searchValue;
+        }
+
       this.reload(url);
     },
 
     pagination: function(e) {
-      var $ele = $(e.target),
+      var $ele = $(e.target).closest("a"),
         url = $ele.prop("href");
       if (url) {
         this.reload(url);
